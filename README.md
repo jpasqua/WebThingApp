@@ -1,19 +1,281 @@
 # WebThingApp
-![](../../doc/images/WebThing_Logo_256.png)
 
-A library for building apps based on the [WebThing library](https://github.com/jpasqua/WebThing).
+<img src='doc/images/WebThing_Logo_256.png' style='float:left; padding:10px'>
 
-# Introduction
+A library for building apps based on the [WebThing library](https://github.com/jpasqua/WebThing). In this context, the word app is used somewhat loosely. What we're really talking about is a [`WebThing`](https://github.com/jpasqua/WebThing) with a touchscreen display as opposed to a standalone `WebThing` such as an [air quality monitor](https://github.com/jpasqua/PurpleHaze) or a weather station. 
 
-In this context, the word app is used somewhat loosely. What we're really talking about is a [`WebThing`](https://github.com/jpasqua/WebThing) with a touchscreen display as opposed to a standalone `WebThing` such as an [air quality monitor](https://github.com/jpasqua/PurpleHaze) or a weather station. Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to 4 3D printers as well as providing time and weather information.
+The goal of the library is to do most of the work of handling the Web UI, GUI, settings management, and plugins, so the "app" can focus on the core functionality it is providing. 
+<hr style='clear:left'></div>
+Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to 4 3D printers as well as providing time and weather information. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`.
 
 ![](doc/images/MarbleMonitor512.jpg)
 
-The goal of the library is to do most of the work of handling the Web UI, GUI, settings management, and plugins, so the "app" can focus on the core functionality it is providing. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`.
+This document is divided into three major parts:
 
-# Main Concepts and Components
+1. [How to build a WebThingApp](#building): Start here if you are building an existing app; e.g., one you found on [github](github.com) or the example app that comes with `WebThingApp`.
+2. [How to configure your device](#preparation): Once your device is built and the software is loaded, you'll need to configure it via the Web UI.
+3. [How to create or modify a WebThingApp](#creating): Start here if you want to create your own app or modify an existing one. You'll need to understand the `WebThingApp` framework to do so.
 
-The library is organized around a few main concepts and components:
+<a name="building"></a>
+# Part 1: Building a WebThingApp
+
+To illustrate the process of building a WebThingApp we will focus on an example: *CurrencyMon*. This example demonstrates of all of the elements of a `WebThingApp` (hardware and software).
+
+`WebThingApp` has been built and tested with Arduino IDE 1.8.10 and ESP8266 cores 2.6.1 and 2.7.1. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). `WebThingApp` also supports the ESP32, though it has less testing to date. It requires v1.0.5rc2 or later of the ESP32 Arduino core.
+
+The general build process is:
+
+1. [Prepare your hardware](#hardware): You only need to do this once.
+2. [Download required libraries](#libs): You only need to do this once unless you later want to get a newer version of one of the libraries.
+3. [Configure the graphics library](#tft_espi): You only need to do this once unless you change your display or the way it is connected.
+4. [Upload the data files](#upload): Do this every time your supporting files change. If you are using an existing app, you should only need to do this once. If you are developing your own app you may need to do this multiple times as you refine and debug your application.
+5. [Build and upload the application](#upload): Do this every time your supporting files change. If you are using an existing app, you should only need to do this once. If you are developing your own app you may need to do this multiple times as you refine and debug your application.
+
+
+
+<a name="hardware"></a>
+## Hardware
+`WebThingApp` requires an ESP8266 or ESP32 and a 320x240 touch screen display. For example, a [Wemos D1 Mini](https://docs.wemos.cc/en/latest/d1/d1_mini.html) and a [Wemos D1 Mini 2.4" TFT Shield](https://docs.wemos.cc/en/latest/d1_mini_shiled/tft_2_4.html). They are a nice combination since they require no soldering and only 1 mounting point (the display). However, it should work with virtually any ESP8266/ESP32 with sufficient storage space and any 320x240 screen with an ILI9341 display controller and an XPT2046 touch screen controller. The ESP32 version of the D1 Mini form factor also works wells with `WebThingApp`.
+
+You may wish to provide a physical reset button. If you are using the adapter board, simply solder two wires to the `RST` pads of the adapter board and connect the other end of the wires to a momentary push button.
+
+If you'd like a larger display, `WebThingApp` has also been tested with the 2.8" and 3.2" variants of [this one](https://www.aliexpress.com/item/32960934541.html). Both versions of this display have a single 14-pin header that can be conveniently attached to the D1 Mini using this [adapter board](https://oshpark.com/shared_projects/IhMOtfQC).
+
+![](doc/images/AdapterBoard.jpg)
+
+
+### Controlling the brightness of the display
+
+`WebthingApp` can set the brightness of the attached display using a PWM-capable pin on your ESP8266/ESP32. Connect that pin to the brightness pin of the display and specify which pin you used by defining `TFT_LED` in the configuration file for the [graphics library](#tft_espi). 
+
+On the D1 Mini TFT Shield you choose which pin to use by creating a solder bridge as shown in the images below which connects the brightness input to pin D4 of the D1 Mini.
+
+The first image shows the back side of the TFT Shield and the jumper area is marked in red. The second is a closeup of the are in red which show the solder bridge.
+
+![](doc/images/TFTBackSide.jpg)
+![](doc/images/D4Bridge.jpg)
+
+<a name="enclosure"></a>
+### Enclosure
+I've uploaded two models to [thingiverse](thingiverse.com) that may be useful for the D1 Mini Shield hardware:
+
+1. [2.4" TFT Modular Enclosure](https://www.thingiverse.com/thing:4393857)  
+2. [Slanted box for 2.4Inch TFT](https://www.thingiverse.com/thing:4413894)
+
+I have also upload [another model](https://www.thingiverse.com/thing:4460344) for use with a 3.2" display.
+
+
+<a name="software"></a>
+## Software
+
+### Dependencies
+
+<a name="libs"></a>
+#### Libraries
+The following third party libraries are used by WebThingApp. You'll need to download them and place them in your Arduino `library` folder before you build the project.
+
+* [Arduino-Log](https://github.com/thijse/Arduino-Log)
+* [ArduinoJson](https://github.com/bblanchon/ArduinoJson): Minimum version: 6.15
+* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.2 or later for ESP32]
+* [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI): Minimum version 2.2.7
+* [TimeLib](https://github.com/PaulStoffregen/Time.git)
+* [JSONService](https://github.com/jpasqua/JSONService) [v0.0.2 or later for ESP32]
+* [WebThing](https://github.com/jpasqua/WebThing) [0.2.0 or later. v0.2.1 or later for ESP32]
+* [WiFiManager](https://github.com/tzapu/WiFiManager)
+* ESP32 Only
+	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite)
+
+The following libraries are used in the browser - you do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
+
+* [JSON Form](https://github.com/jsonform/jsonform)
+
+#### Services
+The following services are used by `WebThingApp`. You will need to obtain a free API key for each using the provided links:
+
+ - [OpenWeatherMap.org](https://openweathermap.org/appid): Provides weather data for your city.
+ - Services used by [WebThing](https://github.com/jpasqua/WebThing)
+	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient. *Note* that this functionality is only used by the client code - not code running on the device.
+	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data.
+
+<a name="tft_espi"></a>
+#### Configuring the graphics library: `TFT_eSPI`
+
+All of the graphics, text, and images displayed by `WebThingApp` are drawn using the `TFT_eSPI` library. In order to function properly, it needs to know how your display is physically connected to your ESP8266/ESP32. You specify this by providing a  file (a `.h` file). `WebThingApp` provides the following predefined *user setups* which you can use:
+
+| Microcontroller | Display                                   | File                     |
+|-----------------|-------------------------------------------|--------------------------|
+| ESP8266 D1 Mini | 2.4" D1 Mini Shield                       | D1Mini_ILI9341.h         |
+|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | D1_DB_Mini_ILI9341.h     |
+| ESP32 D1 Mini   | 2.4" D1 Mini Shield                       | ESP32D1Mini_ILI9341.h    |
+|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | ESP32D1Mini_DB_ILI9341.h |
+
+To use one of these, just copy the files listed below into the `TFT_eSPI` directory and uncomment the corresponding line in `User_Setup_Select.h`.
+
+* `WebThingApp/resources/TFT_eSPI/User_Setup_Select.h` &rarr;<br> &nbsp;&nbsp;`library/TFT_eSPI` 
+	+ *Notes*:
+		+ This will overwrite the file in the destination, so you may wish to save the original.
+		+ OR, instead of overwriting this file, simply edit it to add new lines for the setups listed below. This will ensure that the User_Setup_Select.h most closely matches the version of the library you are using.
+* `WebThingApp/resources/TFT_eSPI/User_Setups/D1Mini_ILI9341.h`  &rarr; <br> &nbsp;&nbsp;`library/TFT_eSPI/User_Setups/D1Mini_ILI9341.h`
+* `WebThingApp/resources/TFT_eSPI/User_Setups/D1_DB_Mini_ILI9341.h`  &rarr; <br> &nbsp;&nbsp;`library/TFT_eSPI/User_Setups/D1_DB_Mini_ILI9341.h`
+* `WebThingApp/resources/TFT_eSPI/User_Setups/ESP32D1Mini_DB_ILI9341.h`  &rarr;<br> &nbsp;&nbsp; `library/TFT_eSPI/User_Setups/ESP32D1Mini_DB_ILI9341.h`
+
+### The build process
+
+Building the software for a `WebThingApp` like `CurrencyMon` is a bit more complex than a typical application. You build an upload your app as usual, but you also need to upload support files (such as HTML templates) to your ESP8266/ESP32 using a plugin to the Arduino IDE. The support files need to be in a subfolder of your app named `data` which has this structure:
+
+````
+data
+├── <HTML files that are specific to your app>
+├── plugins <Optional plugin descriptor files>
+├── wt <These files come with the WebThing library>
+└── wta <These files come with the WebThingApp library>
+````
+<a name="upload"></a>
+Follow these steps to upload the data to your device:
+
+1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plugin. For ESP32, use the [ESP32 Sketch Data Upload plugin](https://github.com/me-no-dev/arduino-esp32fs-plugin) plugin. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions [here](https://github.com/esp8266/arduino-esp8266fs-plugin#installation). If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
+2. Prepare the data directory
+	* Copy or link the `WebThing/data/wt` directory to the `CurrencyMon/data` directory.
+	* Copy or link the `WebThingApp/data/wta` directory to the `CurrencyMon/data` directory.
+	* When you're done you'll have a `data` directory that has the structure shown below.
+3. You need to reserve some flash memory space for the file system.
+	* ESP8266: In the Tools menu of the Arduino IDE you will see a `Flash Size` submenu. Choose `FS: 1MB`.
+	* ESP32: For the moment this project is too big to fit in the default program space on the ESP32. Future optimization may change that. For now you must use the `Tools -> Partition Scheme` menu item to select a choice that provides more program space. I use `No OTA (Large APP)`
+4. Now connect your ESP8266 to your computer via USB and select the `ESP8266 Sketch Data Upload` item from the tools menu. You will see all the files in your `data` directory, including those in the `wt` and `wta` subdirectories being loaded onto your ESP. The process is the same for ESP32, though the specific names/menu items will be different.
+5. Finally you can proceed as usual and compile / upload *CurrencyMon* to your ESP8266/ESP32.
+
+![](doc/images/ArduinoToolsMenu.png)
+
+<a name="upload"></a>
+#### Upload
+Now is the easy part: just compile and upload your app as usual using the `Sketch->Upload` menu item. Once uploaded you will need to configure your application settings using the Web UI.
+<br><br>
+
+-----
+
+<a name="preparation"></a>
+## Part 2: Setting up your device
+
+Now that your device is up and running, you'll need to configure it using the Web UI. But before you get started, you will need API keys for the services mentioned above (Google Maps, TimezoneDB, and OpenWeatherMap). All are free. Please go to each site, create a key, and keep track of them. You'll need to supply them during the configuration process. You'll also need any API keys which are required for a specific application. For example, in the CurrencyMon sample app, you need a key from [exchangeratesapi.io](exchangeratesapi.io).
+
+
+<a name="connecting-to-your-network"></a>
+## Connecting to your network
+
+Now it's time to get connected to your WiFi network. When your device boots it will create its own WiFi access point. You'll need to connect to it from your computer, smartphone, or tablet. Search for a WiFi network named something like `APP-nnnnnn`. Your app-specific documentation will tell you what name to look for. Once you do, you will enter a "captive portal" where you can configure your device to use your WiFi base station. When you've done that, the device will restart and connect to your WiFi base station.
+
+At this point you will need to connect to your device using a web browser to configure various settings. You can connect using either an IP address or a hostname. You can find the IP address and the default host name on the Utility Screen. You can typically get to the Utility screen by pressing and holding the Home Screen for 3 seconds. Your app documentation will provide details. Once you have your ip address or host name, type it into a browser's address bar and you will be greeted by a Web UI. Now it's time to configure your device.
+
+<a name="configuring-multimon"></a>
+## Configuring your device
+
+Once connected, you can use the web interface to configure and change settings including how information is displayed, the weather configuration, and more. You get to the settings by selecting an item from the [hamburger menu](https://en.wikipedia.org/wiki/Hamburger_button) in the top left of the web page. The image in the [Home Page](#home-page) section illustrates the overall structure of all of common pages. Before getting to settings that are specific to your app, you need to configure some general information for your web-connected device including a username / password. You do this using the [General Settings](#general-settings) menu item.
+
+**Note**: If you have mounted your display in an enclosure in a way that is upside-down relative to the default configuration, your image will be upside down until you get around to the [Configure Display](#configure-display) menu. This isn't a problem since the configuration will be happening in the Web UI, not on the display, but if it bothers you, you can skip to that step to flip the display orientation and then come back here.
+
+<a name="general-settings"></a>
+![](doc/images/GeneralSettings.png)  
+These settings are common to many network connected devices and are encapsulated by the [*WebThing*](https://github.com/jpasqua/WebThing) library. The settings you must configure are listed below in the order you will want to enter them on a new device. In general, once you have entered the General Settings once, you won't need to change them again. When you are setting up your device for the first time, you will need to enter some of the settings, save, and reboot before you can enter the rest. In particular, you'll need to enter the API keys before you can geolocate your address.
+
+* API Keys: You need these keys to be entered in order to use the location options below and to have the time set.
+	* [Google Maps](https://developers.google.com/maps/documentation/javascript/get-api-key): Fill in the api key you acquired from for the Google Maps service
+	* [TimeZoneDB](https://timezonedb.com/api): Fill in the api key you acquired from for the TimezoneDB service. Note: NTP is perhaps a more natural choice for a time service, but it does not incorporate a mechanism for time zone determination. TimeZoneDB allows WebThing to get the time, time zone, and local time without need for another mechanism. **Note** that these keys will not be active until after you have saved them and rebooted the device.
+* Username / Password: The username / password you'll use when you connect to your device. This is not the same as any username/password you use to log into your printers. It defaults to admin/password. ***You should change these right away***.
+* Web Server Settings:
+	* Hostname: A network name for your device. If you configure a name such as `MyMonitor`, then you can access your device from a browser using the address `http://MyMonitor.local` rather than using the IP address. This only works on systems that have support for mDNS. This is native on Macs but can be added to Linux and Windows with software such as [Avahi](https://github.com/lathiat/avahi).
+	* Port: The port that your device will listen on. Usually 80 unless you've got a good reason.
+* Location Settings: Location settings are used to determine the proper time zone. Some apps may also take advantage of this infomration for additional purposes. Note that the "weather city" is specifid separately.
+	* Latitude, Longitude, Elevation: Used to determine your time zone. For this purpose elevation is not important, but specific use cases may require it.
+	* Address / Geocode: Since you probably don't know your lat/lon and elevation by heart, enter an address in the Address field and press the Geocode button. Assuming you have already saved your Google Maps API key, the address will be translated to lat/lon and elevation. If you prefer not to create a Google Maps key, you can find your lat/lon manually as [described here](https://support.google.com/maps/answer/18539?co=GENIE.Platform%3DDesktop&hl=en).
+* Theme Color: Choose a theme for the Web UI that suits your style. The themes are all from the [W3.CSS](https://www.w3schools.com/w3css/w3css_color_themes.asp) set.
+
+<a name="configure-display"></a>
+![](doc/images/ConfigureDisplay.png)  
+Use this menu to configure aspects of the GUI - both how information is displayed and control of the display hardware. Your device will operate with defaults for these settings, but your display may be upside down! The specific settings are described below:
+
+* Enable Schedules: You can set morning/evening schedules that control the brightness of the display.
+	* To enable the schedules, click the checkbox.
+	* Next, fill in the time at which Morning and Evening begin using the format HH:MM in 24 hour format. That is, 10:30PM would be 22:30.
+	* Finally, fill in the brightness (between 1 and 100) for the display for Morning and Evening.
+	* Note that the scheduled brightness can be overridden at any time from the [home page](#home-page) or from the GUI.
+- Use 24 Hour Clock: Controls the display format of times in the GUI (10:30PM vs 22:30)
+- Flip display orientation: Depending on how your hardware was mounted, your display may have been installed "upside down". If you see the image inverted, check this box.
+
+<a name="weather-settings"></a>
+![](doc/images/ConfigureWeather.png)  
+Use this menu item to configure weather settings. Data for current weather conditions and the forecast are provided by OpenWeatherMap.org. If you are not interested in having the weather data or getting a key from OpenWeatherMap.org, you can disable this functionality. Simply uncheck the box labeled "Get Weather Data from OpenWeatherMap.org".
+
+The rest of the settings are as follows:
+
+- OpenWeatherMap API Key: The key you acquired for the OpenWeatherMap service
+- City ID: OpenWeatherMaps identifies cities with a numeric code. Enter the code for your city. You can obtain the code [here](https://openweathermap.org/find).
+- Nickname: A nickname for your weather city (e.g. Home)
+- Weather Language: Language used for weather descriptions (e.g. Clouds, Mist, Rain)
+- Use Metric: Use metric or imperial units in the interface
+
+<a name="configure-plugins"></a>
+![](doc/images/ConfigurePlugins.png)  
+Use this menu item to configure the settings for any loaded plugins. The settings will vary completely depending on the type of plugin. You may be asked to configure things like API keys, refresh times, or names of devices. Each configured plugin will have a separate section on the page with its own "Save" button. Hitting save will save the settings, but not leave the page as you may have other changes you'd like to make. An example of a plugin configuration page is shown below.
+
+![](doc/images/PluginPage.png)
+
+
+<a name="home-page"></a>
+## Home Page
+
+The Home Page for your device will depend on the specific application. Refer to the app's documenation for details. This example (see below for screen shot) contains three primary elements.
+
+1. **Printers**: This is app-specific data. In this case it is displaying information about 3d Printers that are being monitored by the device.
+2. **Display Brightness**: A brightness slider that reflects the brightness of the display when the page was loaded. You can move the slider and click the `Set Brightness` button to change the screen brightness. That level will stay in effect until you change it again, a [schedule is executed](#configure-display), or the device is rebooted.
+3. **Forecast**: An OpenWeatherMap banner with the 5-day forecast for the [configured weather city](weather-settings).
+
+![](doc/images/HomePageSmall.png)
+
+<a name="dev-info"></a>
+## Operational Info for Developers
+
+Though it is not normally part of the main menu, you can get to an additional page of options by entering the url `http://[Device_Address]/dev` into your browser. The dev page is app specific, but there is a default page which is described here. To add a menu item for the dev page, bring up the page manually once and click the "Show dev menu" option.
+
+<a name="get-settings"></a>
+**Viewing your settings**
+
+It can sometimes be useful to see all the settings in their JSON representation. The `/dev` page has a `View Settings` button which will return a page with the JSON representation of the settings. You can also get to this page directly with the url `http://[Device_Adress]/dev/settings`. If you save these settings as a file named `settings.json` and place it in your `data` directory, it can be uploaded to your device using the `Sketch Data Uploader`. There is no need to do this, but developers may find it useful to easily switch between batches of settings.
+
+The `/dev` page also has a `View WebThing Settings` button which will return a page with the JSON representation of the WebThing settings. This includes things such as the hostname, API keys, and the web color scheme.
+
+**Screenshots**
+
+You can get a screen shot of whatever is currently displayed on the device using the `Take a screen shot` button. This will display an image in your browser which corresponds to the current content of the display. You can also get to this page directly with the url `http://[Device_Adress]/dev/screenShot`.
+
+**Rebooting**
+
+Finally, the `/dev` page also has a `Request Reboot` button. If you press the button you will be presented with a popup in your browser asking if you are sure. If you confirm, your device will go to a "Reboot Screen" that displays a red reboot button and a green cancel button. The user must press and hold the reboot button for 1 second to confirm a reboot. Pressing cancel will resume normal operation. Pressing no button for 1 minute will behave as if the cancel button was pressed.
+<br><br>
+
+-----
+
+<a name="creating"></a>
+# Part 3: Creating your own WebThingApp
+
+The easiest way, by far, to create a new WebThingApp is to start from an existing one like `CurrencyMonApp` which is provided as an example. You can also start with other instances of `WebThingApp` on github such as [MultiMon](http://github.com/jpasqua/MultiMon) or [GrillMon](http://github.com/jpasqua/GrillMon). Look at the main concepts below and start customizing the app as needed.
+
+## Main Concepts and Components
+
+When creating a new `WebThingApp` there are five primary elements you'll need to provide or customize:
+
+1. An **app** object: 
+  + This will be a subclass of `WTApp`. More precisely, it will be a subclass of `WTAppImpl` which itself is a subclass of `WTApp`.
+  + This is a singleton which is exported into the global namespace as  `WTApp* wtApp` and is thereby available to all parts of the application.
+  + When accessing the wtApp, you may need to downcast it to your derived type; e.g. `(CurrencyMonApp*)`.
+2. A **settings** object
+  + App-specifc settings (if any) are stored in an object which is a subclass of `WTSettings`.
+  + The latter handles all the settings that are common to all `WebThingApp`'s. Your subclass just needs to handle app-specific settings.
+  + A pointer to the settings object is stored in `WTApp`. To get your app-specific settings, you'll need to downcast it to your derived type; e.g. `SDSettings`.
+3. **Custom screens** in the GUI (optional). For example, you would probably want to have you're own home screen that focuses on the main data of interest for your use case.
+4. **Custom pages** in the Web UI (optional). You may wish to have a custom home page, and if you have app-specific settings, you'll want to give the user a way of viewing and changing them via a page in the WebUI.
+5. **Custom code** for managing any app-specific tasks or communicating with other devices/services (optional).
+
+Looking a little deeper, we have:
 
 * **[WebThing](https://github.com/jpasqua/WebThing)**: WebThing is a generic ESP8266/ESP32 framework for building *things* with a web configuration capability. They are called *things* as in Internet of *Things*. This library provides core functionality such as connecting to WiFi, saving and retreiving settings from the file system, and a Web UI capability that handles core configuration tasks as well as providing a framework for additional Web UI functionality.
 * **Settings**: Information that is typically provided by the user to customize the operation of `WebThing`, `WebThingApp`, and any Plugins. These are stored in three separate files, though the developer doesn't really need to think about that.
@@ -35,9 +297,9 @@ The library is organized around a few main concepts and components:
 	* A Web UI to adjust the settings 
 	* A Screen to display information in a custom layout. The data to be displayed is given by keys that are looked up via the `DataBroker`.
 	* Basic identifying information for the Plugin
-* **App**: App objects hold the state of the application and provide the functions used in the main loop. Specific App sublasses, such as MultiMonApp, provide app-specific functionality such as monitoring printers and publishing printer-related data to the Data broker.
+* **App**: App objects hold the state of the application and provide the functions used in the main loop. Specific App sublasses, such as CurrencyMonApp, provide app-specific functionality such as monitoring printers and publishing printer-related data to the Data broker.
 
-# File Structure for the `WebThingApp` library
+## File / directory structure for the `WebThingApp` library
 
 The library is structured as follows:
 
@@ -87,26 +349,26 @@ Description:
 
 * **`WebThingApp`**: The root directory houses the implementation of the app infrastructure:
   * **`WTApp`**: The base class for apps. It is really a data class providing the common data used by all apps.
-  * **`WTAppImpl`**: A subclass of `WTApp` that provides most of the app logic and structure. It is subclassed by apps like `MultiMon` to provide app-specific functionality.
-  * **`WTAppSettings`**: Contains the data and code to manage the common settings used by all apps. It is subclassed by apps like `MultiMon` to provide app-specific settings.
-  * **`WebUIHelper`**: A set of functions and data that build on the Web UI provided by `WebThing` to provide Web UI functions that are common to most apps. This is not a class, it is a namespace. Apps like `MultiMon` will use WebUIHelper to provide most of their WebUI and then add endpoints for app-specific functionality.
+  * **`WTAppImpl`**: A subclass of `WTApp` that provides most of the app logic and structure. It is subclassed by apps like `CurrencyMon` to provide app-specific functionality.
+  * **`WTAppSettings`**: Contains the data and code to manage the common settings used by all apps. It is subclassed by apps like `CurrencyMon` to provide app-specific settings.
+  * **`WebUIHelper`**: A set of functions and data that build on the Web UI provided by `WebThing` to provide Web UI functions that are common to most apps. This is not a class, it is a namespace. Apps like `CurrencyMon` will use WebUIHelper to provide most of their WebUI and then add endpoints for app-specific functionality.
 * **`clients`**: This directory contains code that implements client objects for web services, sensors, or other data providers/actuators that are common to many `WebThingApps`. Of course applications can use existing libraries if they exist or define their own.
 * **`data`**: This directory contains one subdirectory: `wta`. It contains the HTML files that correspond to the pages that will be served by `WebUIHelper`. The `wta` directory should be copied into (or linked to) the applications data directory.
 * **`gui`**: This directory has the definitions and implementations for core GUI elements such as `Display`, `Screen`, `ScreenMgr` and `Theme`. The common screens included in the library, as well as any app-specific screens, are built on the GUI elements.
 * **`plugins`**: This directory contains the both the implementation of the Plugin mechanism and a subdirectory containing a number of standard plugins that may be used by `WebThingApps`.
 * **`screens`**: This directory contains the definition and implementation of a number of common Screens that are likely to be used by many `WebThingApps`. The list of common screens is defined [below](#common_screens).
 	
-# File Structure for an example App
+## File Structure for an example App
 
-Let's look at the files and directory structure of a typical `WebThingApp`. In this case the app is called `MultiMon	` and files often have the prefix `MM`. Here is an overview of the directory structure.
+Let's look at the files and directory structure of a typical `WebThingApp`. In this case the app is called `CurrencyMon` and files often have the prefix `SD`. Here is an overview of the directory structure.
 
 ````
-MultiMon
-├── MMDataSupplier.[h,cpp]
-├── MMSettings.[h,cpp]
-├── MMWebUI.[h,cpp]
-├── MultiMon.ino
-├── MultiMonApp.[h,cpp]
+CurrencyMon
+├── SDDataSupplier.[h,cpp]
+├── SDSettings.[h,cpp]
+├── SdWebUI.[h,cpp]
+├── CurrencyMon.ino
+├── CurrencyMonApp.[h,cpp]
 ├── README.md
 ├── data
 │   ├── ...
@@ -135,14 +397,14 @@ MultiMon
 
 Description:
 
-* The `MultiMon` directory contains the source code for the app itself:
+* The `CurrencyMon` directory contains the source code for the app itself:
 
-	* `MMDataSupplier`: This module contains a dataSupplier function which gets plugged into the `DataBroker` to publish app specific information. In this case it is information about the configuration and status of 3D printers.
-	* `MMSettings`: Defines, internalizes, and externalizes the settings that are specific to this app.
-	* `MMWebUI`: Provides app-specific web pages and functions. For example, the home page and a printer configuration page. `WebThingApp` provides many other pages such as general settings, display settings, and weather settings.
-	* `MultiMon.ino`: This is a bridge between the Arduino `setup()` and `loop()` functions and the app initialization and operation. It is boilerplate and there is no app-specific code in this module.
-	* `MultiMonApp`: This is the core of the application. It is a subclass of `WTAppImpl` and `WTApp` which are part of the `WebThingApp` library.
-* The `data` contains contains all the files that will be written to the file system as part of the build process. There are four sets of files in the data directory:
+	* `SDDataSupplier `: This module contains a dataSupplier function which gets plugged into the `DataBroker` to publish app specific information. In this case it is information about the configuration and status of 3D printers.
+	* `SDSettings `: Defines, internalizes, and externalizes the settings that are specific to this app.
+	* `SDWebUI`: Provides app-specific web pages and functions. For example, the home page and a printer configuration page. `WebThingApp` provides many other pages such as general settings, display settings, and weather settings.
+	* `CurrencyMon.ino`: This is a bridge between the Arduino `setup()` and `loop()` functions and the app initialization and operation. It is boilerplate and there is no app-specific code in this module.
+	* `CurrencyMonApp`: This is the core of the application. It is a subclass of `WTAppImpl` and `WTApp` which are part of the `WebThingApp` library.
+* The `data` directory contains contains all the files that will be written to the file system as part of the build process. There are four sets of files in the data directory:
 
 	* At the root are HTML files that are used by any custom pages served up by the app's Web UI. For example, a custom home page. You may also place a settings.json file here if you want to have settings loaded into the app by default. Otherwise the user will need to configure the app settings when the device starts the first time.
 	* The `plugins` subdirectory contains subdirectories for each plugin to be loaded. See the [plugin section](#plugins) for details.
@@ -153,15 +415,17 @@ Description:
 
 * The `src/screens` directory contains code for app-specific screens. Most apps will use the common screens provided by `WebThingApp`, but they will also typically provide at least one custom screen.
 
+
+<a name="screens"></a>
 # Screens
 
 There are conceptually three types of screens you need to be aware of:
 
-1. Common screens that are provided by `WebThingApp`
-2. Custom screens that are implemented by your app
+1. Common screens that are provided by `WebThingApp`: For example, there is a weather forecast screen and a screen that lets the user perform calibration of the touch screen.
+2. **Custom screens that are implemented by your app**: You will probably have at least one custom screen (typically the home screen), that sets your app apart.
 3. `FlexScreens` whose layout and data sources are given in JSON files and do not require custom code.
 
-This sction describes each.
+This section describes each.
 
 <a name="common_screens"></a>
 ## Common `Screen` Subclasses
