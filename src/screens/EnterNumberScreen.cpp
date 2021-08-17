@@ -81,9 +81,16 @@ void EnterNumberScreen::init(
     Log.verbose(F("In EnterNumberScreen Button Handler, id = %d, type = %d"), id, type);
 
     if (type > Button::PressType::NormalPress) {
-      // Any long press is interpreted as a cancellation, which is handled the same as
-      // no change to the initial value
-      if (newValueCB) newValueCB(_initialValue);
+      if (id == BackspaceButton) {
+        // Clear the whole value
+        if (minVal > 0) formattedValue = String(minVal);
+        else formattedValue = "";
+        display();
+      } else {
+        // Any other long press is interpreted as a cancellation, which is handled the same as
+        // no change to the initial value
+        if (newValueCB) newValueCB(_initialValue);
+      }
       return;
     }
 
@@ -98,7 +105,7 @@ void EnterNumberScreen::init(
       else { formattedValue += DigitLabels[id-FirstDigitButton]; }
     } else if (id == DecimalButton) {
       if (!allowDecimals) return;
-      if (formattedValue.indexOf('.') != -1) formattedValue += '.';
+      if (formattedValue.indexOf('.') == -1) formattedValue += '.';
     } else if (id == BackspaceButton) {
       int len = formattedValue.length();
       if (len > 0) formattedValue.remove(len-1);
@@ -116,15 +123,15 @@ void EnterNumberScreen::init(
     }
   };
 
-  uint16_t vW, bsW, x, w;
-  
-  w = (minVal < 0) + allowDecimals;
-  if (w == 0) { vW = 3; bsW = 2; }
-  else if (w == 1) { vW = 3; bsW = 2; }
-  else { vW = 2; bsW = 1; }
+  uint16_t vW = 4;    // Assume the value gets 4 slots
+  uint16_t bsW = 1;   // ... and the backspace button gets 1
 
-  x = ValueXOrigin;
-  w = vW*DigitWidth;
+  if (minVal < 0) vW--;     // Need space for the "+/-" button
+  if (allowDecimals) vW--;  // Need space for the "." button
+  if (vW == 4) { vW--; bsW++; } // Balance out the space a little better
+
+  uint16_t x = ValueXOrigin;
+  uint16_t w = vW*DigitWidth;
   buttons[ValueButton].init(
       x, ValueYOrigin, w, DigitHeight, buttonHandler, ValueButton);   
 
