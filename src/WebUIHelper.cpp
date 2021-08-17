@@ -30,8 +30,6 @@ namespace WebUIHelper {
     String BASE_ACTIONS =
       "<a class='w3-bar-item w3-button' href='/updateStatus'>"
       "<i class='fa fa-recycle'></i> Update Status</a>"
-      "<a class='w3-bar-item w3-button' href='/presentPrinterConfig'>"
-      "<i class='fa fa-cog'></i> Configure Printers</a>"
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
       "<i class='fa fa-desktop'></i> Configure Display</a>"
       "<a class='w3-bar-item w3-button' href='/presentWeatherConfig'>"
