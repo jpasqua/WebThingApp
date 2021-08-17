@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "enabled":true,
+  "nicknames": ["Bitcoin", "Doge"],
+  "coinIDs": [
+    "BTC-USD",
+    "DOGE-USD"
+  ],
+  "refreshInterval": 10,
+  "riScale": 60000
+}
