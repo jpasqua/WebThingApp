@@ -97,7 +97,9 @@ void WTAppImpl::begin() {
   WebThing::postSetup();                // Must be last
 }
 
-void WTAppImpl::loop() { 
+void WTAppImpl::loop() {
+  app_loop();
+  
   conditionalUpdate(false);
 
   WebThing::loop();

@@ -49,16 +49,17 @@ public:
   void conditionalUpdate(bool force);
   void updateAllData();
 
-  // ----- Functions that *may* be provided by subclasses
-  void begin(); // If overriden, the subclass should still invoke this function!
-  void loop();  // If overriden, the subclass should still invoke this function!
+  // ----- Functions that aren't provided by subclasses
+  void begin();
+  void loop();
 
   // ----- Functions that *must* be provided by subclasses
   virtual void app_registerDataSuppliers() = 0;
+  virtual Screen* app_registerScreens() = 0;
   virtual void app_initWebUI() = 0;
   virtual void app_initClients() = 0;
   virtual void app_conditionalUpdate(bool force = false) = 0;
-  virtual Screen* app_registerScreens() = 0;
+  virtual void app_loop() = 0;
 
 protected:
   // ----- Weather Functions
