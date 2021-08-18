@@ -93,8 +93,7 @@ void UtilityScreen::display(bool activating) {
 
   tft.setTextColor(Theme::Color_NormalText);
   tft.setTextDatum(BC_DATUM);
-  String sub = "SUBHEADING + SUBCONTENT"; // TO DO: Fix this!!
-  tft.drawString(sub, Display::XCenter, PI_YOrigin-1, SubFont);
+  tft.drawString(_subHeading + _subContent, Display::XCenter, PI_YOrigin-1, SubFont);
 
   String name;
   uint16_t textColor = Theme::Color_NormalText;
