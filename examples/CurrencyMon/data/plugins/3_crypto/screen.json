@@ -17,7 +17,7 @@
       "justify": "BR",
       "font": "2",
       "color": "0xFFFFFF",
-      "format": "Readings"
+      "format": "Name"
     },
     {
       "x": 86,  "y": 35,
