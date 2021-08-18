@@ -27,7 +27,11 @@ void WiFiScreen::display(bool activating) {
   tft.fillScreen(Theme::Color_Background);
   uint16_t x = (Display::Width-WiFiLogo_Width)/2;
   uint16_t y = 30;  // A little space from the top of the screen
+#ifdef WiFiLogo_UseMono
+  tft.drawBitmap(x, y, WiFiLogoMono, WiFiLogo_Width, WiFiLogo_Height, Theme::Color_WiFiBlue);
+#else   // WiFiLogo_UseMono
   tft.pushImage(x, y, WiFiLogo_Width, WiFiLogo_Height, WiFiLogo, WiFiLogo_Transparent);
+#endif  // WiFiLogo_UseMono  
   y += WiFiLogo_Height;
 
   Display::Font::setUsingID(Display::Font::FontID::SBO12, tft);
