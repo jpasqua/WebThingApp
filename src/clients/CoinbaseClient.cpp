@@ -85,7 +85,7 @@ bool CoinbaseClient::getPrice(String coinID, String& currency, String& price) {
   //    {"data":{"base":"BTC","currency":"USD","amount":"34909.53"}}
 
   currency = (*root)["data"]["currency"].as<String>();
-  price = (*root)["data"]["price"].as<String>();
+  price = (*root)["data"]["amount"].as<String>();
   delete root;
 
   return true;
