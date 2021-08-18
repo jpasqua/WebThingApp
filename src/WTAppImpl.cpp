@@ -99,7 +99,7 @@ void WTAppImpl::begin() {
 
 void WTAppImpl::loop() {
   app_loop();
-  
+
   conditionalUpdate(false);
 
   WebThing::loop();
@@ -209,20 +209,27 @@ void WTAppImpl::prepWebThing() {
  *----------------------------------------------------------------------------*/
 
 void WTAppImpl::registerScreens() {
+  // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
+  
   calibrationScreen = new CalibrationScreen();
-  configScreen = new ConfigScreen();
-  forecastScreen = new ForecastScreen();
-  rebootScreen = new RebootScreen();
-  weatherScreen = new WeatherScreen();
-  wifiScreen = new WiFiScreen();
-  utilityScreen = new UtilityScreen();
-
   ScreenMgr::registerScreen("Calibration", calibrationScreen);
+
+  configScreen = new ConfigScreen();
   ScreenMgr::registerScreen("Config", configScreen);
+
+  forecastScreen = new ForecastScreen();
   ScreenMgr::registerScreen("Forecast", forecastScreen);
+
+  rebootScreen = new RebootScreen();
   ScreenMgr::registerScreen("Reboot", rebootScreen);
+
+  weatherScreen = new WeatherScreen();
   ScreenMgr::registerScreen("Weather", weatherScreen);
+
+  wifiScreen = new WiFiScreen();
   ScreenMgr::registerScreen("WiFi", wifiScreen);
+
+  utilityScreen = new UtilityScreen();
   ScreenMgr::registerScreen("Utility", utilityScreen);
 
   splashScreen = app_registerScreens();
