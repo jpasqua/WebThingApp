@@ -1,4 +1,5 @@
 **/.DS_Store
 *settings.json
-examples/*/data/wt
-examples/*/data/wta
+examples/**/data/wt
+examples/**/data/wta
+src/gui/.DS_Store
