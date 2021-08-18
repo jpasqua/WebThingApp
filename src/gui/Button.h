@@ -26,6 +26,10 @@
 #ifndef Button_h
 #define Button_h
 
+#if defined(ESP32)
+  #include <functional>
+#endif
+
 class Button {
 public:
   typedef enum {NormalPress, LongPress, VeryLongPress} PressType;
