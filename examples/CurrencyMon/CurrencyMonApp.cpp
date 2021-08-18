@@ -56,7 +56,7 @@ Plugin* pluginFactory(String& type) {
   // CUSTOM: Choose which plugins you'd like to load
   if      (type.equalsIgnoreCase("generic")) { p = new GenericPlugin(); }
   else if (type.equalsIgnoreCase("blynk"))   { p = new BlynkPlugin();   }
-  // else if (type.equalsIgnoreCase("crypto"))  { p = new CryptoPlugin();  }
+  else if (type.equalsIgnoreCase("crypto"))  { p = new CryptoPlugin();  }
   
 
   if (p == NULL) {
