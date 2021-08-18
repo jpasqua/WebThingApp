@@ -1,5 +1,4 @@
-.DS_Store
+*.DS_Store
 *settings.json
-data/wt
-data/wta
-.DS_Store
+examples/*/data/wt
+examples/*/data/wta
