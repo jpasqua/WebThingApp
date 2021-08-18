@@ -445,6 +445,7 @@ This library ships with the following `Screen` subclasses which can be used with
   * Return tot he home screen.
 * `WeatherScreen`: Provides current weather information based on data from [OpenWeatherMap.org](https://openweathermap.org). It is typically used in conjunction with `ForecastScreen `.
 * `WiFiScreen`: During the startup process of a `WebThing`, one of the earliest steps is to connect to WiFi. This screen can be displayed to tell the user that the connection is being established.
+  * **NOTE**: There are two available images that can be used by this Screen. One is 16 bits per pixel and consumes ~80KB and the other is 1bpp and consumes only ~5KB. The first looks nicer, but takes a lot of space. To use the smaller image and thereby save space space for other code/data, be sure to uncomment the line `#define WiFiLogo_UseMono` in `WiFiScreen.h`.
 
 All of these screens are loaded by default. If you want to exclude one of them to save space, you'll need to remove it from `WTAppImpl::registerScreens()`. This amounts to commenting out two lines: the declaration and the instantiation.
 
