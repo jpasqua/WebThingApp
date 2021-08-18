@@ -16,54 +16,52 @@
       "type": "String", "key": "$W.ldesc"
     },
     {
-      "x": 0,  "y": 22, "w": 80,  "h": 22, "xOff": 79, "yOff": 11,
-      "justify": "MR", "font": "2", "color": "0xFFFFFF", "format": "%s: ",
-      "type": "STRING", "key": "$E.BW.NN1"
-    },
-    {
-      "x": 80,  "y": 22, "w": 80,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0x00FF00", "format": "%0.0fF",
-      "type": "FLOAT", "key": "$E.BW.0/V0"
-    },
-    {
-      "x": 160,  "y": 22, "w": 80,  "h": 22, "xOff": 79, "yOff": 11,
-      "justify": "MR", "font": "2", "color": "0xFFFFFF", "format": "%s: ",
-      "type": "STRING", "key": "$E.BW.NN2"
-    },
-    {
-      "x": 240,  "y": 22, "w": 80,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0x00FF00", "format": "%0.0fF",
-      "type": "FLOAT", "key": "$E.BW.1/V0"
-    },
-    {
-      "x": 0, "y": 44, "w": 320,  "h":79, "xOff": 160, "yOff": 39,
+      "x": 0, "y": 35, "w": 320,  "h":79, "xOff": 160, "yOff": 39,
       "justify": "MC", "font": "D72", "color": "0x00ff00", "format": "%2d:%02d",
       "type": "CLOCK", "key": "$S.time"
     },
+
     {
-      "x": 0, "y": 132, "w": 160,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0xFFFFFF", "format": "Grill: %s",
-      "type": "String", "key": "$G.state"
+      "x": 0,   "y": 120, "w": 86,  "h": 26, "xOff": 85, "yOff": 25,
+      "justify": "BR", "font": "2", "color": "0xFFFFFF", "format": "Name"
     },
     {
-      "x": 160, "y": 132, "w": 160,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0xFFFFFF", "format": "Flame: %s",
-      "type": "String", "key": "$G.fireState"
+      "x": 86,  "y": 120, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB9", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.NN1"
     },
     {
-      "x": 0, "y": 153, "w": 320,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0xFFFF00", "format": "Warning: %s",
-      "type": "String", "key": "$G.warning"
+      "x": 203,  "y": 120, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB9", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.NN2"
     },
     {
-      "x": 0, "y": 174, "w": 160,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0x00FF00", "format": "Food Temp: %s",
-      "type": "String", "key": "$G.foodTemps"
+      "x": 0,   "y": 149, "w": 86,  "h": 26, "xOff": 85, "yOff": 13,
+      "justify": "MR", "font": "2", "color": "0xFFFFFF", "format": "Price:"
     },
     {
-      "x": 160, "y": 174, "w": 160,  "h": 22, "xOff": 0, "yOff": 11,
-      "justify": "ML", "font": "2", "color": "0x00FF00", "format": "Grill Temp: %s",
-      "type": "String", "key": "$G.grillTemps"
+      "x": 86,  "y": 149, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB12", "color": "0x00FF00", "format": "%s",
+      "type": "STRING", "key": "$E.CC.PR1"
+    },
+    {
+      "x": 203,  "y": 149, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB12", "color": "0x00FF00", "format": "%s",
+      "type": "STRING", "key": "$E.CC.PR2"
+    },
+    {
+      "x": 0,   "y": 175, "w": 86,  "h": 26, "xOff": 85, "yOff": 13,
+      "justify": "MR", "font": "2", "color": "0xFFFFFF","format": "Currency:"
+    },
+    {
+      "x": 86,  "y": 175, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.CU1"
+    },
+    {
+      "x": 203,  "y": 175, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.CU2"
     },
     {
       "x": 0, "y": 222, "w": 110,  "h": 18, "xOff": 0, "yOff": 0,
