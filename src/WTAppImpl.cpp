@@ -56,9 +56,6 @@ void WTAppImpl::updateAllData() {
   conditionalUpdate(true);
 }
 
-
-
-
 WTAppImpl::WTAppImpl(const String& name, const String& prefix, const String& version, WTAppSettings* appSettings) :
   	WTApp(name, prefix, version, appSettings)
 {
@@ -66,35 +63,51 @@ WTAppImpl::WTAppImpl(const String& name, const String& prefix, const String& ver
 }
 
 void WTAppImpl::begin() {
+WebThing::genHeapStatsRow("Entering WTAppImpl::begin");
   WebThing::preSetup();                 // Must be first
 
+WebThing::genHeapStatsRow("before reading settings");
   settings->init(SettingsFileName);
   settings->read();
   settings->logSettings();
 
+WebThing::genHeapStatsRow("before DataBroker");
   DataBroker::begin();
   DataBroker::registerMapper( ([this](const String& key, String& value){ weatherDataSupplier(key, value); }), 'W' );
   app_registerDataSuppliers();
 
+WebThing::genHeapStatsRow("before ScreenMgr setup");
   ScreenMgr::setup(&settings->uiOptions, &settings->displayOptions);
+WebThing::genHeapStatsRow("before registerScreens");
   registerScreens();
+WebThing::genHeapStatsRow("before display wifiScreen");
   ScreenMgr::display(wifiScreen);
 
+WebThing::genHeapStatsRow("before prepWebThing");
   prepWebThing();
+WebThing::genHeapStatsRow("before app_initWebUI");
   app_initWebUI();
 
+WebThing::genHeapStatsRow("before splashscreen");
   if (splashScreen) ScreenMgr::display(splashScreen);
 
+WebThing::genHeapStatsRow("before initclients");
   app_initClients();
   prepWeather();
 
+WebThing::genHeapStatsRow("before loading plugins");
   pluginMgr.loadAll("/plugins");
 
+WebThing::genHeapStatsRow("before conditionalUpdate");
   conditionalUpdate(true);
 
+WebThing::genHeapStatsRow("before HomeScreen");
   ScreenMgr::displayHomeScreen();
 
+WebThing::genHeapStatsRow("before postSetup");
   WebThing::postSetup();                // Must be last
+
+WebThing::genHeapStatsRow("Exiting WTAppImpl::begin");
 }
 
 void WTAppImpl::loop() {
@@ -195,9 +208,12 @@ void WTAppImpl::prepWebThing() {
   WebThing::notifyOnConfigMode([this](String &ssid, String &ip) { configModeCallback(ssid, ip); });
   WebThing::notifyConfigChange([this]() { baseConfigChange(); } );
 
+WebThing::genHeapStatsRow("before WebThing::setup");
   WebThing::setup();
 
+WebThing::genHeapStatsRow("before WebThing::setDisplayedVersion");
   WebThing::setDisplayedVersion(appPrefix + appVersion);
+WebThing::genHeapStatsRow("before setTitle");
   setTitle();
 }
 
@@ -210,7 +226,7 @@ void WTAppImpl::prepWebThing() {
 
 void WTAppImpl::registerScreens() {
   // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
-  
+
   calibrationScreen = new CalibrationScreen();
   ScreenMgr::registerScreen("Calibration", calibrationScreen);
 
