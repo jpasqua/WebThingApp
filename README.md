@@ -6,7 +6,7 @@ A library for building apps based on the [WebThing library](https://github.com/j
 
 The goal of the library is to do most of the work of handling the Web UI, GUI, settings management, and plugins, so the "app" can focus on the core functionality it is providing. 
 <hr style='clear:left'></div>
-Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to 4 3D printers as well as providing time and weather information. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`.
+Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to 4 3D printers as well as providing time and weather information. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`. The library comes with a simple demo application called `CurrencyMon` which will be mentioned again below and has it's own [documentation](examples/CurrencyMon/README.md). 
 
 ![](doc/images/MarbleMonitor512.jpg)
 
@@ -225,9 +225,8 @@ Use this menu item to configure the settings for any loaded plugins. The setting
 
 The Home Page for your device will depend on the specific application. Refer to the app's documenation for details. This example (see below for screen shot) contains three primary elements.
 
-1. **Printers**: This is app-specific data. In this case it is displaying information about 3d Printers that are being monitored by the device.
-2. **Display Brightness**: A brightness slider that reflects the brightness of the display when the page was loaded. You can move the slider and click the `Set Brightness` button to change the screen brightness. That level will stay in effect until you change it again, a [schedule is executed](#configure-display), or the device is rebooted.
-3. **Forecast**: An OpenWeatherMap banner with the 5-day forecast for the [configured weather city](weather-settings).
+1. **Display Brightness**: A brightness slider that reflects the brightness of the display when the page was loaded. You can move the slider and click the `Set Brightness` button to change the screen brightness. That level will stay in effect until you change it again, a [schedule is executed](#configure-display), or the device is rebooted.
+2. **Forecast**: An OpenWeatherMap banner with the 5-day forecast for the [configured weather city](weather-settings).
 
 ![](doc/images/HomePageSmall.png)
 
@@ -360,61 +359,8 @@ Description:
 	
 ## File Structure for an example App
 
-Let's look at the files and directory structure of a typical `WebThingApp`. In this case the app is called `CurrencyMon` and files often have the prefix `SD`. Here is an overview of the directory structure.
 
-````
-CurrencyMon
-├── SDDataSupplier.[h,cpp]
-├── SDSettings.[h,cpp]
-├── SdWebUI.[h,cpp]
-├── CurrencyMon.ino
-├── CurrencyMonApp.[h,cpp]
-├── README.md
-├── data
-│   ├── ...
-│   ├── plugins
-│   │   ├── 1_gnrc
-│   │   ├── 2_blynk
-│   │   └── 4_ovw
-│   └── wt
-│   │   └── ...
-│   └── wta
-│       └── ...
-└── src
-    ├── clients
-    │   ├── DuetClient.[h,cpp]
-    │   ├── MockPrintClient.h
-    │   ├── OctoClient.[h,cpp]
-    │   └── PrintClient.h
-    └── screens
-        ├── AppTheme.h
-        ├── DetailScreen.[h,cpp]
-        ├── SplashScreen.[h,cpp]
-        ├── TimeScreen.[h,cpp]
-        └── images
-            └── ...
-````
-
-Description:
-
-* The `CurrencyMon` directory contains the source code for the app itself:
-
-	* `SDDataSupplier `: This module contains a dataSupplier function which gets plugged into the `DataBroker` to publish app specific information. In this case it is information about the configuration and status of 3D printers.
-	* `SDSettings `: Defines, internalizes, and externalizes the settings that are specific to this app.
-	* `SDWebUI`: Provides app-specific web pages and functions. For example, the home page and a printer configuration page. `WebThingApp` provides many other pages such as general settings, display settings, and weather settings.
-	* `CurrencyMon.ino`: This is a bridge between the Arduino `setup()` and `loop()` functions and the app initialization and operation. It is boilerplate and there is no app-specific code in this module.
-	* `CurrencyMonApp`: This is the core of the application. It is a subclass of `WTAppImpl` and `WTApp` which are part of the `WebThingApp` library.
-* The `data` directory contains contains all the files that will be written to the file system as part of the build process. There are four sets of files in the data directory:
-
-	* At the root are HTML files that are used by any custom pages served up by the app's Web UI. For example, a custom home page. You may also place a settings.json file here if you want to have settings loaded into the app by default. Otherwise the user will need to configure the app settings when the device starts the first time.
-	* The `plugins` subdirectory contains subdirectories for each plugin to be loaded. See the [plugin section](#plugins) for details.
-	* The `wt` subdirectory contains HTML for the pages displayed by the `WebThing` Web UI pages. These are low level configuration items such as the hostname to use. You may also place a settings.json file here if you want to have settings loaded into the app by default. Otherwise the user will need to configure all the `WebThings` settings when the device starts the first time.
-	* The `wta` subdirectory contains HTML for the pages displayed by the `WebUIHelper`. These are pages that are common to most apps like a page to configure display settings.
-
-* The `src/clients` directory contains code that implements client objects for web services, sensors, or other data providers/actuators. Of course applications can use existing libraries if they exist. This directory is for app-specific clients.
-
-* The `src/screens` directory contains code for app-specific screens. Most apps will use the common screens provided by `WebThingApp`, but they will also typically provide at least one custom screen.
-
+Please take a moment to review [the structure of a sample application](examples/CurrencyMon/README.md#structure), CurrencyMon, to learn what the major components are and where to find them.
 
 <a name="screens"></a>
 # Screens
@@ -435,6 +381,14 @@ This library ships with the following `Screen` subclasses which can be used with
 * `CalibrationScreen`: Provides a process for the user to calibrate the touch screen. The application would typically want to save the calibration data, so it can provide a change-listener callback which will be invoked by `CalibrationScreen` any time the process is completed.
 * `ConfigScreen`: When a WebThing comes online for the first time it typically has no WiFi connection information and must be configured by the user. If this is the case, the app may display the `ConfigScreen` to instruct the user to do so.
 * `EnterNumberScreen`: Displays a number pad that allows the user to enter numerical data.
+	* This screen is a bit different from the others in that it is a bit more interactive. Most screens just accept simple button presses. This screen does that too, but the buttons represent a numeric input "pad" that allows the user to enter numbers that can be used by the app.
+	* ![](doc/images/EnterNumberScreen.png)
+	* The buttons function as follows:
+		* Value Button: In the upper left, there is a value button which displays the current value. To accept the value you have entered, press the value button. That will pass the value back to the app.
+		* To the left of the value button is a "DEL" button. It deletes the rightmost digit of the value. Press and hold "DEL" for a second and it will clear the entire value.
+		* To the left of the "DEL" button a "." button *may* be displayed. It is only visible if the application is asking for a value that can contain decimals.
+		* To the left of the "." button a "+/-" button *may* be displayed. Pressing it negates the current value. It is only displayed if the application allows negative values.
+		* [0-9]: Append the specified digit to the end of the current value
 * `ForecastScreen`: Provides a 5-day forecast based on data from [OpenWeatherMap.org](https://openweathermap.org). It is typically used in conjunction with `WeatherScreen`.
 * `RebootScreen`: Some `WebThing` applications may provide expert or developer interfaces. These may wish to invoke a `RebootScreen` which asks the user to confirm a reboot and upon confirmation, reboots the device.
 * `UtilityScreen`: This screen provides information about the "thing" such as the name, version number, the web address, and the wifi signal strength. It also provides buttons that can be used to:
@@ -445,7 +399,7 @@ This library ships with the following `Screen` subclasses which can be used with
   * Return tot he home screen.
 * `WeatherScreen`: Provides current weather information based on data from [OpenWeatherMap.org](https://openweathermap.org). It is typically used in conjunction with `ForecastScreen `.
 * `WiFiScreen`: During the startup process of a `WebThing`, one of the earliest steps is to connect to WiFi. This screen can be displayed to tell the user that the connection is being established.
-  * **NOTE**: There are two available images that can be used by this Screen. One is 16 bits per pixel and consumes ~80KB and the other is 1bpp and consumes only ~5KB. The first looks nicer, but takes a lot of space. To use the smaller image and thereby save space space for other code/data, be sure to uncomment the line `#define WiFiLogo_UseMono` in `WiFiScreen.h`.
+  * **NOTE**: There are two available images that can be used by this Screen. One is 16 bits per pixel and consumes ~80KB and the other is 1bpp and consumes only ~5KB. The first looks nicer, but takes a lot of space. To use the smaller image and thereby save space space for other code/data, be sure to uncomment the line `#define WiFiLogo_UseMono` in `WiFiLogon.h`. By default, it is defined on ESP8266 and not defined on ESP32.
 
 All of these screens are loaded by default. If you want to exclude one of them to save space, you'll need to remove it from `WTAppImpl::registerScreens()`. This amounts to commenting out two lines: the declaration and the instantiation.
 
@@ -586,7 +540,7 @@ The elements are as follows:
   * D20, D72, D100: 7-Segment Digital Font in large sizes
   
   `font` may also be a number corresponding to a built-in font in the [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI). If this item is omitted, it defaults to built-in font 2.
-* `color`: *Required*. The color of the content of the field. This is a 24-bit (888) hex color specifier (not a name) which may begin with `#` or `0x`.
+* `color`: *Required*. The color of the content of the field. This is a 24-bit (888) hex color specifier (not a name) which begins with `0x`.
 * `format`: *Required*. The format is used to display the content of the field. It is a `printf` style format. For example if the field is meant to display a temperature, then the format might be: `"Temp: %0.1fF"`. If the field is just a static label, then the format specifies the label. Note: while optional, if this is not supplied, then no content will be displayed other than a border if specified.   The `format` must correspond to the `type`. For example, if the `type` is `FLOAT`, then the `format` must include some variation of `%f`. 
   
   There are special values of the format string that begin with '#'. These format strings indicate that a a custom display element should be used rather than displaying the result textually. The current set of custom display elements are:
