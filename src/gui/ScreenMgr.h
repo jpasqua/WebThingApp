@@ -36,6 +36,7 @@ namespace ScreenMgr {
   void display(String name);
   void display(Screen* screen);
   void displayHomeScreen();
+
   /**
    * Overlay the current screen with an icon to indicate that a potentially
    * long-running update is in progress. this lets the user know that the UI
@@ -44,6 +45,13 @@ namespace ScreenMgr {
    * @param   accentColor   An accent color to indicate what's happening
    */
   void showUpdatingIcon(uint16_t accentColor);
+
+  /**
+   * Same as above, but allows the updating symbol to be set.
+   * @param   accentColor   An accent color to indicate what's happening
+   * @param   symbol        The symbol to display within the icon
+   */
+  void showUpdatingIcon(uint16_t accentColor, char symbol);
 
   /**
    * Remove the "updating icon" from the current screen and restore the original

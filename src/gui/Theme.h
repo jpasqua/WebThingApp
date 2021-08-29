@@ -31,6 +31,7 @@ namespace Theme {
   static const uint32_t Mono_Background = 0x0000;     // Background for 1bpp sprites
   static const uint32_t Mono_Foreground = 0x0001;     // Foreground for 1bpp sprites
 
+  static const uint32_t Color_WebRequest = TFT_PURPLE;
   static const uint32_t Color_UpdatingWeather = TFT_ORANGE;
   static const uint32_t Color_UpdatingPlugins = TFT_SKYBLUE;
   static const uint32_t Color_UpdatingText = TFT_WHITE;

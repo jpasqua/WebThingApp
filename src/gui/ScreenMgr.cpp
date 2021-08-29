@@ -11,6 +11,8 @@
 #include <ArduinoJson.h>
 #include <ArduinoLog.h>
 #include <TimeLib.h>
+//                                  WebThing Includes
+#include <WebThing.h>
 //                                  Local Includes
 #include "Display.h"
 #include "ScreenMgr.h"
@@ -45,37 +47,25 @@ namespace ScreenMgr {
     uint16_t *savedPixels = NULL;
     bool infoIconIsDisplayed = false;
 
-    void drawInfoIcon(uint16_t x, uint16_t y, uint16_t borderColor, uint16_t fillColor, uint16_t textColor) {
-      uint16_t centerX = x+(InfoIconSize/2);
-      uint16_t centerY = y+(InfoIconSize/2);
+    void drawInfoIcon(
+        uint16_t borderColor, char symbol, uint16_t fillColor, uint16_t textColor)
+    {
+      tft.readRect(InfoIconX, InfoIconY, InfoIconSize, InfoIconSize, savedPixels);
+      uint16_t centerX = InfoIconX+(InfoIconSize/2);
+      uint16_t centerY = InfoIconY+(InfoIconSize/2);
       tft.fillCircle(centerX, centerY, InfoIconSize/2-1, borderColor);
       tft.fillCircle(centerX, centerY, (InfoIconSize/2-1)-InfoIconBorderSize, fillColor);
       tft.setTextDatum(MC_DATUM);
       // tft.setFreeFont(&FreeSerifBoldItalic9pt7b);
       tft.setFreeFont(&FreeSansBold9pt7b);
       tft.setTextColor(textColor);
-      tft.drawString("i", centerX, centerY);
+      tft.drawString(String(symbol), centerX, centerY);
     }
 
     void initInfoIcon() {
       // In theory it would be better to allocate/deallocate this as needed, but it causes
       // a lot more fragmentation and potentially a crash.
       savedPixels = (uint16_t *)malloc(InfoIconSize*InfoIconSize*sizeof(uint16_t));  // This is BIG!
-    }
-
-    void showUpdating(uint16_t accentColor) {
-      if (infoIconIsDisplayed) return;
-      tft.readRect(InfoIconX, InfoIconY, InfoIconSize, InfoIconSize, savedPixels);
-      drawInfoIcon(
-        InfoIconX, InfoIconY, accentColor,
-        Theme::Color_UpdatingFill, Theme::Color_UpdatingText);
-      infoIconIsDisplayed = true;
-    }
-
-    void hideUpdating() {
-      if (!infoIconIsDisplayed) return;
-      tft.pushRect(InfoIconX, InfoIconY, InfoIconSize, InfoIconSize, savedPixels);
-      infoIconIsDisplayed = false;
     }
 
     void processSchedules() {
@@ -108,7 +98,9 @@ namespace ScreenMgr {
   void setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
     State::uiOptions = uiOptions;
     State::displayOptions = displayOptions;
+WebThing::genHeapStatsRow("before Display::begin");
     Display::begin(displayOptions);
+WebThing::genHeapStatsRow("before initInfoIcon");
     Internal::initInfoIcon();
   }
 
@@ -187,8 +179,24 @@ namespace ScreenMgr {
     return (flexScreen);
   }
 
-  void showUpdatingIcon(uint16_t accentColor) { Internal::showUpdating(accentColor); }
-  void hideUpdatingIcon() { Internal::hideUpdating(); }
+  void showUpdatingIcon(uint16_t accentColor, char symbol) {
+    if (Internal::infoIconIsDisplayed) return;
+    Internal::drawInfoIcon(
+      accentColor, symbol, Theme::Color_UpdatingFill, Theme::Color_UpdatingText);
+    Internal::infoIconIsDisplayed = true;
+  }
+
+  void showUpdatingIcon(uint16_t accentColor) {
+    showUpdatingIcon(accentColor, 'i');
+  }
+
+  void hideUpdatingIcon() {
+    if (!Internal::infoIconIsDisplayed) return;
+    tft.pushRect(
+      Internal::InfoIconX, Internal::InfoIconY, Internal::InfoIconSize,
+      Internal::InfoIconSize, Internal::savedPixels);
+    Internal::infoIconIsDisplayed = false;
+  }
 
 
 };
