@@ -5,16 +5,11 @@
 #define WiFiLogo_Width (300)
 #define WiFiLogo_Height (134)
 
-#ifndef WiFiLogo_UseMono
-  #if defined(ESP8266)
-    #define WiFiLogo_UseMono
-  #else // ESP32
-    // To force the mono image on ESP32, uncomment the following line.
-    // #define WiFiLogo_UseMono
-  #endif
-#endif
+// If you would like to save a large amount of flash space (~75K), uncomment
+// the following line which will use a monochrome bitmap rather than a
+// 16bpp color image.
+// #define WiFiLogo_UseMono
 
-// Comment out the following line to use a full-color image
 
 #ifdef WiFiLogo_UseMono
 
