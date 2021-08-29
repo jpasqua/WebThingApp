@@ -14,8 +14,14 @@ RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies
 
 	_nCurrencies = (nCurrencies > MaxCurrencies) ? MaxCurrencies : nCurrencies;
 	_currencies = currencies;
+
 	_apiKey = apiKey;
 	_apiKey.trim();
+
+  if (_apiKey.startsWith("MOCK")) {
+    Log.verbose("Mocking the RateClient");
+    mockUpdate();
+  }
 
   details.server = ServerName;
   details.port = 80;
@@ -34,11 +40,16 @@ RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies
 	  	if (i) _endpoint += ',';
 	  }
   }
-  Log.verbose("n: %d, _endpoint=%s", _nCurrencies, _endpoint.c_str());
 }
 
 void RateClient::updateRates() {
   static const uint32_t ResultSize = 1000;
+
+  if (_apiKey.startsWith("MOCK")) {
+    mockUpdate();
+    return;
+  }
+
 
   if (_endpoint.isEmpty()) return;	// Nothing to do...
 
@@ -62,3 +73,9 @@ float RateClient::convert(Currency* from, Currency* to, float amount) {
 	return (amount / from->exchangeRate) * to->exchangeRate;
 }
 
+void RateClient::mockUpdate() {
+  for (int i = 0; i < _nCurrencies; i++) {
+    float offset = random(-10, 11)/100.0;
+    _currencies[i].exchangeRate *= (1.0 + offset);
+  }
+}

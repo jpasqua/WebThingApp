@@ -40,6 +40,8 @@ private:
   JSONService     *service = NULL;
 
   String _endpoint;
+
+  void mockUpdate();
 };
 
 #endif  // RateClient_h
