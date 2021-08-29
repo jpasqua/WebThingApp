@@ -59,7 +59,7 @@ namespace WebUIHelper {
 
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
-    String BASE_ACTIONS =
+    const char CORE_MENU_ITEMS[] PROGMEM =
       "<a class='w3-bar-item w3-button' href='/updateStatus'>"
       "<i class='fa fa-recycle'></i> Update Status</a>"
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
@@ -69,7 +69,7 @@ namespace WebUIHelper {
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
       "<i class='fa fa-plug'></i> Configure Plugins</a>";
 
-    String DEV_ACTION =
+    const char DEV_MENU_ITEMS[] PROGMEM =
       "<a class='w3-bar-item w3-button' href='/dev'>"
       "<i class='fa fa-gears'></i> Dev Settings</a>";
   }
@@ -273,7 +273,8 @@ namespace WebUIHelper {
 
     void updateDevConfig() {
       auto action = []() {
-        // Nothing to do by default...
+        wtApp->settings->uiOptions.showDevMenu = WebUI::hasArg("showDevMenu");
+        wtApp->settings->write();
         WebUI::redirectHome();
       };
 
@@ -306,7 +307,7 @@ namespace WebUIHelper {
     void presentWeatherConfig() {
       String langTarget = "SL" + wtApp->settings->owmOptions.language;
 
-      auto mapper =[langTarget](String &key) -> String {
+      auto mapper =[&langTarget](String &key) -> String {
         if (key.equals(F("WEATHER_KEY"))) return wtApp->settings->owmOptions.key;
         if (key.equals(F("CITY_NAME")) && wtApp->settings->owmOptions.enabled) {
           return wtApp->owmClient == NULL ? WTBasics::EmptyString : wtApp->owmClient->weather.location.city;
@@ -366,12 +367,12 @@ namespace WebUIHelper {
   }   // ----- END: WebUIHelper::Pages
 
 
-  void init(String& customActions) {
-    String actions = Internal::BASE_ACTIONS + customActions;
+  void init(PGM_P appMenuItems) {
+    WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
+    WebUI::addAppMenuItems(appMenuItems);
     if (wtApp->settings->uiOptions.showDevMenu) {
-      actions += Internal::DEV_ACTION;
+      WebUI::addDevMenuItems(Internal::DEV_MENU_ITEMS);
     }
-    WebUI::addMenuItems(actions);
 
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
@@ -389,7 +390,6 @@ namespace WebUIHelper {
     WebUI::registerHandler("/dev/forceScreen",        Dev::forceScreen);
     WebUI::registerHandler("/dev/enableDevMenu",      Dev::enableDevMenu);
     WebUI::registerHandler("/dev/data",               Dev::getDataBrokerValue);
-    WebUI::registerHandler("/dev/updateSettings",     Dev::updateDevConfig);
 
     templateHandler = WebUI::getTemplateHandler();
   }

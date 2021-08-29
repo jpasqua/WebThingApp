@@ -6,7 +6,7 @@ namespace WebUIHelper {
 
   extern ESPTemplateProcessor  *templateHandler;
 
-  void init(String& customActions);
+  void init(PGM_P customActions);
 
   void showUpdatingIcon();
   void hideUpdatingIcon();

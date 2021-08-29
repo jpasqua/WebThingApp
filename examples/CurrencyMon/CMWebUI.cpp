@@ -11,6 +11,7 @@
 #include <ArduinoLog.h>
 //                                  WebThing Includes
 #include <WebThingBasics.h>
+#include <WebThing.h>
 #include <WebUI.h>
 #include <WebUIHelper.h>
 #include <gui/Display.h>
@@ -24,7 +25,7 @@
 namespace CMWebUI {
 
   namespace Internal {
-    String CUSTOM_ACTIONS =
+    const char APP_MENU_ITEMS[] PROGMEM =
       "<a class='w3-bar-item w3-button' href='/presentCurrencyConfig'>"
       "<i class='fa fa-cog'></i> Set Currencies</a>";
   } // ----- END: CMWebUI::Internal
@@ -32,9 +33,6 @@ namespace CMWebUI {
   // ----- BEGIN: CMWebUI::Pages
   namespace Pages {
     void currencyPage() {
-      Log.trace(F("Web Request: Handle Currency Configure"));
-      if (!WebUI::authenticationOK()) { return; }
-
       auto mapper =[](String &key) -> String {
         if (key.startsWith("_C")) {
           int i = (key.charAt(2) - '0');
@@ -47,9 +45,7 @@ namespace CMWebUI {
         return WTBasics::EmptyString;
       };
 
-      WebUI::startPage();
-      WebUIHelper::templateHandler->send("/ConfigCurrency.html", mapper);
-      WebUI::finishPage();
+      WebUIHelper::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
     }
   } // ----- END: CMWebUI::Pages
 
@@ -57,39 +53,43 @@ namespace CMWebUI {
   // ----- BEGIN: CMWebUI::Endpoints
   namespace Endpoints {
     void updateCurrencyConfig() {
-      if (!WebUI::authenticationOK()) { return; }
-      Log.trace(F("Handling /updateCurrencyConfig"));
+      auto action = []() {
+        for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
+          String prefix = "_c" + String(i) + "_";
+          cmSettings->currencies[i].id = WebUI::arg(prefix + "id");
+          cmSettings->currencies[i].nickname = WebUI::arg(prefix + "nick");
+        }
 
-      for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
-        String prefix = "_c" + String(i) + "_";
-        cmSettings->currencies[i].id = WebUI::arg(prefix + "id");
-        cmSettings->currencies[i].nickname = WebUI::arg(prefix + "nick");
-      }
+        uint32_t refreshInHours = WebUI::arg(F("refreshInterval")).toInt();
+        cmSettings->refreshInterval = max<uint32_t>(refreshInHours, CMSettings::MinRefreshInterval);
+        cmSettings->rateApiKey = WebUI::arg("erKey");
 
-      uint32_t refreshInHours = WebUI::arg(F("refreshInterval")).toInt();
-      cmSettings->refreshInterval = max<uint32_t>(refreshInHours, CMSettings::MinRefreshInterval);
-      cmSettings->rateApiKey = WebUI::arg("erKey");
+        wtApp->settings->write();
 
-      wtApp->settings->write();
+        // Act on changed settings...
+        wtAppImpl->configMayHaveChanged();
+        WebUI::redirectHome();
+      };
 
-      // Act on changed settings...
-      wtAppImpl->configMayHaveChanged();
-      WebUI::redirectHome();
+      WebUIHelper::wrapWebAction("/updateCurrencyConfig", action);
     }
   }   // ----- END: CMWebUI::Endpoints
 
 
   void init() {
-    WebUIHelper::init(Internal::CUSTOM_ACTIONS);
+WebThing::genHeapStatsRow("before WebUIHelper::init");
+    WebUIHelper::init(Internal::APP_MENU_ITEMS);
 
+WebThing::genHeapStatsRow("before registering endpoints");
     // Standard pages and endpoints
     WebUI::registerHandler("/",                     WebUIHelper::Default::homePage);
     WebUI::registerHandler("/dev",                  WebUIHelper::Default::devPage);
-    WebUI::registerHandler("/dev/updateDevData",    WebUIHelper::Default::updateDevConfig);
+    WebUI::registerHandler("/dev/updateSettings",   WebUIHelper::Default::updateDevConfig);
 
     // CUSTOM: App-specific pages and endpoints
     WebUI::registerHandler("/presentCurrencyConfig",Pages::currencyPage);
     WebUI::registerHandler("/updateCurrencyConfig", Endpoints::updateCurrencyConfig);
+WebThing::genHeapStatsRow("Exiting CMWebUI::init");
   }
 
 }
