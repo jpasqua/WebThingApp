@@ -187,8 +187,10 @@ void PluginMgr::refreshAll(bool force) {
 
 uint8_t PluginMgr::getPluginCount() { return _nPlugins; }
 
+Plugin** PluginMgr::getPlugins() { return &(_plugins[0]); }
+
 Plugin* PluginMgr::getPlugin(uint8_t index) {
-  if (index > _nPlugins) return NULL;
+  if (index >= _nPlugins) return NULL;
   return _plugins[index];
 }
 
