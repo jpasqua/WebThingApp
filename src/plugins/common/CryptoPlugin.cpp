@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <ArduinoLog.h>
 //                                  Third Party Libraries
-//                                  WebThing Libraries
+//                                  WebThing Includes
 //                                  Local Includes
 #include "../../clients/CoinbaseClient.h"
 #include "../../gui/Theme.h"

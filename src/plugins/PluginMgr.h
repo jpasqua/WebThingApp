@@ -35,13 +35,14 @@ public:
   static void setFactory(Factory theFactory);
 
   // ----- Member Functions
-  void    loadAll(String pluginRoot);
-  void    refreshAll(bool force = false);
-  uint8_t getPluginCount();
-  Plugin* getPlugin(uint8_t index);
-  void    map(const String& key, String& value);
-  void    displayPlugin(uint8_t pluginIndex);
-  void    displayNextPlugin();
+  void      loadAll(String pluginRoot);
+  void      refreshAll(bool force = false);
+  uint8_t   getPluginCount();
+  Plugin*   getPlugin(uint8_t index);
+  Plugin**  getPlugins();
+  void      map(const String& key, String& value);
+  void      displayPlugin(uint8_t pluginIndex);
+  void      displayNextPlugin();
 
 private:
   static const uint8_t MaxPlugins = 4;
