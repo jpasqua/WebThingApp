@@ -12,6 +12,7 @@
 #include <WebThing.h>
 //                                  Local Includes
 #include "../WTApp.h"
+#include "../WTAppImpl.h"
 #include "../gui/Display.h"
 #include "../gui/Theme.h"
 #include "../gui/ScreenMgr.h"
@@ -63,10 +64,10 @@ static const uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWidth;
 
 WeatherScreen::WeatherScreen() {
 
-  auto buttonHandler =[&](int id, Button::PressType type) -> void {
+  auto buttonHandler =[](int id, Button::PressType type) -> void {
     Log.verbose(F("In WeatherScreen Button Handler, id = %d, type = %d"), id, type);
     if (type > Button::PressType::NormalPress) ScreenMgr::displayHomeScreen();
-    else ScreenMgr::display("Forecast");
+    else ScreenMgr::display(wtAppImpl->forecastScreen);
   };
 
   nButtons = 1;
@@ -97,7 +98,9 @@ void WeatherScreen::display(bool activating) {
   Display::Font::setUsingID(Display::Font::FontID::SB12, tft);
   tft.setTextColor(Theme::Color_WeatherTxt);
   tft.setTextDatum(TL_DATUM);
-  tft.drawString(wtApp->owmClient->weather.location.city, XTopAreaInset, YTopArea);
+  String& city = wtApp->settings->owmOptions.nickname;
+  if (city.isEmpty()) { city = wtApp->owmClient->weather.location.city; }
+  tft.drawString(city, XTopAreaInset, YTopArea);
   showTime();
 
   // ----- Draw the central display area
