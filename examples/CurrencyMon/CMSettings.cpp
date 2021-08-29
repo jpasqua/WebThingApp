@@ -32,15 +32,14 @@ void CMSettings::fromJSON(JsonDocument &doc) {
   refreshInterval = doc[F("refreshInterval")];
   refreshInterval = max<uint32_t>(refreshInterval, MinRefreshInterval);
 
-  rateApiKey = String(doc["rateApiKey"]|"");
+  WTBasics::setStringContent(rateApiKey, doc["rateApiKey"]);
 
   JsonArrayConst osArray = doc[F("currencies")];
   int i = 0;
   for (JsonObjectConst os : osArray) {
-    currencies[i].id = os["id"].as<String>();
-    currencies[i].nickname = os["nickname"].as<String>();
-    i++;
-    if (i == CMSettings::MaxCurrencies) break;
+    WTBasics::setStringContent(currencies[i].id, os["id"]);
+    WTBasics::setStringContent(currencies[i].nickname, os["nickname"]);
+    if (++i == CMSettings::MaxCurrencies) break;
   }
 
   WTAppSettings::fromJSON(doc);

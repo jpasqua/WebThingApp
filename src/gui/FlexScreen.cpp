@@ -30,10 +30,7 @@ using Display::sprite;
  *----------------------------------------------------------------------------*/
 
 inline uint16_t mapColor(String colorSpecifier) {
-  int index = 0;
-  if (colorSpecifier.startsWith(F("0x"))) index = 2;
-  else if (colorSpecifier.startsWith(F("#"))) index = 1;
-  uint32_t hexVal = strtol(colorSpecifier.substring(index).c_str(), NULL, 16);
+  uint32_t hexVal = strtol(colorSpecifier.c_str(), NULL, 16);
   return tft.color24to16(hexVal);
 }
 
@@ -91,6 +88,8 @@ bool FlexScreen::init(
     uint32_t refreshInterval,
     const WTBasics::ReferenceMapper &mapper)
 {
+  FlexItem::init();
+
   _mapper = mapper;
   _refreshInterval = refreshInterval;
 
@@ -150,6 +149,8 @@ bool FlexScreen::fromJSON(JsonObjectConst& screen) {
  *
  *----------------------------------------------------------------------------*/
 
+String FlexItem::_val; // Temporary space shared by all FlexItems
+
 void FlexItem::fromJSON(JsonObjectConst& item) {
   // What it is...
   _dataType = mapType(item[F("type")].as<String>());
@@ -173,8 +174,8 @@ void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
-    String value;
-    mapper(_key, value);
+    _val.clear(); // Reuse the same value buffer across all FlexItems
+    mapper(_key, _val);
 
     sprite->setColorDepth(1);
     sprite->createSprite(_w, _h);
@@ -185,31 +186,31 @@ void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
     char buf[bufSize];
 
     switch (_dataType) {
-      case FlexItem::Type::INT: sprintf(buf, fmt, value.toInt()); break;
-      case FlexItem::Type::FLOAT: sprintf(buf, fmt, value.toFloat()); break;
-      case FlexItem::Type::STRING: sprintf(buf, fmt, value.c_str()); break;
+      case FlexItem::Type::INT: sprintf(buf, fmt, _val.toInt()); break;
+      case FlexItem::Type::FLOAT: sprintf(buf, fmt, _val.toFloat()); break;
+      case FlexItem::Type::STRING: sprintf(buf, fmt, _val.c_str()); break;
       case FlexItem::Type::BOOL: {
-        char c = value[0];
+        char c = _val[0];
         bool bv = (c == 't' || c == 'T' || c == '1') ;
         sprintf(buf, fmt, bv ? F("True") : F("False"));
         break;
       }
       case FlexItem::Type::CLOCK: {
-        int firstDelim = value.indexOf('|');
-        int secondDelim = value.lastIndexOf('|');
-        int theHour = value.substring(0, firstDelim).toInt();
-        int theMinute = value.substring(firstDelim+1, secondDelim).toInt();
-        int theSecond = value.substring(secondDelim+1).toInt();
+        int firstDelim = _val.indexOf('|');
+        int secondDelim = _val.lastIndexOf('|');
+        int theHour = _val.substring(0, firstDelim).toInt();
+        int theMinute = _val.substring(firstDelim+1, secondDelim).toInt();
+        int theSecond = _val.substring(secondDelim+1).toInt();
         sprintf(buf, fmt, theHour, theMinute, theSecond);
         break;
       }
       case FlexItem::Type::STATUS:
         // A Status value consists of a number (often a status code) and a message
         // The form is code|message
-        int index = value.indexOf('|');
+        int index = _val.indexOf('|');
         if (index != -1) {
-          String msg = value.substring(0, index);
-          int code = value.substring(index+1).toInt();
+          String msg = _val.substring(0, index);
+          int code = _val.substring(index+1).toInt();
           if (strncasecmp(fmt, "#progress", 9) == 0) {
             String showPct = WTBasics::EmptyString;
             if (fmt[9] == '|' && fmt[10] != 0) showPct = String(&fmt[10]);
@@ -220,7 +221,7 @@ void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
               _color, bkg, showPct, true);
             return;
           } else {
-            sprintf(buf, fmt, value.c_str(), code);
+            sprintf(buf, fmt, _val.c_str(), code);
           }
         }
         break;

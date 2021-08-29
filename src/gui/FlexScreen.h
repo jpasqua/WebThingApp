@@ -37,6 +37,9 @@ public:
 
   void fromJSON(JsonObjectConst& item);
 
+  static String _val; // Temporary space shared by all FlexItems
+  static void init() { _val.reserve(32); }
+
   uint16_t _x, _y;    // Location of the field
   uint16_t _w, _h;    // Size of the field
   uint16_t _xOff;     // x offset of text within field

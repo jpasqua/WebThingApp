@@ -11,6 +11,8 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
+//                                  WebThing Includes
+#include <WebThingBasics.h>
 //                                  Local Includes
 #include "WTAppSettings.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -47,19 +49,21 @@ OWMOptions::OWMOptions() {
 }
 
 void OWMOptions::fromJSON(JsonDocument &doc) {
-  enabled = doc[F("owm")][F("enabled")];
-  key = doc[F("owm")][F("key")].as<String>();
-  cityID = doc[F("owm")][F("cityID")];
-  language = doc[F("owm")][F("language")].as<String>();
-  nickname = String(doc[F("owm")][F("nickname")]|"");
+  JsonObjectConst owm = doc["owm"].as<JsonObjectConst>();
+  enabled = owm[F("enabled")];
+  cityID = owm[F("cityID")];
+  WTBasics::setStringContent(key, owm["key"]);
+  WTBasics::setStringContent(language, owm["language"]);
+  WTBasics::setStringContent(nickname, owm["nickname"]);
 }
 
 void OWMOptions::toJSON(JsonDocument &doc) {
-  doc[F("owm")][F("enabled")] = enabled;
-  doc[F("owm")][F("key")] = key;
-  doc[F("owm")][F("cityID")] = cityID;
-  doc[F("owm")][F("language")] = language;
-  doc[F("owm")][F("nickname")] = nickname;
+  JsonObject owm = doc["owm"].as<JsonObject>();
+  owm["enabled"] = enabled;
+  owm["key"] = key;
+  owm["cityID"] = cityID;
+  owm["language"] = language;
+  owm["nickname"] = nickname;
 }
 
 void OWMOptions::logSettings() {

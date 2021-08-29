@@ -7,6 +7,8 @@
 #include <ArduinoJson.h>
 #include <ArduinoLog.h>
 #include <JSONService.h>
+//                                  WebThing Includes
+#include <WebThingBasics.h>
 //                                  Local Includes
 #include "OWMClient.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -22,11 +24,22 @@ static ServiceDetails owmDetails(OWMServer, OWMPort);
 static JSONService owmService(owmDetails);
 
 OWMClient::OWMClient(String key, int cityID, bool useMetric, String language) :
-    _key(key), _cityID(cityID), _useMetric(useMetric), _lang(language) { }
+    _key(key), _cityID(cityID), _useMetric(useMetric), _lang(language)
+{
+  _endpoint.reserve(100);
+}
 
 void OWMClient::update() {
-  String endpoint = "/data/2.5/group?id=" + _cityID + "&units=" + (_useMetric?"metric":"imperial") + "&cnt=1&APPID=" + _key + "&lang=" + _lang;
-  DynamicJsonDocument *root = owmService.issueGET(endpoint, 1024);
+  WTBasics::setStringContent(_endpoint, "/data/2.5/group?id=");
+  _endpoint.concat(_cityID);
+  _endpoint.concat("&units=");
+  _endpoint.concat(_useMetric ? "metric" : "imperial");
+  _endpoint.concat("&cnt=1&APPID=");
+  _endpoint.concat(_key);
+  _endpoint.concat("&lang=");
+  _endpoint.concat(_lang);
+
+  DynamicJsonDocument *root = owmService.issueGET(_endpoint, 1024);
   if (!root) {
     Log.warning(F("Failed to update weather info"));
     weather.cached = true;
@@ -78,7 +91,7 @@ void OWMClient::update() {
   JsonObject city = (*root)["list"][0];
   weather.location.lat = city["coord"]["lat"];
   weather.location.lon = city["coord"]["lon"];
-  weather.location.country = city["sys"]["country"].as<String>();
+  WTBasics::setStringContent(weather.location.country, city["sys"]["country"]);
   weather.location.city = city["name"].as<String>();
   weather.location.cityID = city["id"];
 
@@ -86,17 +99,18 @@ void OWMClient::update() {
   weather.time.sunrise = city["sys"]["sunrise"];
   weather.time.sunset = city["sys"]["sunset"];
 
-  weather.description.basic = city["weather"][0]["main"].as<String>();
-  weather.description.longer = city["weather"][0]["description"].as<String>();
-  weather.description.icon = city["weather"][0]["icon"].as<String>();
+  WTBasics::setStringContent(weather.description.basic, city["weather"][0]["main"]);
+  WTBasics::setStringContent(weather.description.longer, city["weather"][0]["description"]);
+  WTBasics::setStringContent(weather.description.icon, city["weather"][0]["icon"]);
   weather.description.code = city["weather"][0]["id"];
 
-  weather.readings.temp = city["main"]["temp"];
-  weather.readings.feelsLike = city["main"]["feels_like"];
-  weather.readings.minTemp = city["main"]["temp_min"];
-  weather.readings.maxTemp = city["main"]["temp_max"];
-  weather.readings.pressure = city["main"]["pressure"];
-  weather.readings.humidity = city["main"]["humidity"];
+  JsonObject cityMain = city["main"];
+  weather.readings.temp = cityMain["temp"];
+  weather.readings.feelsLike = cityMain["feels_like"];
+  weather.readings.minTemp = cityMain["temp_min"];
+  weather.readings.maxTemp = cityMain["temp_max"];
+  weather.readings.pressure = cityMain["pressure"];
+  weather.readings.humidity = cityMain["humidity"];
   weather.readings.windSpeed = city["wind"]["speed"];
   weather.readings.visibility = city["visibility"];
   weather.readings.cloudiness = city["clouds"]["all"];
@@ -110,8 +124,17 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   filter["list"][0]["dt"] = true;
   filter["list"][0]["main"]["temp"] = true;
   filter["list"][0]["weather"][0]["icon"] = true;
-  String endpoint = "/data/2.5/forecast?id=" + _cityID + "&units=" + (_useMetric?"metric":"imperial") + "&APPID=" + _key + "&lang=" + _lang;
-  DynamicJsonDocument *root = owmService.issueGET(endpoint, 8192, &filter);
+
+  WTBasics::setStringContent(_endpoint, "/data/2.5/forecast?id=");
+  _endpoint.concat(_cityID);
+  _endpoint.concat("&units=");
+  _endpoint.concat(_useMetric ? "metric" : "imperial");
+  _endpoint.concat("&APPID=");
+  _endpoint.concat(_key);
+  _endpoint.concat("&lang=");
+  _endpoint.concat(_lang);
+
+  DynamicJsonDocument *root = owmService.issueGET(_endpoint, 8192, &filter);
   if (!root) {
     Log.warning(F("Failed to retreive forecast"));
     return;
@@ -156,7 +179,7 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
     if (curTemp > curMax) {
       curMax = curTemp;
       timeOfMaxTemp = curDT;
-      curIcon = f["weather"][0]["icon"].as<String>();
+      WTBasics::setStringContent(curIcon, f["weather"][0]["icon"]);
     }
     if (curTemp < curMin) {
       curMin = curTemp;

@@ -105,6 +105,7 @@ public:
   String getIcon() {  return weather.description.icon; }
 
 private:
+  String _endpoint;
   String _key = "";
   String _cityID = "";
   bool   _useMetric = false;
