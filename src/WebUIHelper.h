@@ -2,8 +2,6 @@
 #define WebUIHelper_h
 
 namespace WebUIHelper {
-  static const String checkedOrNot[2];
-
   extern ESPTemplateProcessor  *templateHandler;
 
   void init(PGM_P customActions);
@@ -11,10 +9,13 @@ namespace WebUIHelper {
   void showUpdatingIcon();
   void hideUpdatingIcon();
 
-  void wrapWebAction(const char* actionName, std::function<void(void)> action);
+  void wrapWebAction(
+      const char* actionName, std::function<void(void)> action,
+      bool showIcon = true);
   void wrapWebPage(
       const char* pageName, const char* htmlTemplate,
-      ESPTemplateProcessor::ProcessorCallback mapper);
+      ESPTemplateProcessor::ProcessorCallback mapper,
+      bool showIcon = true);
 
 
   namespace Default {

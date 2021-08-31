@@ -14,6 +14,7 @@
 #include <WebThing.h>
 #include <WebUI.h>
 //                                  Local Includes
+#include "WebUIHelper.h"
 #include "WTAppImpl.h"
 #include "gui/Theme.h"
 #include "gui/Display.h"
@@ -34,27 +35,28 @@ namespace WebUIHelper {
   void hideUpdatingIcon() { ScreenMgr::hideUpdatingIcon(); }
 
 
-  void wrapWebAction(const char* actionName, std::function<void(void)> action) {
+  void wrapWebAction(const char* actionName, std::function<void(void)> action, bool showIcon) {
     Log.trace(F("Handling %s"), actionName);
     if (!WebUI::authenticationOK()) { return; }
 
-    showUpdatingIcon();
+    if (showIcon) showUpdatingIcon();
     action();
-    hideUpdatingIcon();
+    if (showIcon) hideUpdatingIcon();
   }
 
   void wrapWebPage(
       const char* pageName, const char* htmlTemplate,
-      ESPTemplateProcessor::ProcessorCallback mapper)
+      ESPTemplateProcessor::ProcessorCallback mapper,
+      bool showIcon)
   {
     Log.trace(F("Handling %s"), pageName);
     if (!WebUI::authenticationOK()) { return; }
 
-    showUpdatingIcon();
+    if (showIcon) showUpdatingIcon();
     WebUI::startPage();
     templateHandler->send(htmlTemplate, mapper);
     WebUI::finishPage();
-    hideUpdatingIcon();
+    if (showIcon) hideUpdatingIcon();
   }
 
   // ----- BEGIN: WebUIHelper::Internal
@@ -82,7 +84,7 @@ namespace WebUIHelper {
     void setBrightness() {
       auto action = []() {
         showUpdatingIcon();
-        uint8_t b = WebUI::arg(F("brightness")).toInt();
+        uint8_t b = WebUI::arg(F("value")).toInt();
         if (b <= 0 || b > 100) {  // NOTE: 0 is not an allowed value!
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
           WebUI::closeConnection(400, "Invalid Brightness: " + WebUI::arg(F("brightness")));
@@ -96,10 +98,12 @@ namespace WebUIHelper {
     }
 
     void updateStatus() {
-      // NOTE: Don't display the updating icon. It will get done by the updating actions
-      if (!WebUI::authenticationOK()) { return; }
-      wtAppImpl->updateAllData();
-      WebUI::redirectHome();
+      auto action = []() {
+        wtAppImpl->updateAllData();
+        WebUI::redirectHome();
+      };
+
+      wrapWebAction("/updateStatus", action, false);
     }
 
     void updateWeatherConfig() {
@@ -187,7 +191,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/dev/reboot", action);
+      wrapWebAction("/dev/reboot", action, false);
     }
 
     void forceScreen() {
@@ -201,7 +205,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/dev/forceScreen", action);
+      wrapWebAction("/dev/forceScreen", action, false);
     }
 
     void yieldSettings() {
@@ -222,7 +226,7 @@ namespace WebUIHelper {
             Display::getSizeOfScreenShotAsBMP(),
             Display::streamScreenShotAsBMP);
       };
-      wrapWebAction("/dev/screenShot", action);
+      wrapWebAction("/dev/screenShot", action, false);
     }
 
     void enableDevMenu() {
@@ -371,6 +375,7 @@ namespace WebUIHelper {
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
     if (wtApp->settings->uiOptions.showDevMenu) {
+Log.verbose("adding dev menu items");
       WebUI::addDevMenuItems(Internal::DEV_MENU_ITEMS);
     }
 
