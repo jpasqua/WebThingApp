@@ -98,9 +98,7 @@ namespace ScreenMgr {
   void setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
     State::uiOptions = uiOptions;
     State::displayOptions = displayOptions;
-WebThing::genHeapStatsRow("before Display::begin");
     Display::begin(displayOptions);
-WebThing::genHeapStatsRow("before initInfoIcon");
     Internal::initInfoIcon();
   }
 

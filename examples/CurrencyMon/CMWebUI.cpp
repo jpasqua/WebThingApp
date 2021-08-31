@@ -77,10 +77,8 @@ namespace CMWebUI {
 
 
   void init() {
-WebThing::genHeapStatsRow("before WebUIHelper::init");
     WebUIHelper::init(Internal::APP_MENU_ITEMS);
 
-WebThing::genHeapStatsRow("before registering endpoints");
     // Standard pages and endpoints
     WebUI::registerHandler("/",                     WebUIHelper::Default::homePage);
     WebUI::registerHandler("/dev",                  WebUIHelper::Default::devPage);
@@ -89,7 +87,6 @@ WebThing::genHeapStatsRow("before registering endpoints");
     // CUSTOM: App-specific pages and endpoints
     WebUI::registerHandler("/presentCurrencyConfig",Pages::currencyPage);
     WebUI::registerHandler("/updateCurrencyConfig", Endpoints::updateCurrencyConfig);
-WebThing::genHeapStatsRow("Exiting CMWebUI::init");
   }
 
 }
