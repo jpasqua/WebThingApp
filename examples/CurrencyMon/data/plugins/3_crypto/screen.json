@@ -1,114 +1,79 @@
 {
   "items": [
     {
-      "x": 0,   "y": 0,
-      "w": 320, "h": 30,
-      "xOff": 160, "yOff": 15,
-      "justify": "MC",
-      "font": "S12",
-      "color": "0x00FF00",
-      "format": "Crypto Currencies",
-      "strokeWidth": 2
+      "x": 0, "y": 0, "w": 136,  "h": 22, "xOff": 0, "yOff": 22,
+      "justify": "BL", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.city"
     },
     {
-      "x": 0,   "y": 35,
-      "w": 86,  "h": 26,
-      "xOff": 85, "yOff": 25,
-      "justify": "BR",
-      "font": "2",
-      "color": "0xFFFFFF",
-      "format": "Name"
+      "x": 136, "y": 0, "w": 48,  "h": 22, "xOff": 24, "yOff": 22,
+      "justify": "BC", "font": "SB9", "color": "0x00FF00", "format": "%0.0fF",
+      "type": "FLOAT", "key": "$W.temp"
     },
     {
-      "x": 86,  "y": 35,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "SB9",
-      "color": "0xFFFFFF",
-      "format": "%s",
-      "type": "STRING",
-      "key": "NN1"
+      "x": 184, "y": 0, "w": 136,  "h": 22, "xOff": 135, "yOff": 22,
+      "justify": "BR", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.ldesc"
     },
     {
-      "x": 203,  "y": 35,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "SB9",
-      "color": "0xFFFFFF",
-      "format": "%s",
-      "type": "STRING",
-      "key": "NN2"
-    },
-    {
-      "x": 0,   "y": 64,
-      "w": 86,  "h": 26,
-      "xOff": 85, "yOff": 13,
-      "justify": "MR",
-      "font": "2",
-      "color": "0xFFFFFF",
-      "format": "Price:"
-    },
-    {
-      "x": 86,  "y": 64,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "SB12",
-      "color": "0x00FF00",
-      "format": "%s",
-      "type": "STRING",
-      "key": "PR1"
-    },
-    {
-      "x": 203,  "y": 64,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "SB12",
-      "color": "0x00FF00",
-      "format": "%s",
-      "type": "STRING",
-      "key": "PR2"
-    },
-    {
-      "x": 0,   "y": 90,
-      "w": 86,  "h": 26,
-      "xOff": 85, "yOff": 13,
-      "justify": "MR",
-      "font": "2",
-      "color": "0xFFFFFF",
-      "format": "Currency:"
-    },
-    {
-      "x": 86,  "y": 90,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "S12",
-      "color": "0xFFFFFF",
-      "format": "%s",
-      "type": "STRING",
-      "key": "CU1"
-    },
-    {
-      "x": 203,  "y": 90,
-      "w": 117,  "h": 26,
-      "xOff": 58, "yOff": 13,
-      "justify": "MC",
-      "font": "S12",
-      "color": "0xFFFFFF",
-      "format": "%s",
-      "type": "STRING",
-      "key": "CU2"
-    },
-    {
-      "x": 100, "y": 218, "w": 120,  "h": 22, "xOff": 60, "yOff": 11,
-      "justify": "MC", "font": "D20", "color": "0xc354ff", "format": "%02d:%02d:%02d",
+      "x": 0, "y": 35, "w": 320,  "h":79, "xOff": 160, "yOff": 39,
+      "justify": "MC", "font": "D72", "color": "0x00ff00", "format": "%2d:%02d",
       "type": "CLOCK", "key": "$S.time"
-    }             
+    },
+
+    {
+      "x": 0,   "y": 120, "w": 86,  "h": 26, "xOff": 85, "yOff": 25,
+      "justify": "BR", "font": "2", "color": "0xFFFFFF", "format": "Name"
+    },
+    {
+      "x": 86,  "y": 120, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB9", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.NN1"
+    },
+    {
+      "x": 203,  "y": 120, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB9", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.NN2"
+    },
+    {
+      "x": 0,   "y": 149, "w": 86,  "h": 26, "xOff": 85, "yOff": 13,
+      "justify": "MR", "font": "2", "color": "0xFFFFFF", "format": "Price:"
+    },
+    {
+      "x": 86,  "y": 149, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB12", "color": "0x00FF00", "format": "%s",
+      "type": "STRING", "key": "$E.CC.PR1"
+    },
+    {
+      "x": 203,  "y": 149, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "SB12", "color": "0x00FF00", "format": "%s",
+      "type": "STRING", "key": "$E.CC.PR2"
+    },
+    {
+      "x": 0,   "y": 175, "w": 86,  "h": 26, "xOff": 85, "yOff": 13,
+      "justify": "MR", "font": "2", "color": "0xFFFFFF","format": "Currency:"
+    },
+    {
+      "x": 86,  "y": 175, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.CU1"
+    },
+    {
+      "x": 203,  "y": 175, "w": 117,  "h": 26, "xOff": 58, "yOff": 13,
+      "justify": "MC", "font": "2", "color": "0xFFFFFF", "format": "%s",
+      "type": "STRING", "key": "$E.CC.CU2"
+    },
+    {
+      "x": 0, "y": 222, "w": 110,  "h": 18, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "2", "color": "0xc354ff", "format": "(c) %s",
+      "type": "STRING", "key": "$S.author"
+    },
+    {
+      "x": 110, "y": 222, "w": 210,  "h": 22, "xOff": 200, "yOff": 0,
+      "justify": "TR", "font": "2", "color": "0xCCCCCC", "format": "%s",
+      "type": "String", "key": "$S.heap"
+    }
   ],
   "bkg": "0x000000",
-  "screenID": "Crypto"
+  "screenID": "Mix1"
 }
