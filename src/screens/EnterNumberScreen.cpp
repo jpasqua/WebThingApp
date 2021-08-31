@@ -101,8 +101,12 @@ void EnterNumberScreen::init(
 
     String currentValue = formattedValue;
     if (id >= FirstDigitButton && id <= LastDigitButton) {
-      if (formattedValue.toFloat() == 0) { formattedValue = DigitLabels[id-FirstDigitButton]; }
-      else { formattedValue += DigitLabels[id-FirstDigitButton]; }
+      if (formattedValue.toFloat() == 0 && formattedValue.indexOf('.') == -1) {
+        formattedValue = DigitLabels[id-FirstDigitButton];
+      }
+      else {
+        formattedValue += DigitLabels[id-FirstDigitButton];
+      }
     } else if (id == DecimalButton) {
       if (!allowDecimals) return;
       if (formattedValue.indexOf('.') == -1) formattedValue += '.';
