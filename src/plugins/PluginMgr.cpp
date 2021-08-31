@@ -20,9 +20,10 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 #include <ArduinoLog.h>
-//                                  WebThing Libraries
+//                                  WebThing Includes
 #include <ESP_FS.h>
 #include <DataBroker.h>
+#include <WebThing.h>
 //                                  Local Includes
 #include "../gui/ScreenMgr.h"
 #include "PluginMgr.h"
@@ -119,13 +120,15 @@ uint8_t PluginMgr::enumPlugins(String& pluginRoot, String* pluginDirNames) {
   uint8_t nPluginsFound = 0;
   uint8_t lengthOfPIPath = pluginRoot.length();
 
-  if (!ESP_FS::beginFileList(pluginRoot)) {
+  ESP_FS::DirEnumerator* de = ESP_FS::newEnumerator();
+  if (!de->begin(pluginRoot)) {
     Log.warning("The specified plugin path (%s) is not a directory", pluginRoot.c_str());
+    delete de;
     return 0;
   }
 
   String path;
-  while (nPluginsFound < MaxPlugins && ESP_FS::getNextFileName(path)) {
+  while (nPluginsFound < MaxPlugins && de->next(path)) {
     int firstSlash = path.indexOf('/', lengthOfPIPath+2);
     if (firstSlash == -1) continue; // Not in a subdirectory;
     String pluginDirName = path.substring(lengthOfPIPath, firstSlash);
@@ -137,6 +140,8 @@ uint8_t PluginMgr::enumPlugins(String& pluginRoot, String* pluginDirNames) {
       pluginDirNames[nPluginsFound++] = pluginDirName;
     }
   }
+  delete de;
+
   return nPluginsFound;
 }
 
@@ -153,7 +158,7 @@ void PluginMgr::setFactory(Factory theFactory) {
 
 void PluginMgr::loadAll(String pluginRoot) {
 
-  auto buttonHandler =[&](int id, Button::PressType type) -> void {
+  auto buttonHandler =[this](int id, Button::PressType type) -> void {
     Log.verbose(F("FlexScreen button delegate: id = %d, type = %d"), id, type);
     displayNextPlugin();
   };
