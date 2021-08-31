@@ -58,12 +58,11 @@ void OWMOptions::fromJSON(JsonDocument &doc) {
 }
 
 void OWMOptions::toJSON(JsonDocument &doc) {
-  JsonObject owm = doc["owm"].as<JsonObject>();
-  owm["enabled"] = enabled;
-  owm["key"] = key;
-  owm["cityID"] = cityID;
-  owm["language"] = language;
-  owm["nickname"] = nickname;
+  doc["owm"]["enabled"] = enabled;
+  doc["owm"]["key"] = key;
+  doc["owm"]["cityID"] = cityID;
+  doc["owm"]["language"] = language;
+  doc["owm"]["nickname"] = nickname;
 }
 
 void OWMOptions::logSettings() {
