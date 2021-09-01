@@ -174,7 +174,9 @@ void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
-    _val.clear(); // Reuse the same value buffer across all FlexItems
+    // Reuse the same value buffer across all FlexItems, so clear it out
+    WTBasics::resetString(_val);
+    
     mapper(_key, _val);
 
     sprite->setColorDepth(1);
