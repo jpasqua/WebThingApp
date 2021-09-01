@@ -157,9 +157,14 @@ void WTAppImpl::prepWeather() {
 void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
   if (owmClient == NULL) return;
   if (key.equalsIgnoreCase("temp")) value +=  owmClient->weather.readings.temp;
-  else if (key.equalsIgnoreCase("city")) value += owmClient->weather.location.city;
   else if (key.equalsIgnoreCase("desc")) value += owmClient->weather.description.basic;
   else if (key.equalsIgnoreCase("ldesc")) value += owmClient->weather.description.longer;
+  else if (key.equalsIgnoreCase("city")) {
+    if (settings->owmOptions.nickname.isEmpty())
+      value += owmClient->weather.location.city;
+    else
+      value += settings->owmOptions.nickname;
+  }
 }
 
 
