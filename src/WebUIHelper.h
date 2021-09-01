@@ -2,7 +2,8 @@
 #define WebUIHelper_h
 
 namespace WebUIHelper {
-  extern ESPTemplateProcessor  *templateHandler;
+  extern ESPTemplateProcessor *templateHandler;
+  extern const String checkedOrNot[2];
 
   void init(PGM_P customActions);
 

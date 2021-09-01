@@ -25,7 +25,8 @@
 // ----- BEGIN: WebUIHelper namespace
 namespace WebUIHelper {
   static const char UpdatingSymbol = 'w';
-  static const String   checkedOrNot[2] = {"", "checked='checked'"};
+  
+  const String   checkedOrNot[2] = {"", "checked='checked'"};
   ESPTemplateProcessor  *templateHandler;
 
   void showUpdatingIcon() {
