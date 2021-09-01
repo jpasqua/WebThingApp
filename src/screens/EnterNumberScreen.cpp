@@ -74,8 +74,12 @@ void EnterNumberScreen::init(
   newValueCB = cb;
   _initialValue = constrain(initialValue, minVal, maxVal);
 
-  if (allowDecimals) { formattedValue = String(_initialValue); }
-  else { formattedValue = String( (long)_initialValue ); }
+  long valAsLong = _initialValue;
+  if (allowDecimals && (_initialValue - valAsLong != 0)) {
+    formattedValue = String(_initialValue);
+  } else {
+    formattedValue = String(valAsLong);
+  }
 
   auto buttonHandler =[this](int id, Button::PressType type) -> void {
     Log.verbose(F("In EnterNumberScreen Button Handler, id = %d, type = %d"), id, type);
