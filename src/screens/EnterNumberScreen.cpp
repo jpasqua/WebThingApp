@@ -10,7 +10,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "../gui/Display.h"
 #include "../gui/Theme.h"
@@ -19,45 +19,44 @@
 
 using Display::tft;
 
-static const char* DigitLabels[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
 
 // -- Button IDs
-static const uint8_t FirstDigitButton = 0;
-static const uint8_t LastDigitButton = 9;
-static const uint8_t DecimalButton = 10;
-static const uint8_t BackspaceButton = DecimalButton+1;
-static const uint8_t PlusMinusButton = BackspaceButton+1;
-static const uint8_t ValueButton = PlusMinusButton+1;
-static const uint8_t TotalButtons = ValueButton+1;
+static constexpr uint8_t FirstDigitButton = 0;
+static constexpr uint8_t LastDigitButton = 9;
+static constexpr uint8_t DecimalButton = 10;
+static constexpr uint8_t BackspaceButton = DecimalButton+1;
+static constexpr uint8_t PlusMinusButton = BackspaceButton+1;
+static constexpr uint8_t ValueButton = PlusMinusButton+1;
+static constexpr uint8_t TotalButtons = ValueButton+1;
 
 // Fonts
-static const auto ValueFont = Display::Font::FontID::SB12;
-static const uint16_t ValueFontHeight = 29;
+static constexpr auto ValueFont = Display::Font::FontID::SB12;
+static constexpr uint16_t ValueFontHeight = 29;
 
-static const auto DigitFont = Display::Font::FontID::SB9;
-static const uint16_t DigitFontHeight = 22;
+static constexpr auto DigitFont = Display::Font::FontID::SB9;
+static constexpr uint16_t DigitFontHeight = 22;
 
 // Field Locations
-static const auto TitleFont = Display::Font::FontID::SB12;
-static const uint16_t TitleFontHeight = 29;   // TitleFont->yAdvance;
-static const uint16_t TitleXOrigin = 0;
-static const uint16_t TitleYOrigin = 0;
-static const uint16_t TitleHeight = TitleFontHeight;
-static const uint16_t TitleWidth = Display::Width;
+static constexpr auto TitleFont = Display::Font::FontID::SB12;
+static constexpr uint16_t TitleFontHeight = 29;   // TitleFont->yAdvance;
+static constexpr uint16_t TitleXOrigin = 0;
+static constexpr uint16_t TitleYOrigin = 0;
+static constexpr uint16_t TitleHeight = TitleFontHeight;
+static constexpr uint16_t TitleWidth = Display::Width;
 
-static const uint16_t DigitWidth = 60;
-static const uint16_t DigitHeight = 60;
+static constexpr uint16_t DigitWidth = 60;
+static constexpr uint16_t DigitHeight = 60;
 
-static const uint16_t ValueXOrigin = 5;
-static const uint16_t ValueYOrigin = TitleHeight + 5;
-static const uint16_t ValueWidth = 100;
-static const uint16_t ValueHeight = 60;
+static constexpr uint16_t ValueXOrigin = 5;
+static constexpr uint16_t ValueYOrigin = TitleHeight + 5;
+static constexpr uint16_t ValueWidth = 100;
+static constexpr uint16_t ValueHeight = 60;
 
-static const uint16_t DigitsXOrigin = ValueXOrigin;
-static const uint16_t DigitsYOrigin = ValueYOrigin + ValueHeight + 5;
+static constexpr uint16_t DigitsXOrigin = ValueXOrigin;
+static constexpr uint16_t DigitsYOrigin = ValueYOrigin + ValueHeight + 5;
 
-static const uint8_t ValueFrameSize = 2;
-static const uint8_t DigitFrameSize = 1;
+static constexpr uint8_t ValueFrameSize = 2;
+static constexpr uint8_t DigitFrameSize = 1;
 
 EnterNumberScreen::EnterNumberScreen() {
   nButtons = 0; // No buttons until init is called!
@@ -106,10 +105,10 @@ void EnterNumberScreen::init(
     String currentValue = formattedValue;
     if (id >= FirstDigitButton && id <= LastDigitButton) {
       if (formattedValue.toFloat() == 0 && formattedValue.indexOf('.') == -1) {
-        formattedValue = DigitLabels[id-FirstDigitButton];
+        formattedValue = (char)('0' + (id-FirstDigitButton));
       }
       else {
-        formattedValue += DigitLabels[id-FirstDigitButton];
+        formattedValue += (char)('0' + (id-FirstDigitButton));
       }
     } else if (id == DecimalButton) {
       if (!allowDecimals) return;
@@ -184,10 +183,12 @@ void EnterNumberScreen::display(bool activating) {
     tft.setTextDatum(MC_DATUM);
     tft.drawString(title, TitleWidth/2, TitleHeight/2);
 
+    String label(' ');
     // Draw all the static components -- everything except the value
     for (int i = FirstDigitButton; i <= LastDigitButton; i++) {
+      label.setCharAt(0, (char)('0' + (i-FirstDigitButton)) );
       buttons[i].drawSimple(
-          DigitLabels[i-FirstDigitButton], DigitFont, DigitFrameSize,
+          label, DigitFont, DigitFrameSize,
           Theme::Color_NormalText, Theme::Color_Border,
           Theme::Color_Background, false);
     }

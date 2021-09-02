@@ -35,8 +35,8 @@ public:
   typedef enum {NormalPress, LongPress, VeryLongPress} PressType;
   typedef std::function<void(int, PressType)> ButtonCallback;
   
-  static const uint32_t LongPressInterval = 500;
-  static const uint32_t VeryLongPressInterval = 1000;
+  static constexpr uint32_t LongPressInterval = 500;
+  static constexpr uint32_t VeryLongPressInterval = 1000;
   
   uint16_t _x;
   uint16_t _y;

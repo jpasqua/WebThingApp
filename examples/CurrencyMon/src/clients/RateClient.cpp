@@ -43,7 +43,6 @@ RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies
 }
 
 void RateClient::updateRates() {
-  static const uint32_t ResultSize = 1000;
 
   if (_apiKey.startsWith("MOCK")) {
     mockUpdate();
@@ -53,6 +52,7 @@ void RateClient::updateRates() {
 
   if (_endpoint.isEmpty()) return;	// Nothing to do...
 
+  constexpr uint32_t ResultSize = 1000;
   DynamicJsonDocument *root = service->issueGET(_endpoint, ResultSize);
   if (!root) {
     Log.warning(F("issueGET failed for Rate Information"));

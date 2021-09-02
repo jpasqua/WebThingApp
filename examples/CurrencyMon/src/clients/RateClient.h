@@ -19,7 +19,7 @@ public:
 
 class RateClient {
 public:
-	static const uint8_t MaxCurrencies = 4;
+	static constexpr uint8_t MaxCurrencies = 4;
 
   uint32_t      timeOfLastUpdate = 0;
 

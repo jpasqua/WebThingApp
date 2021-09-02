@@ -10,7 +10,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 #include <WebThing.h>
 //                                  Local Includes
 #include "../WTApp.h"
@@ -31,14 +31,14 @@ using Display::tft;
  *
  *----------------------------------------------------------------------------*/
 
-static const auto ReadingsFont = Display::Font::FontID::SB9;
-static const uint16_t ReadingsFontHeight = 22;  // ReadingsFont->yAdvance;
+static constexpr auto ReadingsFont = Display::Font::FontID::SB9;
+static constexpr uint16_t ReadingsFontHeight = 22;  // ReadingsFont->yAdvance;
 
-static const uint16_t TileWidth = Display::Width/2;
-static const uint16_t TileHeight = Display::Height/3;
-static const uint16_t TextVPad = (TileHeight - (2*ReadingsFontHeight))/2;
+static constexpr uint16_t TileWidth = Display::Width/2;
+static constexpr uint16_t TileHeight = Display::Height/3;
+static constexpr uint16_t TextVPad = (TileHeight - (2*ReadingsFontHeight))/2;
 
-static int16_t TinyFont = 2;  // A small 5x7 font
+static constexpr int16_t TinyFont = 2;  // A small 5x7 font
 
 /*------------------------------------------------------------------------------
  *

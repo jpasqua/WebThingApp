@@ -53,7 +53,7 @@ public:
   }
 
 private:
-  static const uint32_t DebounceTime = 100;
+  static constexpr uint32_t DebounceTime = 100;
   uint32_t startOfPress = 0;
   uint32_t endOfPress = 0;
   uint16_t lastX, lastY;

@@ -19,7 +19,7 @@
 
 #define TFT_CS     5
 #define TFT_DC  	16  
-#define TFT_LED 	26  // LED backlight brightness
+#define TFT_LED 	26  // LED backlight brightness. -1 for no connection (full brightness)
 #define TFT_RST   -1
 
 #define TOUCH_CS  21

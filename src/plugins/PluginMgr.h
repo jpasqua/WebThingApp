@@ -16,7 +16,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "Plugin.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -28,7 +28,7 @@ public:
   typedef std::function<Plugin*(String&)> Factory;
 
   // ----- Constants
-  static const char PluginNamespacePrefix = 'E';
+  static constexpr char PluginNamespacePrefix = 'E';
   
   // ----- Class Functions
   static DynamicJsonDocument* getDoc(String filePathString, uint16_t maxFileSize);
@@ -45,7 +45,7 @@ public:
   void      displayNextPlugin();
 
 private:
-  static const uint8_t MaxPlugins = 4;
+  static constexpr uint8_t MaxPlugins = 4;
   static Factory factory;
   
   uint8_t _nPlugins;

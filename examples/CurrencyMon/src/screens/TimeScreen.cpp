@@ -11,7 +11,7 @@
 //                                  Third Party Libraries
 #include <TimeLib.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 #include <gui/Display.h>
 #include <gui/Theme.h>
 #include <gui/ScreenMgr.h>
@@ -53,46 +53,46 @@ using Display::sprite;
  *
  *----------------------------------------------------------------------------*/
 
-static const float NotSet = -1;
+static constexpr float NotSet = -1;
 
-static const auto WeatherFont = Display::Font::FontID::SB9;
-static const uint16_t WeatherFontHeight = 22;   // WeatherFont->yAdvance;
-static const uint16_t WeatherXOrigin = 0;
-static const uint16_t WeatherYOrigin = 0;
-static const uint16_t WeatherHeight = WeatherFontHeight;
-static const uint16_t WeatherWidth = Display::Width;
+static constexpr auto WeatherFont = Display::Font::FontID::SB9;
+static constexpr uint16_t WeatherFontHeight = 22;   // WeatherFont->yAdvance;
+static constexpr uint16_t WeatherXOrigin = 0;
+static constexpr uint16_t WeatherYOrigin = 0;
+static constexpr uint16_t WeatherHeight = WeatherFontHeight;
+static constexpr uint16_t WeatherWidth = Display::Width;
 
 // FC is short for Forecast
-static const uint16_t FC_YOrigin = WeatherYOrigin + WeatherHeight + 2;
-static const uint16_t FC_Height = WeatherFontHeight;
+static constexpr uint16_t FC_YOrigin = WeatherYOrigin + WeatherHeight + 2;
+static constexpr uint16_t FC_Height = WeatherFontHeight;
 
 // CB is short for "Currency Button"
 // NOTE: The rightmost frame of Button[i] overlaps the leftmost frame
 //       of Button[i+1]
-static const uint16_t CB_FrameSize = 2;                             // Size of the Frame
-static const uint16_t CB_Width = 106;                               // Includes Frame
-static const uint16_t CB_Height = 42;                               // Includes Frame
-static const uint16_t CB_XOrigin = 1;                               // X of origin of 1st currency button
-static const uint16_t CB_YOrigin = Display::Height - CB_Height;     // Y Origin of all currency buttons
-static const auto CB_Font = Display::Font::FontID::SB9;             // Font for currency value
-static const auto ButtonLabelFont = 2;                              // A small 5x7 font
+static constexpr uint16_t CB_FrameSize = 2;                             // Size of the Frame
+static constexpr uint16_t CB_Width = 106;                               // Includes Frame
+static constexpr uint16_t CB_Height = 42;                               // Includes Frame
+static constexpr uint16_t CB_XOrigin = 1;                               // X of origin of 1st currency button
+static constexpr uint16_t CB_YOrigin = Display::Height - CB_Height;     // Y Origin of all currency buttons
+static constexpr auto CB_Font = Display::Font::FontID::SB9;             // Font for currency value
+static constexpr auto ButtonLabelFont = 2;                              // A small 5x7 font
 
-static const uint16_t ClockXOrigin = 0;                             // Starts at left edge of screen
-static const uint16_t ClockYOrigin = FC_YOrigin + FC_Height;        // Starts below the Playing area
-static const uint16_t ClockWidth = Display::Width;                  // Full width of the screen
-static const uint16_t ClockHeight = CB_YOrigin-ClockYOrigin;        // The space between the other 2 areas
-static const auto ClockFont = Display::Font::FontID::D100;
-static const uint16_t ClockFontHeight = 109;    // ClockFont->yAdvance;
+static constexpr uint16_t ClockXOrigin = 0;                             // Starts at left edge of screen
+static constexpr uint16_t ClockYOrigin = FC_YOrigin + FC_Height;        // Starts below the Playing area
+static constexpr uint16_t ClockWidth = Display::Width;                  // Full width of the screen
+static constexpr uint16_t ClockHeight = CB_YOrigin-ClockYOrigin;        // The space between the other 2 areas
+static constexpr auto ClockFont = Display::Font::FontID::D100;
+static constexpr uint16_t ClockFontHeight = 109;    // ClockFont->yAdvance;
 
 // Button Indices
-static const uint8_t Currency1Button = 0;
-static const uint8_t Currency2Button = Currency1Button + 1;
-static const uint8_t Currency3Button = Currency2Button + 1;
-static const uint8_t NCurrencyButtons = Currency3Button + 1;
+static constexpr uint8_t Currency1Button = 0;
+static constexpr uint8_t Currency2Button = Currency1Button + 1;
+static constexpr uint8_t Currency3Button = Currency2Button + 1;
+static constexpr uint8_t NCurrencyButtons = Currency3Button + 1;
 
-static const uint8_t WeatherAreaIndex = NCurrencyButtons;
-static const uint8_t ClockAreaIndex = WeatherAreaIndex + 1;
-static const uint8_t NTotalButtons = ClockAreaIndex + 1;
+static constexpr uint8_t WeatherAreaIndex = NCurrencyButtons;
+static constexpr uint8_t ClockAreaIndex = WeatherAreaIndex + 1;
+static constexpr uint8_t NTotalButtons = ClockAreaIndex + 1;
 
 
 /*------------------------------------------------------------------------------

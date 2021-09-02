@@ -11,7 +11,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 #include <DataBroker.h>
 //                                  Local Includes
 #include "Display.h"

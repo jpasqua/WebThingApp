@@ -28,7 +28,35 @@ static const char *pis_label[6] = {"Dim", "Medium", "Bright", "Refresh", "Calibr
 static const uint16_t pis_colors[6] = {
   Theme::Color_Inactive,   Theme::Color_DimText,    Theme::Color_NormalText,
   Theme::Color_NormalText, Theme::Color_NormalText, Theme::Color_AlertGood};
-static int16_t SubFont = 2; // A small 5x7 font
+
+static constexpr int16_t SubFont = 2; // A small 5x7 font
+
+static constexpr auto HeaderFont = Display::Font::FontID::SB12;
+static constexpr uint16_t HeaderFontHeight = 29;
+
+static constexpr auto ButtonFont = Display::Font::FontID::SB9;
+static constexpr uint16_t ButtonFontHeight = 22;
+
+static constexpr uint16_t ButtonFrameSize = 2;
+static constexpr uint16_t ButtonHeight = 40;
+static constexpr uint16_t ButtonInset = 1;
+static constexpr uint16_t HalfWidth = (Display::Width-(2*ButtonInset))/2;
+static constexpr uint16_t ThirdWidth = (Display::Width-(2*ButtonInset))/3;
+
+static constexpr uint16_t PI_YOrigin = 60;
+
+static constexpr uint8_t FirstPluginIndex = 0;
+static constexpr uint8_t MaxPlugins = 4;
+static constexpr uint8_t DimButtonIndex = 4;
+static constexpr uint8_t MediumButtonIndex = 5;
+static constexpr uint8_t BrightButtonIndex = 6;
+static constexpr uint8_t RefreshButtonIndex = 7;
+static constexpr uint8_t CalButtonIndex = 8;
+static constexpr uint8_t HomeButtonIndex = 9;
+static constexpr uint8_t TotalButtons = 10;
+
+static constexpr uint16_t WifiBarsWidth = 13;
+static constexpr uint16_t WifiBarsHeight = 16;
 
 UtilityScreen::UtilityScreen() {
 

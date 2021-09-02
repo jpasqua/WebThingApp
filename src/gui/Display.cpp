@@ -16,7 +16,7 @@
 #endif
 #include <ArduinoLog.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "Display.h"
 #include "FlexScreen.h"

@@ -22,8 +22,8 @@ void SplashScreen::display(bool activating) {
 
   tft.fillScreen(AppTheme::Color_SplashBkg);
 
-  static const uint16_t x = Display::XCenter - (CMLogoMono_Width/2);
-  static const uint16_t y = 25;
+  constexpr uint16_t x = Display::XCenter - (CMLogoMono_Width/2);
+  constexpr uint16_t y = 25;
 
   tft.drawBitmap(x, y, CMLogoMono, CMLogoMono_Width, CMLogoMono_Height, AppTheme::Color_SplashFG);
 

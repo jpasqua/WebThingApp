@@ -28,10 +28,10 @@
 
 namespace Display {
   // ----- Constants
-  static const uint16_t Width = 320;
-  static const uint16_t Height = 240;
-  static const uint16_t XCenter = Width/2;
-  static const uint16_t YCenter = Height/2;
+  constexpr uint16_t Width = 320;
+  constexpr uint16_t Height = 240;
+  constexpr uint16_t XCenter = Width/2;
+  constexpr uint16_t YCenter = Height/2;
 
 
   // ----- Data

@@ -16,7 +16,6 @@
 #include "CMSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
-const uint32_t  CMSettings::CurrentVersion = 0x0001;
 
 CMSettings::CMSettings() {
   maxFileSize = 4096;

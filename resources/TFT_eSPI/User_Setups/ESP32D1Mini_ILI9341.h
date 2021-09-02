@@ -13,14 +13,15 @@
 #undef  TFT_LED
 #undef  TOUCH_CS
 
-#define TFT_MISO 19
-#define TFT_MOSI 23
-#define TFT_SCLK 18
-#define TFT_CS  26
-#define TFT_DC  5
-#define TFT_RST -1
-#define TFT_LED 16    // LED backlight brightness. Requires an added wire.
-                      // Use -1 for no connection (full brightness)
+#define TFT_SCLK  18
+#define TFT_MISO  19
+#define TFT_MOSI  23
+
+#define TFT_CS    26
+#define TFT_DC     5
+#define TFT_LED   16  // LED backlight brightness. -1 for no connection (full brightness)
+#define TFT_RST   -1
+
 #define TOUCH_CS  17
 
 #define LOAD_GLCD   // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH

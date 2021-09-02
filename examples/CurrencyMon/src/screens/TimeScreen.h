@@ -19,7 +19,7 @@ public:
   virtual void processPeriodicActivity();
 
 private:
-  static const uint8_t NumCurrencyButtons = 3;
+  static constexpr uint8_t NumCurrencyButtons = 3;
   
   uint8_t activeCurrency = 0;
   uint32_t nextUpdateTime = UINT32_MAX;

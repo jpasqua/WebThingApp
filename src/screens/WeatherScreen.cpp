@@ -8,7 +8,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 #include <WebThing.h>
 //                                  Local Includes
 #include "../WTApp.h"
@@ -29,31 +29,31 @@ using Display::sprite;
  *
  *----------------------------------------------------------------------------*/
 
-static const auto TimeFont = Display::Font::FontID::D20;
-static const uint16_t TimeFontWidth = 17;
-static const uint16_t TimeFontHeight = 22;
-static const uint16_t TimeFontColonWidth = 9;
+static constexpr auto TimeFont = Display::Font::FontID::D20;
+static constexpr uint16_t TimeFontWidth = 17;
+static constexpr uint16_t TimeFontHeight = 22;
+static constexpr uint16_t TimeFontColonWidth = 9;
 
-static const auto TempUnitsFont = TimeFont;
-static const uint16_t TempUnitsFontWidth = TimeFontWidth;
-static const uint16_t TempUnitsFontHeight = TimeFontHeight;
+static constexpr auto TempUnitsFont = TimeFont;
+static constexpr uint16_t TempUnitsFontWidth = TimeFontWidth;
+static constexpr uint16_t TempUnitsFontHeight = TimeFontHeight;
 
-static const auto TempFont = Display::Font::FontID::D72;
-static const uint16_t TempFontWidth = 60;
-static const uint16_t TempFontHeight = 72;
+static constexpr auto TempFont = Display::Font::FontID::D72;
+static constexpr uint16_t TempFontWidth = 60;
+static constexpr uint16_t TempFontHeight = 72;
 
-static const auto ReadingsFont = Display::Font::FontID::S12;
-static const uint16_t ReadingsFontHeight = 29;
+static constexpr auto ReadingsFont = Display::Font::FontID::S12;
+static constexpr uint16_t ReadingsFontHeight = 29;
 
 
-static const uint16_t YCentralArea = 50;
-static const uint16_t ImageInset = 2;
-static const uint16_t YTopArea = 3;
-static const uint16_t XTopAreaInset = 3;
-static const uint16_t YTopAreaHeight = 22;
-static const uint16_t YReadingsArea = Display::Height - 2*ReadingsFontHeight;
+static constexpr uint16_t YCentralArea = 50;
+static constexpr uint16_t ImageInset = 2;
+static constexpr uint16_t YTopArea = 3;
+static constexpr uint16_t XTopAreaInset = 3;
+static constexpr uint16_t YTopAreaHeight = 22;
+static constexpr uint16_t YReadingsArea = Display::Height - 2*ReadingsFontHeight;
 
-static const uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWidth;
+static constexpr uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWidth;
 
 
 /*------------------------------------------------------------------------------

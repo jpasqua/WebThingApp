@@ -8,7 +8,7 @@
 #include <ArduinoLog.h>
 #include <JSONService.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "OWMClient.h"
 //--------------- End:    Includes ---------------------------------------------

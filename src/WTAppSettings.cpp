@@ -12,7 +12,7 @@
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "WTAppSettings.h"
 //--------------- End:    Includes ---------------------------------------------

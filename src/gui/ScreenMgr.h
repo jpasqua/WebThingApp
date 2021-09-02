@@ -14,7 +14,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "UIOptions.h"
 #include "DisplayOptions.h"

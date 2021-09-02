@@ -22,10 +22,6 @@ public:
   virtual void processPeriodicActivity();
 
 private:
-  static const uint16_t IconInset = 10;
-  static const uint8_t RebootButtonID = 0;
-  static const uint8_t CancelButtonID = 1;
-
   uint32_t autoCancelTime = UINT32_MAX;
 };
 

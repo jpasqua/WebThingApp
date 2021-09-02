@@ -24,7 +24,7 @@ using Display::tft;
 
 namespace ScreenMgr {
   namespace State {
-    static const uint8_t MaxScreens = 20;
+    constexpr uint8_t MaxScreens = 20;
 
     struct {
       String name;
@@ -40,10 +40,10 @@ namespace ScreenMgr {
   };
 
   namespace Internal {
-    static const uint16_t InfoIconSize = 32;
-    static const uint16_t InfoIconBorderSize = 5;
-    static const uint16_t InfoIconX = (320 - InfoIconSize);
-    static const uint16_t InfoIconY = 0;
+    constexpr uint16_t InfoIconSize = 32;
+    constexpr uint16_t InfoIconBorderSize = 5;
+    constexpr uint16_t InfoIconX = (320 - InfoIconSize);
+    constexpr uint16_t InfoIconY = 0;
     uint16_t *savedPixels = NULL;
     bool infoIconIsDisplayed = false;
 

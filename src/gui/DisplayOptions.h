@@ -16,7 +16,7 @@
 
 class CalibrationData {
 public:
-  static const int nCalReadings = 5;
+  static constexpr int nCalReadings = 5;
   uint16_t readings[nCalReadings];
 
   CalibrationData();

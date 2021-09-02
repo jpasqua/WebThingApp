@@ -73,9 +73,9 @@ void Button::drawSimple(
       sprite->pushSprite(_x, _y);
       sprite->deleteSprite();
     } else {                          // We need to go to 4bpp
-      static const uint8_t BackgroundIndex = 0;
-      static const uint8_t LabelIndex = 1;
-      static const uint8_t BorderIndex = 2;
+      constexpr uint8_t BackgroundIndex = 0;
+      constexpr uint8_t LabelIndex = 1;
+      constexpr uint8_t BorderIndex = 2;
       uint16_t cmap[16];
       cmap[BackgroundIndex] = bgColor;
       cmap[LabelIndex] = labelColor;
@@ -117,10 +117,10 @@ void Button::drawProgress(
       bool buffer) {
   String note = (label == showPct) ? String((int)(pct*100)) + "%" : label;
   if (buffer) {
-    static const uint8_t BackgroundIndex = 0;
-    static const uint8_t BarIndex = 1;
-    static const uint8_t TextIndex = 2;
-    static const uint8_t BorderIndex = 3;
+    constexpr uint8_t BackgroundIndex = 0;
+    constexpr uint8_t BarIndex = 1;
+    constexpr uint8_t TextIndex = 2;
+    constexpr uint8_t BorderIndex = 3;
     uint16_t cmap[16];
     cmap[BackgroundIndex] = bgColor;
     cmap[BarIndex] = barColor;

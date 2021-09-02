@@ -21,6 +21,10 @@
 
 using Display::tft;
 
+static constexpr uint16_t IconInset = 10;
+static constexpr uint8_t RebootButtonID = 0;
+static constexpr uint8_t CancelButtonID = 1;
+
 RebootScreen::RebootScreen() {
     auto buttonHandler =[&](int id, Button::PressType type) -> void {
       Log.verbose(F("In RebootScreen ButtonHandler, id = %d"), id);

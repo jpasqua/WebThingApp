@@ -23,7 +23,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  WebThing Includes
 //                                  Local Includes
 #include "Screen.h"

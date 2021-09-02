@@ -28,7 +28,7 @@
 
 namespace CMDataSupplier {
   // CUSTOM: Choose a single character prefix to use for this data source
-  static const char ERPrefix = 'R';
+  constexpr char ERPrefix = 'R';
   
   extern void dataSupplier(const String& key, String& value);
 }

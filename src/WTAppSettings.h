@@ -40,8 +40,6 @@ public:
   OWMOptions owmOptions;
 
 private:
-  // ----- Constants -----
-  static const uint32_t CurrentVersion;
 };
 
 #endif  // WTAppSettings_h

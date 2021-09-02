@@ -85,8 +85,8 @@
       return;
     }
 
-    static const uint32_t ReplyJSONSize = 256;
-    static const uint8_t MaxFailures = 10;
+    constexpr uint32_t ReplyJSONSize = 256;
+    constexpr uint8_t MaxFailures = 10;
     static uint8_t nFailures = 0;
 
     if (coinID.isEmpty()) return false;

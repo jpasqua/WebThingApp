@@ -21,8 +21,8 @@
 
 class CMSettings: public WTAppSettings {
 public:
-  static const uint8_t MaxCurrencies = 3;
-  static const uint8_t MinRefreshInterval = 4;
+  static constexpr uint8_t MaxCurrencies = 3;
+  static constexpr uint8_t MinRefreshInterval = 4;
 
   // ----- Constructors and methods
   CMSettings();
@@ -40,6 +40,6 @@ public:
 
 private:
   // ----- Constants -----
-  static const uint32_t CurrentVersion;
+  static constexpr uint32_t CurrentVersion = 0x0001;
 };
 #endif // CMSettings_h

@@ -15,7 +15,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Libraries
-#include <WebThingBasics.h>
+#include <WTBasics.h>
 //                                  Local Includes
 #include "../gui/FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
