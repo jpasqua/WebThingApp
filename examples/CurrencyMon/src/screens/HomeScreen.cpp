@@ -1,5 +1,5 @@
 /*
- * TimeScreen:
+ * HomeScreen:
  *    This is the "home" screen. It displays the time, some weather information,
  *    and currency conversion data and controls
  *
@@ -18,7 +18,7 @@
 #include <screens/EnterNumberScreen.h>
 //                                  Local Includes
 #include "../../CurrencyMonApp.h"
-#include "TimeScreen.h"
+#include "HomeScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
 using Display::tft;
@@ -29,7 +29,7 @@ using Display::sprite;
 // and the clock area is defined to be the space in between
 
 /*
-  ASCII art TimeScreen layout:
+  ASCII art HomeScreen layout:
 
       +--------------------------------------------+
       |    City Name      Temp      Description    |
@@ -101,10 +101,10 @@ static constexpr uint8_t NTotalButtons = ClockAreaIndex + 1;
  *
  *----------------------------------------------------------------------------*/
 
-TimeScreen::TimeScreen() {
+HomeScreen::HomeScreen() {
 
   auto buttonHandler =[this](int id, Button::PressType type) -> void {
-    Log.verbose(F("In TimeScreen Button Handler, id = %d"), id);
+    Log.verbose(F("In HomeScreen Button Handler, id = %d"), id);
 
     if (type > Button::PressType::NormalPress) {
       ScreenMgr::display("Utility");
@@ -145,7 +145,7 @@ TimeScreen::TimeScreen() {
     buttonHandler, ClockAreaIndex);
 }
 
-void TimeScreen::display(bool activating) {
+void HomeScreen::display(bool activating) {
   if (activating) {tft.fillScreen(Theme::Color_Background); }
 
   drawClock(activating);
@@ -155,7 +155,7 @@ void TimeScreen::display(bool activating) {
   nextUpdateTime = millis() + 1 * 1000L;
 }
 
-void TimeScreen::processPeriodicActivity() {
+void HomeScreen::processPeriodicActivity() {
   if (millis() >= nextUpdateTime) display();
 }
 
@@ -165,9 +165,9 @@ void TimeScreen::processPeriodicActivity() {
  *
  *----------------------------------------------------------------------------*/
 
-void TimeScreen::updateAmounts(float newBase) {
+void HomeScreen::updateAmounts(float newBase) {
   if (cmApp->currencies[activeCurrency].exchangeRate < .0001) {
-    Log.verbose("TimeScreen::updateAmounts: avoid divide by zero error");
+    Log.verbose("HomeScreen::updateAmounts: avoid divide by zero error");
     return;
   }
   for (int i = 0; i < NCurrencyButtons; i++) {
@@ -178,7 +178,7 @@ void TimeScreen::updateAmounts(float newBase) {
   }
 }
 
-void TimeScreen::drawClock(bool force) {
+void HomeScreen::drawClock(bool force) {
   static int lastTimeDisplayed = -1;
   time_t  t = now();
   int     hr = hour(t);
@@ -224,7 +224,7 @@ void TimeScreen::drawClock(bool force) {
   sprite->deleteSprite();
 }
 
-void TimeScreen::drawWeather(bool force) {
+void HomeScreen::drawWeather(bool force) {
   (void)force;  // We don't use this parameter. Avoid a warning...
   if (!wtApp->owmClient) { Log.verbose(F("owmClient = NULL")); return; }
   if (!wtApp->settings->owmOptions.enabled) return;
@@ -278,7 +278,7 @@ void TimeScreen::drawWeather(bool force) {
 }
 
 
-void TimeScreen::drawCurrencyLabels(bool force) {
+void HomeScreen::drawCurrencyLabels(bool force) {
   if (!force) return;
 
   uint16_t yPos = CB_YOrigin;
@@ -303,7 +303,7 @@ void TimeScreen::drawCurrencyLabels(bool force) {
   }
 }
 
-void TimeScreen::drawCurrencyButtons(bool force) {
+void HomeScreen::drawCurrencyButtons(bool force) {
   (void)force;  // We don't use this parameter. Avoid a warning...
 
   for (int i = 0; i < NCurrencyButtons; i++) {

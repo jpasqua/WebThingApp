@@ -34,7 +34,7 @@
 //                                  Local Includes
 #include "CMSettings.h"
 #include "src/screens/SplashScreen.h"
-#include "src/screens/TimeScreen.h"
+#include "src/screens/HomeScreen.h"
 #include "src/clients/RateClient.h"
 //--------------- End:    Includes ---------------------------------------------
 
@@ -53,7 +53,7 @@ public:
 
   // CUSTOM: Screens implemented by this app
   SplashScreen*   splashScreen;
-  TimeScreen*     timeScreen;
+  HomeScreen*     homeScreen;
   // CUSTOM: Screen implemented by WebThingApp
   EnterNumberScreen* numpad;
 

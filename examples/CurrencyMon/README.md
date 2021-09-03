@@ -68,7 +68,7 @@ CurrencyMon
     └── screens
         ├── AppTheme.h
         ├── SplashScreen.[h,cpp]
-        ├── TimeScreen.[h,cpp]
+        ├── HomeScreen.[h,cpp]
         └── images
             └── ...
 ````

@@ -1,5 +1,5 @@
-#ifndef TimeScreen_h
-#define TimeScreen_h
+#ifndef HomeScreen_h
+#define HomeScreen_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -10,9 +10,9 @@
 //                                  Local Includes
 //--------------- End:    Includes ---------------------------------------------
 
-class TimeScreen : public Screen {
+class HomeScreen : public Screen {
 public:
-  TimeScreen();
+  HomeScreen();
 
   void display(bool activating = false);
 
@@ -34,4 +34,4 @@ private:
   EnterNumberScreen* _numpad;
 };
 
-#endif  // TimeScreen_h
+#endif  // HomeScreen_h

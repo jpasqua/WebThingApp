@@ -158,12 +158,12 @@ Screen* CurrencyMonApp::app_registerScreens() {
 
 	numpad = new EnterNumberScreen();
   splashScreen = new SplashScreen();
-  timeScreen = new TimeScreen();
+  homeScreen = new HomeScreen();
 
   ScreenMgr::registerScreen("Splash", splashScreen);
-  ScreenMgr::registerScreen("Time", timeScreen);
+  ScreenMgr::registerScreen("Time", homeScreen);
 
-  ScreenMgr::setAsHomeScreen(timeScreen);
+  ScreenMgr::setAsHomeScreen(homeScreen);
 
   return splashScreen;
 }
