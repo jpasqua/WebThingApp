@@ -20,7 +20,7 @@ public:
   uint16_t readings[nCalReadings];
 
   CalibrationData();
-  void fromJSON(JsonDocument &doc);
+  void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };
@@ -31,7 +31,7 @@ public:
   CalibrationData calibrationData;
 
   DisplayOptions();
-  void fromJSON(JsonDocument &doc);
+  void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };

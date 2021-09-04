@@ -97,7 +97,7 @@ void ForecastScreen::processPeriodicActivity() {
   // Nothing to do here...
 }
 
-void ForecastScreen::displaySingleForecast(Forecast *f, uint16_t x, uint16_t y) {
+void ForecastScreen::displaySingleForecast(Forecast* f, uint16_t x, uint16_t y) {
   tft.pushImage(
       x, y+((TileHeight-WI_Height)/2),
       WI_Width, WI_Height,

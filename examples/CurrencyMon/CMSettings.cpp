@@ -27,7 +27,7 @@ CMSettings::CMSettings() {
   }
 }
 
-void CMSettings::fromJSON(JsonDocument &doc) {
+void CMSettings::fromJSON(const JsonDocument &doc) {
   refreshInterval = doc[F("refreshInterval")];
   refreshInterval = max<uint32_t>(refreshInterval, MinRefreshInterval);
 

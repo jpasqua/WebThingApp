@@ -33,7 +33,7 @@ public:
   virtual void processPeriodicActivity();
 
   void init(
-      String theTitle, float initialValue, WTBasics::FloatValCB cb, bool decimalsAllowed = false,
+      const String &theTitle, float initialValue, WTBasics::FloatValCB cb, bool decimalsAllowed = false,
       float minAllowed = 0.0, float maxAllowed = FLT_MAX);
 
 private:

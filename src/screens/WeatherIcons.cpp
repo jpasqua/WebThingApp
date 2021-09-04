@@ -2,7 +2,7 @@
 #include "images/WeatherImages.h"
 #include "images/WindIcons.h"
 
-const uint16_t *getWeatherIcon(String iconName) {
+const uint16_t* getWeatherIcon(String iconName) {
   if (iconName == "01d") return &wi_01d[0];
   if (iconName == "01n") return &wi_01n[0];
   if (iconName == "02d") return &wi_02d[0];
@@ -24,7 +24,7 @@ const uint16_t *getWeatherIcon(String iconName) {
   return &wi_01d[0];
 }
 
-const uint16_t *getWindIcon(float speed) {
+const uint16_t* getWindIcon(float speed) {
   if (speed > 20) return &Wind_Strong[0];
   if (speed > 5) return &Wind_Light[0];
   return &Wind_None[0];

@@ -70,7 +70,7 @@ protected:
   // ----- WebThing Functions
   void setTitle();
   void baseConfigChange();
-  void configModeCallback(String &ssid, String &ip);
+  void configModeCallback(const String &ssid, const String &ip);
   void prepWebThing();
 
 private:

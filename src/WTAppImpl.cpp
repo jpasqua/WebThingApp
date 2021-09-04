@@ -180,7 +180,7 @@ void WTAppImpl::baseConfigChange() {
   setTitle();
 }
 
-void WTAppImpl::configModeCallback(String &ssid, String &ip) {
+void WTAppImpl::configModeCallback(const String &ssid, const String &ip) {
   (void)ip; // We don't use this parameter - avoid a warning
   configScreen->setSSID(ssid);
   ScreenMgr::display(configScreen);
@@ -195,7 +195,7 @@ void WTAppImpl::prepWebThing() {
   WebThing::displayPowerOptions(false);               // Don't let the user fool with this.
   WebThing::replaceEmptyHostname(appPrefix.c_str());
 
-  WebThing::notifyOnConfigMode([this](String &ssid, String &ip) { configModeCallback(ssid, ip); });
+  WebThing::notifyOnConfigMode([this](const String &ssid, const String &ip) { configModeCallback(ssid, ip); });
   WebThing::notifyConfigChange([this]() { baseConfigChange(); } );
 
   WebThing::setup();

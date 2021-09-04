@@ -7,7 +7,7 @@ BrightnessSchedule::BrightnessSchedule() {
   evening.hr = 20; evening.min = 0; evening.brightness = 20;
 }
 
-void BrightnessSchedule::fromJSON(JsonDocument &doc) {
+void BrightnessSchedule::fromJSON(const JsonDocument &doc) {
   active = doc[F("scheduleActive")];
   morning.hr = doc[F("morning")][F("hr")];
   morning.min = doc[F("morning")][F("min")];
@@ -41,7 +41,7 @@ UIOptions::UIOptions() {
   showDevMenu = false;
 }
 
-void UIOptions::fromJSON(JsonDocument &doc) {
+void UIOptions::fromJSON(const JsonDocument &doc) {
   use24Hour = doc[F("use24Hour")];
   useMetric = doc[F("useMetric")];
   showDevMenu = doc[F("showDevMenu")];

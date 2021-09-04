@@ -7,7 +7,7 @@ CalibrationData::CalibrationData() {
   }
 }
 
-void CalibrationData::fromJSON(JsonDocument &doc) {
+void CalibrationData::fromJSON(const JsonDocument &doc) {
   for (int i = 0; i < nCalReadings; i++) {
     readings[i] = doc[F("calibrationData")][i];
   }
@@ -32,7 +32,7 @@ DisplayOptions::DisplayOptions() {
   invertDisplay = false;
 }
 
-void DisplayOptions::fromJSON(JsonDocument &doc) {
+void DisplayOptions::fromJSON(const JsonDocument &doc) {
   invertDisplay = doc[F("invertDisplay")];
   calibrationData.fromJSON(doc);
 }

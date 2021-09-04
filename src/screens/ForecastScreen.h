@@ -27,7 +27,7 @@ public:
   virtual void processPeriodicActivity();
 
 private:
-  void displaySingleForecast(Forecast *f, uint16_t x, uint16_t y);
+  void displaySingleForecast(Forecast* f, uint16_t x, uint16_t y);
   void showTime(bool clear = false);
 };
 

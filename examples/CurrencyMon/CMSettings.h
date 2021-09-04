@@ -26,7 +26,7 @@ public:
 
   // ----- Constructors and methods
   CMSettings();
-  void fromJSON(JsonDocument &doc) override;
+  void fromJSON(const JsonDocument &doc) override;
   void toJSON(JsonDocument &doc);
   void logSettings();
 

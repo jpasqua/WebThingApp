@@ -22,7 +22,7 @@ public:
   void display(bool activating = false);
   virtual void processPeriodicActivity();
 
-  void setSSID(String &ssid);
+  void setSSID(const String &ssid);
 
 private:
   String _ssid = "app-NNNNN";

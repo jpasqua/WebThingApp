@@ -23,7 +23,7 @@ public:
   } morning, evening;
 
   BrightnessSchedule();
-  void fromJSON(JsonDocument &doc);
+  void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };
@@ -36,7 +36,7 @@ public:
   BrightnessSchedule schedule;
 
   UIOptions();
-  void fromJSON(JsonDocument &doc);
+  void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };

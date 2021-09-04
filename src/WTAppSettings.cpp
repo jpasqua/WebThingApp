@@ -20,7 +20,7 @@
 
 WTAppSettings::WTAppSettings() { }
 
-void WTAppSettings::fromJSON(JsonDocument &doc) {
+void WTAppSettings::fromJSON(const JsonDocument &doc) {
   uiOptions.fromJSON(doc);
   displayOptions.fromJSON(doc);
   owmOptions.fromJSON(doc);
@@ -48,7 +48,7 @@ OWMOptions::OWMOptions() {
   nickname = "";
 }
 
-void OWMOptions::fromJSON(JsonDocument &doc) {
+void OWMOptions::fromJSON(const JsonDocument &doc) {
   JsonObjectConst owm = doc["owm"].as<JsonObjectConst>();
   enabled = owm[F("enabled")];
   cityID = owm[F("cityID")];

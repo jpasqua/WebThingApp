@@ -64,7 +64,7 @@ EnterNumberScreen::EnterNumberScreen() {
 }
 
 void EnterNumberScreen::init(
-    String theTitle, float initialValue, WTBasics::FloatValCB cb, bool decimalsAllowed,
+    const String& theTitle, float initialValue, WTBasics::FloatValCB cb, bool decimalsAllowed,
     float minAllowed, float maxAllowed) {
   title = theTitle;
   minVal = minAllowed;

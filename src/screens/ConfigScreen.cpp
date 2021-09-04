@@ -46,4 +46,4 @@ void ConfigScreen::processPeriodicActivity() {
   // Nothing to do here, we're displaying a static screen
 }
 
-void ConfigScreen::setSSID(String &ssid) { _ssid = ssid; }
+void ConfigScreen::setSSID(const String &ssid) { _ssid = ssid; }

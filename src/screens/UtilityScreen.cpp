@@ -153,7 +153,7 @@ void UtilityScreen::drawButton(String label, int i, uint16_t textColor, bool cle
       textColor, Theme::Color_Border, Theme::Color_Background);
 }
 
-void UtilityScreen::setSub(String& heading, String& content) {
+void UtilityScreen::setSub(const String& heading, const String& content) {
   _subHeading = heading;
   _subContent = content;
 }

@@ -12,7 +12,7 @@ static ServiceDetails blynkDetails(BlynkServer, BlynkPort);
 static JSONService blynkService(blynkDetails);
 static uint8_t nFailures = 0;
 
-bool BlynkClient::readPin(String blynkAppID, String pin, String& value) {
+bool BlynkClient::readPin(const String blynkAppID, String pin, String& value) {
     if (blynkAppID.isEmpty()) return false;
     if (nFailures > MaxFailures) return false;
 

@@ -30,12 +30,12 @@ GenericSettings::GenericSettings() {
   refreshInterval = 60;   // 1 Minute
 }
 
-void GenericSettings::fromJSON(JsonDocument& doc) {
+void GenericSettings::fromJSON(const JsonDocument& doc) {
   enabled = doc[F("enabled")];
   refreshInterval = doc[F("refreshInterval")];
 }
 
-void GenericSettings::fromJSON(String& settings) {
+void GenericSettings::fromJSON(const String& settings) {
   DynamicJsonDocument doc(maxFileSize);
   auto error = deserializeJson(doc, settings);
   if (error) {
@@ -79,7 +79,7 @@ void GenericPlugin::getSettings(String& serializedSettings) {
   settings.toJSON(serializedSettings);
 }
 
-void GenericPlugin::newSettings(String& serializedSettings) {
+void GenericPlugin::newSettings(const String& serializedSettings) {
   settings.fromJSON(serializedSettings);
   settings.write();
 }

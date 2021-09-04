@@ -62,7 +62,7 @@ namespace ScreenMgr {
 
   // ----- Plugin-related functions
   FlexScreen* createFlexScreen(
-      JsonDocument &doc,
+      const JsonDocument &doc,
       uint32_t refreshInterval,
       const WTBasics::ReferenceMapper &mapper);
 

@@ -37,7 +37,7 @@ CryptoSettings::CryptoSettings() {
   refreshInterval = 10;   // 10 Minutes
 }
 
-void CryptoSettings::fromJSON(JsonDocument &doc) {
+void CryptoSettings::fromJSON(const JsonDocument &doc) {
   JsonArrayConst ids = doc[F("coinIDs")];
   JsonArrayConst names = doc[F("nicknames")];
   nCoins = ids.size();  
@@ -54,7 +54,7 @@ void CryptoSettings::fromJSON(JsonDocument &doc) {
   riScale = doc[F("riScale")];
 }
 
-void CryptoSettings::fromJSON(String& settings) {
+void CryptoSettings::fromJSON(const String& settings) {
   DynamicJsonDocument doc(maxFileSize);
   auto error = deserializeJson(doc, settings);
   if (error) {
@@ -108,7 +108,7 @@ void CryptoPlugin::getSettings(String& serializedSettings) {
   settings.toJSON(serializedSettings);
 }
 
-void CryptoPlugin::newSettings(String& serializedSettings) {
+void CryptoPlugin::newSettings(const String& serializedSettings) {
   settings.fromJSON(serializedSettings);
   settings.write();
 }

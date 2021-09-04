@@ -6,15 +6,16 @@ A library for building apps based on the [WebThing library](https://github.com/j
 
 The goal of the library is to do most of the work of handling the Web UI, GUI, settings management, and plugins, so the "app" can focus on the core functionality it is providing. 
 <hr style='clear:left'></div>
-Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to 4 3D printers as well as providing time and weather information. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`. The library comes with a simple demo application called `CurrencyMon` which will be mentioned again below and has it's own [documentation](examples/CurrencyMon/README.md). 
+Here's an example of a `WebThingApp` called [MultiMon](https://github.com/jpasqua/MultiMon). It monitors up to four 3D printers as well as providing time and weather information. In the case of [MultiMon](https://github.com/jpasqua/MultiMon), that means it can focus on 3D Printer functionality and leave (most of) the rest to `WebThingApp`. The library comes with a simple demo application called *CurrencyMon* which will be mentioned again below and has it's own [documentation](examples/CurrencyMon/README.md). 
 
 ![](doc/images/MarbleMonitor512.jpg)
 
+### Organization
 This document is divided into three major parts:
 
-1. [How to build a WebThingApp](#building): Start here if you are building an existing app; e.g., one you found on [github](github.com) or the example app that comes with `WebThingApp`.
-2. [How to configure your device](#preparation): Once your device is built and the software is loaded, you'll need to configure it via the Web UI.
-3. [How to create or modify a WebThingApp](#creating): Start here if you want to create your own app or modify an existing one. You'll need to understand the `WebThingApp` framework to do so.
+1. [How to build a WebThingApp](#building): Start here if you are building an existing app; e.g., one you found on [github](github.com) or the example app: *CurrencyMon*. This section covers both Hardware aspects and Software.
+2. [How to configure your device](#preparation): Once your device is built and the software is loaded, you'll need to configure it via the Web UI. This includes things like getting it on your WiFi netowrk and giving it a name.
+3. [How to create or modify a WebThingApp](#creating): This section covers hot to create your own app or modify an existing one. You'll need to understand the `WebThingApp` framework to do so. Starting from an example like *CurrencyMon* is a good idea.
 
 <a name="building"></a>
 # Part 1: Building a WebThingApp
@@ -121,7 +122,7 @@ To use one of these, just copy the files listed below into the `TFT_eSPI` direct
 
 ### The build process
 
-Building the software for a `WebThingApp` like `CurrencyMon` is a bit more complex than a typical application. You build an upload your app as usual, but you also need to upload support files (such as HTML templates) to your ESP8266/ESP32 using a plugin to the Arduino IDE. The support files need to be in a subfolder of your app named `data` which has this structure:
+Building the software for a `WebThingApp` like *CurrencyMon* is a bit more complex than a typical application. You build an upload your app as usual, but you also need to upload support files (such as HTML templates) to your ESP8266/ESP32 using a plugin to the Arduino IDE. The support files need to be in a subfolder of your app named `data` which has this structure:
 
 ````
 data
@@ -321,7 +322,7 @@ WebThingApp
     ├── clients
     │   ├── BlynkClient.[h,cpp]
     │   ├── CoinbaseClient.[h,cpp]
-    │   └──  OWMClient.[h,cpp]
+    │   └── OWMClient.[h,cpp]
     ├── gui
     │   ├── Button.[h,cpp]
     │   ├── ...
@@ -348,9 +349,9 @@ Description:
 
 * **`WebThingApp`**: The root directory houses the implementation of the app infrastructure:
   * **`WTApp`**: The base class for apps. It is really a data class providing the common data used by all apps.
-  * **`WTAppImpl`**: A subclass of `WTApp` that provides most of the app logic and structure. It is subclassed by apps like `CurrencyMon` to provide app-specific functionality.
-  * **`WTAppSettings`**: Contains the data and code to manage the common settings used by all apps. It is subclassed by apps like `CurrencyMon` to provide app-specific settings.
-  * **`WebUIHelper`**: A set of functions and data that build on the Web UI provided by `WebThing` to provide Web UI functions that are common to most apps. This is not a class, it is a namespace. Apps like `CurrencyMon` will use WebUIHelper to provide most of their WebUI and then add endpoints for app-specific functionality.
+  * **`WTAppImpl`**: A subclass of `WTApp` that provides most of the app logic and structure. It is subclassed by apps like *CurrencyMon* to provide app-specific functionality.
+  * **`WTAppSettings`**: Contains the data and code to manage the common settings used by all apps. It is subclassed by apps like *CurrencyMon* to provide app-specific settings.
+  * **`WebUIHelper`**: A set of functions and data that build on the Web UI provided by `WebThing` to provide Web UI functions that are common to most apps. This is not a class, it is a namespace. Apps like *CurrencyMon* will use WebUIHelper to provide most of their WebUI and then add endpoints for app-specific functionality.
 * **`clients`**: This directory contains code that implements client objects for web services, sensors, or other data providers/actuators that are common to many `WebThingApps`. Of course applications can use existing libraries if they exist or define their own.
 * **`data`**: This directory contains one subdirectory: `wta`. It contains the HTML files that correspond to the pages that will be served by `WebUIHelper`. The `wta` directory should be copied into (or linked to) the applications data directory.
 * **`gui`**: This directory has the definitions and implementations for core GUI elements such as `Display`, `Screen`, `ScreenMgr` and `Theme`. The common screens included in the library, as well as any app-specific screens, are built on the GUI elements.
@@ -669,3 +670,7 @@ There are numerous limitations and innefficiencies in this library and [WebThing
 * DataBroker can only provide String results which limits its utility.
 	*  For example, it would be nice if all (or at least most) Screens could be implemented solely based on data from the DataBroker rather than having hard linkages to client code.
 	*  The same is true for the Web UI. It should be able to get all of it's data from the DataBroker. 
+
+## A note on https (SSL)
+
+TO DO: Write this section

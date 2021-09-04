@@ -21,7 +21,7 @@ public:
   String  nickname;     // If not empty, override the city name with this nickname (e.g. Home)
 
   OWMOptions();
-  void fromJSON(JsonDocument &doc);
+  void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };
@@ -31,7 +31,7 @@ class WTAppSettings: public BaseSettings {
 public:
   // ----- Constructors and methods
   WTAppSettings();
-  void fromJSON(JsonDocument &doc) override;
+  void fromJSON(const JsonDocument &doc) override;
   void toJSON(JsonDocument &doc);
   void logSettings();
 

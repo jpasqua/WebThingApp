@@ -22,8 +22,8 @@ class CryptoSettings : public BaseSettings {
 public:
   // ----- Constructors and methods
   CryptoSettings();
-  void fromJSON(JsonDocument &doc);
-  void fromJSON(String& settings);
+  void fromJSON(const JsonDocument &doc);
+  void fromJSON(const String& settings);
   void toJSON(JsonDocument &doc);
   void toJSON(String &serialized);
   void logSettings();
@@ -46,7 +46,7 @@ public:
   void typeSpecificMapper(const String& key, String& value);
   void refresh(bool force = false);
   void getSettings(String& serializedSettings);
-  void newSettings(String& serializedSettings);
+  void newSettings(const String& serializedSettings);
   uint32_t getUIRefreshInterval();
 
 private:

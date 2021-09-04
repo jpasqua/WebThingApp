@@ -25,7 +25,7 @@ public:
   void display(bool activating = false);
   virtual void processPeriodicActivity();
 
-  void setSub(String& heading, String& content);
+  void setSub(const String& heading, const String& content);
 
 private:
   PluginMgr* pluginMgr;
