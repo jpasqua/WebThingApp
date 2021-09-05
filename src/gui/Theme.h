@@ -4,7 +4,6 @@
 #include <TFT_eSPI.h>
 
 namespace Theme {
-  #include <TFT_eSPI.h> // 
   constexpr uint32_t Color_Online = TFT_GREEN;
   constexpr uint32_t Color_Offline = TFT_RED;
   constexpr uint32_t Color_Progress = TFT_DARKGREEN;
