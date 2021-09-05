@@ -671,6 +671,8 @@ There are numerous limitations and innefficiencies in this library and [WebThing
 	*  For example, it would be nice if all (or at least most) Screens could be implemented solely based on data from the DataBroker rather than having hard linkages to client code.
 	*  The same is true for the Web UI. It should be able to get all of it's data from the DataBroker. 
 
-## A note on https (SSL)
+## A note on accessing https sites
 
-TO DO: Write this section
+`WebThingApp` uses the [`JSONService`](https://github.com/jpasqua/JSONService) library to interact with various web services. That library does support `https` sites, but the underlying libraries use a lot of program space and heap space. Since `WebThing` and `WebThingApp` are also fairly bulky, this means that putting the two together on an ESP8266 won't work by default. You'd have to trim some functionality. This is possible, but sort of a pain. I usually use an ESP32 if I need `https` connections.
+
+Note that as of this writing, `JSONService` disables `https` support by default on ESP8266. You must change a `#define` to enable it. The `CoinbaseClient` requires `https` support, so by default on an ESP8266 it act as a [mocked object](https://en.wikipedia.org/wiki/Mock_object).

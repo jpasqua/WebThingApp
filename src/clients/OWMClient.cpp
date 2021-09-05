@@ -13,15 +13,14 @@
 #include "OWMClient.h"
 //--------------- End:    Includes ---------------------------------------------
 
-static const String OWMServer = "api.openweathermap.org";
-static const uint16_t OWMPort = 80;
+static constexpr char OWMServer[] = "api.openweathermap.org";
+static constexpr uint16_t OWMPort = 80;
 
-static const String ProxyOWMServer = "192.168.1.99";
-static const uint16_t ProxyOWMPort = 59641;
+static constexpr char ProxyOWMServer[] = "192.168.1.99";
+static constexpr uint16_t ProxyOWMPort = 59641;
 
 //static ServiceDetails owmDetails(ProxyOWMServer, ProxyOWMPort);
-static ServiceDetails owmDetails(OWMServer, OWMPort);
-static JSONService owmService(owmDetails);
+static JSONService owmService(ServiceDetails(OWMServer, OWMPort));
 
 OWMClient::OWMClient(String key, int cityID, bool useMetric, String language) :
     _key(key), _cityID(cityID), _useMetric(useMetric), _lang(language)

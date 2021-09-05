@@ -39,9 +39,9 @@
  *----------------------------------------------------------------------------*/
 
 // CUSTOM: Update these strings for your app:
-static const String VersionString = "0.1.0";
-static const String AppName = "CurrencyMon";
-static const String AppPrefix = "CM-";
+static const char* VersionString = "0.1.0";
+static const char* AppName = "CurrencyMon";
+static const char* AppPrefix = "CM-";
 
 
 /*------------------------------------------------------------------------------

@@ -3,13 +3,11 @@
 #include <JSONService.h>
 #include "BlynkClient.h"
 
-static const String FailedRead = "";
-static const String BlynkServer = "blynk-cloud.com";
-static const uint16_t BlynkPort = 80;
-static const uint8_t MaxFailures = 10;
+static constexpr char BlynkServer[] = "blynk-cloud.com";
+static constexpr uint16_t BlynkPort = 80;
+static constexpr uint8_t MaxFailures = 10;
 
-static ServiceDetails blynkDetails(BlynkServer, BlynkPort);
-static JSONService blynkService(blynkDetails);
+static JSONService blynkService(ServiceDetails(BlynkServer, BlynkPort));
 static uint8_t nFailures = 0;
 
 bool BlynkClient::readPin(const String blynkAppID, String pin, String& value) {

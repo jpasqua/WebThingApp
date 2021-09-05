@@ -28,7 +28,7 @@
    *
    *----------------------------------------------------------------------------*/
 
-  static const String SiteValidation = 
+  static constexpr char SiteValidation[] = 
   #if defined(ESP8266)
     // Use a fingerprint for coinbase
     "11 7A 9E 53 1A 1A 84 1A 04 0A B8 9E A5 40 95 87 7A 3B 43 4D";
@@ -58,9 +58,6 @@
     "-----END CERTIFICATE-----\n";
   #endif
     
-  static const String CoinbaseServer = "api.coinbase.com";
-  static const uint16_t CoinbasePort = 443;
-
 
   /*------------------------------------------------------------------------------
    *
@@ -68,8 +65,7 @@
    *
    *----------------------------------------------------------------------------*/
 
-  static ServiceDetails CoinbaseDetails(CoinbaseServer, CoinbasePort);
-  static JSONService CoinbaseService(CoinbaseDetails);
+  static JSONService CoinbaseService(ServiceDetails("api.coinbase.com", 443));
 
 
   /*------------------------------------------------------------------------------
