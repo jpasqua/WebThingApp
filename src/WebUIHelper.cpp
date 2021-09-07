@@ -35,7 +35,6 @@ namespace WebUIHelper {
 
   void hideUpdatingIcon() { ScreenMgr::hideUpdatingIcon(); }
 
-
   void wrapWebAction(const char* actionName, std::function<void(void)> action, bool showIcon) {
     Log.trace(F("Handling %s"), actionName);
     if (!WebUI::authenticationOK()) { return; }
@@ -62,7 +61,7 @@ namespace WebUIHelper {
 
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
-    const char CORE_MENU_ITEMS[] PROGMEM =
+    const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/updateStatus'>"
       "<i class='fa fa-recycle'></i> Update Status</a>"
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
@@ -70,11 +69,11 @@ namespace WebUIHelper {
       "<a class='w3-bar-item w3-button' href='/presentWeatherConfig'>"
       "<i class='fa fa-thermometer-three-quarters'></i> Configure Weather</a>"
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
-      "<i class='fa fa-plug'></i> Configure Plugins</a>";
+      "<i class='fa fa-plug'></i> Configure Plugins</a>");
 
-    const char DEV_MENU_ITEMS[] PROGMEM =
+    const __FlashStringHelper* DEV_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/dev'>"
-      "<i class='fa fa-gears'></i> Dev Settings</a>";
+      "<i class='fa fa-gears'></i> Dev Settings</a>");
   }
 
   // ----- END: WebUIHelper::Internal
@@ -368,7 +367,9 @@ namespace WebUIHelper {
   }   // ----- END: WebUIHelper::Pages
 
 
-  void init(PGM_P appMenuItems) {
+  void init(const __FlashStringHelper* appMenuItems) {
+    templateHandler = WebUI::getTemplateHandler();
+
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
     if (wtApp->settings->uiOptions.showDevMenu) {
@@ -392,7 +393,11 @@ namespace WebUIHelper {
     WebUI::registerHandler("/dev/enableDevMenu",      Dev::enableDevMenu);
     WebUI::registerHandler("/dev/data",               Dev::getDataBrokerValue);
 
-    templateHandler = WebUI::getTemplateHandler();
+    WebUI::registerBusyCallback([](bool busy) -> void { 
+        if (busy) showUpdatingIcon();
+        else hideUpdatingIcon();
+      }
+    );
   }
 
 }
