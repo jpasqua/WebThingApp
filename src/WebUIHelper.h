@@ -5,7 +5,7 @@ namespace WebUIHelper {
   extern ESPTemplateProcessor *templateHandler;
   extern const String checkedOrNot[2];
 
-  void init(PGM_P customActions);
+  void init(const __FlashStringHelper* customActions);
 
   void showUpdatingIcon();
   void hideUpdatingIcon();
