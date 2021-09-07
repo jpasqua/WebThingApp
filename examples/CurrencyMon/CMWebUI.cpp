@@ -33,16 +33,16 @@ namespace CMWebUI {
   // ----- BEGIN: CMWebUI::Pages
   namespace Pages {
     void currencyPage() {
-      auto mapper =[](String &key) -> String {
+      auto mapper =[](const String &key, String& val) -> void {
         if (key.startsWith("_C")) {
+          // "key" is of the form: _CN_subkey, where N is a digit
           int i = (key.charAt(2) - '0');
-          key.remove(0, 4); // Get rid of the prefix; e.g. _C1_
-          if (key.equals(F("ID"))) return  cmSettings->currencies[i].id;
-          if (key.equals(F("NICK"))) return  cmSettings->currencies[i].nickname;
+          const char* subkey = &(key.c_str()[4]);
+          if (strcmp(subkey, "ID") == 0) val = cmSettings->currencies[i].id;
+          else if (strcmp(subkey, "NICK") == 0) val = cmSettings->currencies[i].nickname;
         }
-        if (key.equals(F("RFRSH"))) return String(cmSettings->refreshInterval);
-        if (key.equals(F("ER_KEY"))) return String(cmSettings->rateApiKey);
-        return WTBasics::EmptyString;
+        else if (key.equals(F("RFRSH"))) val.concat(cmSettings->refreshInterval);
+        else if (key.equals(F("ER_KEY"))) val = cmSettings->rateApiKey;
       };
 
       WebUIHelper::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
