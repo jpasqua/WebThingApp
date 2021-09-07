@@ -15,7 +15,7 @@ namespace WebUIHelper {
       bool showIcon = true);
   void wrapWebPage(
       const char* pageName, const char* htmlTemplate,
-      ESPTemplateProcessor::ProcessorCallback mapper,
+      ESPTemplateProcessor::Mapper mapper,
       bool showIcon = true);
 
 

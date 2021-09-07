@@ -47,7 +47,7 @@ namespace WebUIHelper {
 
   void wrapWebPage(
       const char* pageName, const char* htmlTemplate,
-      ESPTemplateProcessor::ProcessorCallback mapper,
+      ESPTemplateProcessor::Mapper mapper,
       bool showIcon)
   {
     Log.trace(F("Handling %s"), pageName);
@@ -153,7 +153,7 @@ namespace WebUIHelper {
         }
       };
 
-      wrapWebAction("/updateDisplayConfig", action);
+      wrapWebAction("/updatePluginConfig", action);
     }
 
     void updateDisplayConfig() {
@@ -172,6 +172,7 @@ namespace WebUIHelper {
         wtApp->settings->uiOptions.schedule.evening.brightness = WebUI::arg(F("eBright")).toInt();
 
         wtApp->settings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
+        wtApp->settings->uiOptions.screenBlankMinutes = WebUI::arg(F("blank")).toInt();
         wtApp->settings->displayOptions.invertDisplay = WebUI::hasArg(F("invDisp"));
 
         wtApp->settings->write();
@@ -257,15 +258,11 @@ namespace WebUIHelper {
   namespace Default {
     void devPage() {
       auto action = []() {
-        auto mapper =[](String &key) -> String {
-          if (key.equals(F("HEAP"))) {
-            String heapStats;
-            heapStats.reserve(32);
-            DataBroker::map("$S.heap", heapStats);
-            return heapStats;
+        auto mapper =[](const String& key, String& val) -> void {
+          if (key.equals(F("HEAP"))) { DataBroker::map("$S.heap", val); }
+          else if (key.equals("SHOW_DEV_MENU")) {
+            val = checkedOrNot[wtApp->settings->uiOptions.showDevMenu];
           }
-          if (key.equals("SHOW_DEV_MENU")) return checkedOrNot[wtApp->settings->uiOptions.showDevMenu];
-          return WTBasics::EmptyString;
         };
 
         WebUI::startPage();
@@ -288,15 +285,14 @@ namespace WebUIHelper {
 
     void homePage() {
       auto action = []() {
-        auto mapper =[](String &key) -> String {
+        auto mapper =[](const String &key, String &val) -> void {
           if (key.equals(F("CITYID"))) {
-            if (wtApp->settings->owmOptions.enabled) return String(wtApp->settings->owmOptions.cityID);
-            else return String("5380748");  // Palo Alto, CA, USA
+            if (wtApp->settings->owmOptions.enabled) val.concat(wtApp->settings->owmOptions.cityID);
+            else val.concat("5380748");  // Palo Alto, CA, USA
           }
-          if (key.equals(F("WEATHER_KEY"))) return wtApp->settings->owmOptions.key;
-          if (key.equals(F("UNITS"))) return wtApp->settings->uiOptions.useMetric ? "metric" : "imperial";
-          if (key.equals(F("BRIGHT"))) return String(Display::getBrightness());
-          return WTBasics::EmptyString;
+          else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
+          else if (key.equals(F("UNITS"))) val.concat(wtApp->settings->uiOptions.useMetric ? "metric" : "imperial");
+          else if (key.equals(F("BRIGHT"))) val.concat(Display::getBrightness());
         };
 
         WebUI::startPage();
@@ -312,17 +308,16 @@ namespace WebUIHelper {
     void presentWeatherConfig() {
       String langTarget = "SL" + wtApp->settings->owmOptions.language;
 
-      auto mapper =[&langTarget](String &key) -> String {
-        if (key.equals(F("WEATHER_KEY"))) return wtApp->settings->owmOptions.key;
-        if (key.equals(F("CITY_NAME")) && wtApp->settings->owmOptions.enabled) {
-          return wtApp->owmClient == NULL ? WTBasics::EmptyString : wtApp->owmClient->weather.location.city;
+      auto mapper =[&langTarget](const String &key, String& val) -> void {
+        if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
+        else if (key.equals(F("CITY_NAME")) && wtApp->settings->owmOptions.enabled) {
+          if (wtApp->owmClient) val = wtApp->owmClient->weather.location.city;
         }
-        if (key.equals(F("NICKNAME"))) return String(wtApp->settings->owmOptions.nickname);
-        if (key.equals(F("CITY"))) return String(wtApp->settings->owmOptions.cityID);
-        if (key.equals(F("USE_METRIC"))) return checkedOrNot[wtApp->settings->uiOptions.useMetric];
-        if (key == langTarget) return "selected";
-        if (key.equals(F("USE_OWM")))  return checkedOrNot[wtApp->settings->owmOptions.enabled];
-        return WTBasics::EmptyString;
+        else if (key.equals(F("NICKNAME"))) val = wtApp->settings->owmOptions.nickname;
+        else if (key.equals(F("CITY"))) val.concat(wtApp->settings->owmOptions.cityID);
+        else if (key.equals(F("USE_METRIC"))) val = checkedOrNot[wtApp->settings->uiOptions.useMetric];
+        else if (key == langTarget) val = "selected";
+        else if (key.equals(F("USE_OWM")))  val = checkedOrNot[wtApp->settings->owmOptions.enabled];
       };
 
       wrapWebPage("/presentWeatherConfig", "/wta/ConfigWeather.html", mapper);
@@ -333,38 +328,39 @@ namespace WebUIHelper {
       uint8_t count = wtAppImpl->pluginMgr.getPluginCount();
       Plugin** plugins = wtAppImpl->pluginMgr.getPlugins();
 
-      auto mapper =[count, plugins](String &key) -> String {
+      auto mapper =[count, plugins](const String &key, String& val) -> void {
         if (key.startsWith("_P")) {
           int pluginIndex = (key.charAt(2) - '0') - 1;
           if (pluginIndex < count) {
             Plugin* p = plugins[pluginIndex];
 
-            key.remove(0, 4); // Get rid of the prefix; e.g. _P1_
-            if (key.equals(F("IDX"))) return String(pluginIndex+1);
-            if (key.equals(F("NAME"))) { return p->getName(); }
-            if (key.equals(F("FORM"))) { String v; p->getForm(v); return v; }
-            if (key.equals(F("VALS"))) { String v; p->getSettings(v); return v; }
+            const char* subkey = &(key.c_str()[4]);
+            if (strcmp(subkey, "IDX") == 0) val.concat(pluginIndex+1);
+            if (strcmp(subkey, "NAME") == 0) val = p->getName();
+            if (strcmp(subkey, "FORM") == 0) p->getForm(val);
+            if (strcmp(subkey, "VALS") == 0) p->getSettings(val);
           }
         }
-        return WTBasics::EmptyString;
       };
 
       wrapWebPage("/presentPluginConfig", "/wta/ConfigPlugins.html", mapper);
     }
 
     void presentDisplayConfig() {
-      auto mapper =[](String &key) -> String {
-        if (key.equals(F("SCHED_ENABLED"))) return checkedOrNot[wtApp->settings->uiOptions.schedule.active];
-        if (key.equals(F("MORN"))) return WebThing::formattedInterval(
-          wtApp->settings->uiOptions.schedule.morning.hr, wtApp->settings->uiOptions.schedule.morning.min, 0, true, false);
-        if (key.equals(F("EVE"))) return WebThing::formattedInterval(
-          wtApp->settings->uiOptions.schedule.evening.hr, wtApp->settings->uiOptions.schedule.evening.min, 0, true, false);
-        if (key.equals(F("M_BRIGHT"))) return String(wtApp->settings->uiOptions.schedule.morning.brightness);
-        if (key.equals(F("E_BRIGHT"))) return String(wtApp->settings->uiOptions.schedule.evening.brightness);
+      UIOptions* uiOptions = &(wtApp->settings->uiOptions);
 
-        if (key.equals(F("USE_24HOUR"))) return checkedOrNot[wtApp->settings->uiOptions.use24Hour];
-        if (key.equals(F("INVERT_DISPLAY"))) return checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
-        return WTBasics::EmptyString;
+      auto mapper =[uiOptions](const String &key, String& val) -> void {
+        if (key.equals(F("SCHED_ENABLED"))) val = checkedOrNot[uiOptions->schedule.active];
+        else if (key.equals(F("MORN"))) val = WebThing::formattedInterval(
+          uiOptions->schedule.morning.hr, uiOptions->schedule.morning.min, 0, true, false);
+        else if (key.equals(F("EVE"))) val = WebThing::formattedInterval(
+          uiOptions->schedule.evening.hr, uiOptions->schedule.evening.min, 0, true, false);
+        else if (key.equals(F("M_BRIGHT"))) val.concat(uiOptions->schedule.morning.brightness);
+        else if (key.equals(F("E_BRIGHT"))) val.concat(uiOptions->schedule.evening.brightness);
+
+        else if (key.equals(F("USE_24HOUR"))) val = checkedOrNot[uiOptions->use24Hour];
+        else if (key.equals(F("BLANK")))  val.concat(uiOptions->screenBlankMinutes);
+        else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };
 
       wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
@@ -376,7 +372,6 @@ namespace WebUIHelper {
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
     if (wtApp->settings->uiOptions.showDevMenu) {
-Log.verbose("adding dev menu items");
       WebUI::addDevMenuItems(Internal::DEV_MENU_ITEMS);
     }
 
