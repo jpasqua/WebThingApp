@@ -77,11 +77,11 @@ The following third party libraries are used by WebThingApp. You'll need to down
 
 * [Arduino-Log](https://github.com/thijse/Arduino-Log)
 * [ArduinoJson](https://github.com/bblanchon/ArduinoJson): Minimum version: 6.15
-* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.2 or later for ESP32]
+* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.5 or later]
 * [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI): Minimum version 2.2.7
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
-* [JSONService](https://github.com/jpasqua/JSONService) [v0.0.2 or later for ESP32]
-* [WebThing](https://github.com/jpasqua/WebThing) [0.2.0 or later. v0.2.1 or later for ESP32]
+* [JSONService](https://github.com/jpasqua/JSONService) [v0.0.5 or later]
+* [WebThing](https://github.com/jpasqua/WebThing) [0.5.0 or later]
 * [WiFiManager](https://github.com/tzapu/WiFiManager)
 * ESP32 Only
 	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite)
@@ -106,9 +106,9 @@ All of the graphics, text, and images displayed by `WebThingApp` are drawn using
 | Microcontroller | Display                                   | File                     |
 |-----------------|-------------------------------------------|--------------------------|
 | ESP8266 D1 Mini | 2.4" D1 Mini Shield                       | D1Mini_ILI9341.h         |
-|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | D1_DB_Mini_ILI9341.h     |
+|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | D1\_DB\_Mini_ILI9341.h     |
 | ESP32 D1 Mini   | 2.4" D1 Mini Shield                       | ESP32D1Mini_ILI9341.h    |
-|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | ESP32D1Mini_DB_ILI9341.h |
+|                 | 2.4", 2.8", 3.2" Display w/ daughterboard | ESP32D1Mini\_DB\_ILI9341.h |
 
 To use one of these, just copy the files listed below into the `TFT_eSPI` directory and uncomment the corresponding line in `User_Setup_Select.h`.
 
