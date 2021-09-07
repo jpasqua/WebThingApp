@@ -37,6 +37,9 @@ namespace ScreenMgr {
 
     UIOptions* uiOptions;
     DisplayOptions* displayOptions;
+
+    uint32_t lastInteraction = 0;
+    Screen* suspendedScreen = nullptr;
   };
 
   namespace Internal {
@@ -46,6 +49,41 @@ namespace ScreenMgr {
     constexpr uint16_t InfoIconY = 0;
     uint16_t *savedPixels = NULL;
     bool infoIconIsDisplayed = false;
+
+    void unsuspend() {
+      if (State::suspendedScreen) {
+        display(State::suspendedScreen);
+        State::suspendedScreen = nullptr;
+      }
+    }
+
+    class BlankScreen : public Screen {
+    public:
+      uint8_t lastBrightness;
+
+      BlankScreen() {
+        auto buttonHandler =[this](int id, Button::PressType type) -> void {
+          (void)id;   // We don't use this parameter - avoid a warning...
+          (void)type; // We don't use this parameter - avoid a warning...
+          Log.verbose("Waking up with millis() = %d", millis());
+          // Let the screen redisplay while the brightness is off...
+          ScreenMgr::Internal::unsuspend();
+          // ...then let there be light
+          Display::setBrightness(lastBrightness);
+        };
+
+        buttons = new Button[(nButtons = 1)];
+        buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
+      }
+
+      void display(bool activating = false) {
+        (void)activating; // Not used, avoid warning
+        lastBrightness = Display::getBrightness();
+        Display::setBrightness(0);
+      }
+
+      void processPeriodicActivity() { }
+    } blankScreen;
 
     void drawInfoIcon(
         uint16_t borderColor, char symbol, uint16_t fillColor, uint16_t textColor)
@@ -93,23 +131,40 @@ namespace ScreenMgr {
         }
       }
     }
+
+    void processInput() {
+      uint32_t curMillis = millis();
+      uint16_t tx = 0, ty = 0;
+      bool pressed = Display::tft.getTouch(&tx, &ty);
+      if (pressed) State::lastInteraction = curMillis;
+      State::curScreen->processInput(pressed, tx, ty);
+
+      // Test whether we should blank the screen
+      if (State::uiOptions->screenBlankMinutes && !State::suspendedScreen) {
+        uint32_t timeToBlankScreen = State::lastInteraction +
+            State::uiOptions->screenBlankMinutes * WTBasics::MillisPerMinute;
+        if (curMillis > timeToBlankScreen) {
+          Log.verbose("Going to sleep with millis() = %d", curMillis);
+          State::suspendedScreen = State::curScreen;
+          display(&Internal::blankScreen);
+        }
+      }
+    }
   };  // ----- END: ScreenMgr::Internal
 
   void setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
     State::uiOptions = uiOptions;
     State::displayOptions = displayOptions;
     Display::begin(displayOptions);
+    State::lastInteraction = millis();
     Internal::initInfoIcon();
   }
 
   void loop() {
-    if (State::curScreen != NULL) {
-      State::curScreen->processPeriodicActivity();
-      uint16_t tx = 0, ty = 0;
-      bool pressed = Display::tft.getTouch(&tx, &ty);
-      State::curScreen->processInput(pressed, tx, ty);
-    }
+    if (State::curScreen == NULL) return;
     Internal::processSchedules();
+    Internal::processInput();
+    State::curScreen->processPeriodicActivity();
   }
 
 

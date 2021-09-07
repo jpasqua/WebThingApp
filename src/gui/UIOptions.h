@@ -34,7 +34,8 @@ public:
   bool useMetric;
   bool showDevMenu;
   BrightnessSchedule schedule;
-
+  uint32_t screenBlankMinutes;
+  
   UIOptions();
   void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
