@@ -25,7 +25,7 @@
 class PluginMgr {
 public:
   // ----- Types
-  typedef std::function<Plugin*(String&)> Factory;
+  using Factory = std::function<Plugin*(const String&)>;
 
   // ----- Constants
   static constexpr char PluginNamespacePrefix = 'E';
@@ -55,7 +55,7 @@ private:
 
   bool validatePluginFiles(String pluginPath);
   void newPlugin(String pluginPath);
-  uint8_t enumPlugins(String& pluginRoot, String* pluginDirNames);
+  uint8_t enumPlugins(const String& pluginRoot, String* pluginDirNames);
 };
 
 #endif // PluginMgr_h
