@@ -662,16 +662,23 @@ Some things to notice in the descriptor files:
 
 There are numerous limitations and innefficiencies in this library and [WebThing](https://github.com/jpasqua/WebThing) overall. As they occur to me, I will list them here.
 
-* Bound to one display type. At the moment this library assumes a specific display type which is 320x240 pixels and has a touch screen. The underlying TFT_eSPI library has more flexibility and so could this library.
-* Support for OpenWeatherMap and weather screens is built in at a fairly low level. This should be optional and modular, including the settings, Web UI configuration, and inclusion of the associated screens.
-* There should be a type of plugin with no screen.
+* **Bound to one display type**. At the moment this library assumes a specific display type which is 320x240 pixels and has a touch screen. The underlying TFT_eSPI library has more flexibility and so could this library.
+* **OpenWeatherMap not optional**. Support for OpenWeatherMap and weather screens is built in at a fairly low level. This should be optional and modular, including the settings, Web UI configuration, and inclusion of the associated screens.
+* **Plugins require Screens**. There should be a type of plugin with no screen.
 	* It would simply be a data provider (based on one or more clients) with settings and a Web UI for configuration.
 	* If that were the case, then the OpenWeatherMap stuff would just be a plugin rather than being built-in
-* DataBroker can only provide String results which limits its utility.
+	* The alternative is to make clients, like OWMClient, plug into DataBroker directly and not use a plugin.
+* **DataBroker can only provide String results**. This limits its utility.
 	*  For example, it would be nice if all (or at least most) Screens could be implemented solely based on data from the DataBroker rather than having hard linkages to client code.
 	*  The same is true for the Web UI. It should be able to get all of it's data from the DataBroker. 
 
-## A note on accessing https sites
+## Heap Fragmentation
+
+Within the `WebThingApp` framework, the biggest cause of heap fragmentation is the [plugin mechanism](#plugins). As noted above, plugins are defined using several JSON files. `WebThingApp` reads these files and allocates the necessary objects as needed. The roblem is that a chunk of memory is allocated for the JSON structure, then the plugin objects are allocated, then the JSON data is freed. This leaves a hole in the heap which results in fragmentation.
+
+There is a <del>hack</del> workaround in `Plugin.cpp` that deals with this issue in most cases. If you have complex plugins (typically a complex screen definition) you may find that the workaround needs to be tuned. Please refer to the implementation. 
+
+## Accessing https sites
 
 `WebThingApp` uses the [`JSONService`](https://github.com/jpasqua/JSONService) library to interact with various web services. That library does support `https` sites, but the underlying libraries use a lot of program space and heap space. Since `WebThing` and `WebThingApp` are also fairly bulky, this means that putting the two together on an ESP8266 won't work by default. You'd have to trim some functionality. This is possible, but sort of a pain. I usually use an ESP32 if I need `https` connections.
 
