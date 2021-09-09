@@ -33,7 +33,7 @@ namespace CMWebUI {
   // ----- BEGIN: CMWebUI::Pages
   namespace Pages {
     void currencyPage() {
-      auto mapper =[](const String &key, String& val) -> void {
+      auto mapper =[](const String& key, String& val) -> void {
         if (key.startsWith("_C")) {
           // "key" is of the form: _CN_subkey, where N is a digit
           int i = (key.charAt(2) - '0');

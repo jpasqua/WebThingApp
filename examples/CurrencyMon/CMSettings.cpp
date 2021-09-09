@@ -31,13 +31,13 @@ void CMSettings::fromJSON(const JsonDocument &doc) {
   refreshInterval = doc[F("refreshInterval")];
   refreshInterval = max<uint32_t>(refreshInterval, MinRefreshInterval);
 
-  WTBasics::setStringContent(rateApiKey, doc["rateApiKey"]);
+  rateApiKey = doc["rateApiKey"].as<const char*>();
 
   JsonArrayConst osArray = doc[F("currencies")];
   int i = 0;
   for (JsonObjectConst os : osArray) {
-    WTBasics::setStringContent(currencies[i].id, os["id"]);
-    WTBasics::setStringContent(currencies[i].nickname, os["nickname"]);
+    currencies[i].id = os["id"].as<const char*>();
+    currencies[i].nickname = os["nickname"].as<const char*>();
     if (++i == CMSettings::MaxCurrencies) break;
   }
 
