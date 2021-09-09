@@ -12,7 +12,6 @@
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
 //                                  Local Includes
 #include "WTAppSettings.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -52,9 +51,9 @@ void OWMOptions::fromJSON(const JsonDocument &doc) {
   JsonObjectConst owm = doc["owm"].as<JsonObjectConst>();
   enabled = owm[F("enabled")];
   cityID = owm[F("cityID")];
-  WTBasics::setStringContent(key, owm["key"]);
-  WTBasics::setStringContent(language, owm["language"]);
-  WTBasics::setStringContent(nickname, owm["nickname"]);
+  key = owm["key"].as<const char*>();
+  language = owm["language"].as<const char*>();
+  nickname = owm["nickname"].as<const char*>();
 }
 
 void OWMOptions::toJSON(JsonDocument &doc) {
