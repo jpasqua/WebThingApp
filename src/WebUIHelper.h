@@ -2,8 +2,9 @@
 #define WebUIHelper_h
 
 namespace WebUIHelper {
+  constexpr const char* checkedOrNot[2] = {"", "checked='checked'"};
+
   extern ESPTemplateProcessor *templateHandler;
-  extern const String checkedOrNot[2];
 
   void init(const __FlashStringHelper* customActions);
 

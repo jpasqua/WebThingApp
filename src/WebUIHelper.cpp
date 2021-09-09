@@ -26,8 +26,7 @@
 namespace WebUIHelper {
   constexpr char UpdatingSymbol = 'w';
   
-  const String   checkedOrNot[2] = {"", "checked='checked'"};
-  ESPTemplateProcessor  *templateHandler;
+  ESPTemplateProcessor* templateHandler;
 
   void showUpdatingIcon() {
     ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
@@ -284,7 +283,7 @@ namespace WebUIHelper {
 
     void homePage() {
       auto action = []() {
-        auto mapper =[](const String &key, String &val) -> void {
+        auto mapper =[](const String& key, String &val) -> void {
           if (key.equals(F("CITYID"))) {
             if (wtApp->settings->owmOptions.enabled) val.concat(wtApp->settings->owmOptions.cityID);
             else val.concat("5380748");  // Palo Alto, CA, USA
@@ -307,7 +306,7 @@ namespace WebUIHelper {
     void presentWeatherConfig() {
       String langTarget = "SL" + wtApp->settings->owmOptions.language;
 
-      auto mapper =[&langTarget](const String &key, String& val) -> void {
+      auto mapper =[&langTarget](const String& key, String& val) -> void {
         if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
         else if (key.equals(F("CITY_NAME")) && wtApp->settings->owmOptions.enabled) {
           if (wtApp->owmClient) val = wtApp->owmClient->weather.location.city;
@@ -327,7 +326,7 @@ namespace WebUIHelper {
       uint8_t count = wtAppImpl->pluginMgr.getPluginCount();
       Plugin** plugins = wtAppImpl->pluginMgr.getPlugins();
 
-      auto mapper =[count, plugins](const String &key, String& val) -> void {
+      auto mapper =[count, plugins](const String& key, String& val) -> void {
         if (key.startsWith("_P")) {
           int pluginIndex = (key.charAt(2) - '0') - 1;
           if (pluginIndex < count) {
@@ -348,7 +347,7 @@ namespace WebUIHelper {
     void presentDisplayConfig() {
       UIOptions* uiOptions = &(wtApp->settings->uiOptions);
 
-      auto mapper =[uiOptions](const String &key, String& val) -> void {
+      auto mapper =[uiOptions](const String& key, String& val) -> void {
         if (key.equals(F("SCHED_ENABLED"))) val = checkedOrNot[uiOptions->schedule.active];
         else if (key.equals(F("MORN"))) val = WebThing::formattedInterval(
           uiOptions->schedule.morning.hr, uiOptions->schedule.morning.min, 0, true, false);
