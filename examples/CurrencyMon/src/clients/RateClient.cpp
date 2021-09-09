@@ -9,21 +9,16 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies) {
-	static const String ServerName = "api.exchangeratesapi.io";
-
-	_nCurrencies = (nCurrencies > MaxCurrencies) ? MaxCurrencies : nCurrencies;
-	_currencies = currencies;
-
-	_apiKey = apiKey;
-	_apiKey.trim();
-
+RateClient::RateClient(const String& apiKey, Currency* const currencies, uint8_t nCurrencies) :
+  _apiKey(apiKey), _currencies(currencies),
+  _nCurrencies((nCurrencies > MaxCurrencies) ? MaxCurrencies : nCurrencies)
+{	
   if (_apiKey.startsWith("MOCK")) {
     Log.verbose("Mocking the RateClient");
-    mockUpdate();
+    mockUpdate(); // Set some initial values
   }
 
-  details.server = ServerName;
+  details.server = "api.exchangeratesapi.io";
   details.port = 80;
   details.apiKey = "";
   details.apiKeyName = "";
@@ -33,7 +28,7 @@ RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies
   	_endpoint = "";
   } else {
 	  _endpoint = "/v1/latest?access_key=";
-	  _endpoint += apiKey;
+	  _endpoint += _apiKey;
 	  _endpoint += "&symbols=";
 	  for (int i = _nCurrencies-1; i >= 0; i--) {
 	  	_endpoint += _currencies[i].id;
@@ -43,12 +38,10 @@ RateClient::RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies
 }
 
 void RateClient::updateRates() {
-
   if (_apiKey.startsWith("MOCK")) {
     mockUpdate();
     return;
   }
-
 
   if (_endpoint.isEmpty()) return;	// Nothing to do...
 
