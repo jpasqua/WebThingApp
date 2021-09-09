@@ -32,8 +32,8 @@
 
 class Button {
 public:
-  typedef enum {NormalPress, LongPress, VeryLongPress} PressType;
-  typedef std::function<void(int, PressType)> ButtonCallback;
+  using PressType = enum {NormalPress, LongPress, VeryLongPress};
+  using ButtonCallback = std::function<void(int, PressType)>;
   
   static constexpr uint32_t LongPressInterval = 500;
   static constexpr uint32_t VeryLongPressInterval = 1000;
@@ -67,7 +67,7 @@ public:
   // @param bgColor     The color to be used to draw the interior of the button
   // @param buffer      Should this be buffered offscreen then copied to the display
   void drawSimple(
-      const String &label, uint8_t font, uint8_t borderSize,
+      const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor, uint16_t bgColor,
       bool buffer = false);
 
@@ -87,9 +87,9 @@ public:
   // @param bgColor     The color to be used for the unfilled part of the progress bar
   // @param buffer      Should this be buffered offscreen then copied to the display
   void drawProgress(
-        float pct, const String &label, uint8_t font, uint8_t borderSize,
+        float pct, const String& label, uint8_t font, uint8_t borderSize,
         uint16_t labelColor, uint16_t borderColor,
-        uint16_t barColor, uint16_t bgColor, const String &showPct,
+        uint16_t barColor, uint16_t bgColor, const String& showPct,
         bool buffer = false);
 
 private:

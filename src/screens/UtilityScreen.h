@@ -19,7 +19,7 @@
 
 class UtilityScreen : public Screen {
 public:
-  typedef std::function<void(bool)> RefreshCallback;
+  using RefreshCallback = std::function<void(bool)>;
 
   UtilityScreen();
   void display(bool activating = false);

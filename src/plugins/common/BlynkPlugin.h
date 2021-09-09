@@ -26,7 +26,7 @@ public:
   void fromJSON(const JsonDocument &doc);
   void fromJSON(const String& settings);
   void toJSON(JsonDocument &doc);
-  void toJSON(String &serialized);
+  void toJSON(String& serialized);
   void logSettings();
 
   // ----- Settings

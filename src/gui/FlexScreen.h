@@ -33,7 +33,7 @@
 
 class FlexItem {
 public:
-  typedef enum {INT, FLOAT, STRING, BOOL, CLOCK, STATUS} Type;
+  using Type = enum {INT, FLOAT, STRING, BOOL, CLOCK, STATUS};
 
   void fromJSON(JsonObjectConst& item);
 

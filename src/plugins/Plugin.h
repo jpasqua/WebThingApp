@@ -29,7 +29,7 @@ public:
   virtual void typeSpecificMapper(const String& key, String &value) = 0;
 	virtual void refresh(bool force = false) = 0;
   virtual void getSettings(String &settings) = 0;
-  virtual void newSettings(const String &settings) = 0;
+  virtual void newSettings(const String& settings) = 0;
   virtual uint32_t getUIRefreshInterval() = 0;
 
   // Implemented by Plugin class
