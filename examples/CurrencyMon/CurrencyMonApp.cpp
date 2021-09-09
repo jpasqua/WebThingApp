@@ -39,7 +39,7 @@
  *----------------------------------------------------------------------------*/
 
 // CUSTOM: Update these strings for your app:
-static const char* VersionString = "0.1.0";
+static const char* VersionString = "0.1.5";
 static const char* AppName = "CurrencyMon";
 static const char* AppPrefix = "CM-";
 
@@ -50,7 +50,7 @@ static const char* AppPrefix = "CM-";
  *
  *----------------------------------------------------------------------------*/
 
-Plugin* pluginFactory(String& type) {
+Plugin* pluginFactory(const String& type) {
   Plugin *p = NULL;
 
   // CUSTOM: Choose which plugins you'd like to load
