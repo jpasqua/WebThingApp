@@ -23,7 +23,7 @@ public:
 
   uint32_t      timeOfLastUpdate = 0;
 
-  RateClient(String& apiKey, Currency* currencies, uint8_t nCurrencies);
+  RateClient(const String& apiKey, Currency* const currencies, uint8_t nCurrencies);
 
   // Update the exchange ratea
   void updateRates();
@@ -32,8 +32,8 @@ public:
   float convert(Currency* from, Currency* to, float amount);
 
 private:
-	String _apiKey;
-	Currency* _currencies;
+	const String _apiKey;
+	Currency* const _currencies;
 	uint8_t _nCurrencies;
 
   ServiceDetails  details;
