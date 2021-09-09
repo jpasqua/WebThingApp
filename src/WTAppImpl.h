@@ -74,9 +74,6 @@ protected:
   void prepWebThing();
 
 private:
-  // ----- Constants
-  static const String SettingsFileName;
-
   void registerScreens();
 };
 

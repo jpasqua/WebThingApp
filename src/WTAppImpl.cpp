@@ -19,7 +19,7 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-const String WTAppImpl::SettingsFileName = "/settings.json";
+constexpr const char* SettingsFileName = "/settings.json";
 
 /*------------------------------------------------------------------------------
  *
