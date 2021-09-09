@@ -5,7 +5,7 @@
 
 class BlynkClient {
 public:
-  static bool readPin(const String blynkAppID, String pin, String& value);
+  static bool readPin(const String& blynkAppID, const String& pin, String& value);
 };
 
 #endif  // BlynkClient_h

@@ -10,11 +10,16 @@ static constexpr uint8_t MaxFailures = 10;
 static JSONService blynkService(ServiceDetails(BlynkServer, BlynkPort));
 static uint8_t nFailures = 0;
 
-bool BlynkClient::readPin(const String blynkAppID, String pin, String& value) {
+bool BlynkClient::readPin(const String& blynkAppID, const String& pin, String& value) {
     if (blynkAppID.isEmpty()) return false;
     if (nFailures > MaxFailures) return false;
 
-    String endpoint = "/" + blynkAppID + "/get/" + pin;
+    String endpoint;
+    endpoint.reserve(64);
+    endpoint = "/";
+    endpoint += blynkAppID;
+    endpoint += "/get/";
+    endpoint += pin;
 
     DynamicJsonDocument *root = blynkService.issueGET(endpoint, 256);
     if (!root) {
