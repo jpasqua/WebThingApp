@@ -18,7 +18,7 @@
 
 class CoinbaseClient {
 public:
-  static bool getPrice(const String coinID, String& currency, String& price);
+  static bool getPrice(const String& coinID, String& currency, String& price);
 };
 
 #endif  // CoinbaseClient_h

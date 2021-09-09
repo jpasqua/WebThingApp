@@ -15,7 +15,7 @@
 
 
 #if defined(MockCoinbase)
-  bool CoinbaseClient::getPrice(const String coinID, String& currency, String& price) {
+  bool CoinbaseClient::getPrice(const String& coinID, String& currency, String& price) {
     (void)coinID;   // Unused in mock client
     currency = "USD";
     price = String(random(0, 500000)/10.0, 2);
@@ -74,7 +74,7 @@
    *
    *----------------------------------------------------------------------------*/            
 
-  bool CoinbaseClient::getPrice(const String coinID, String& currency, String& price) {
+  bool CoinbaseClient::getPrice(const String& coinID, String& currency, String& price) {
     if (_mock) {
       currency = "USD";
       price = String(random(0, 500000)/10.0, 2);
@@ -88,7 +88,10 @@
     if (coinID.isEmpty()) return false;
     if (nFailures > MaxFailures) return false;
 
-    String endpoint = "/v2/prices/" + coinID;
+    String endpoint;
+    endpoint.reserve(28);
+    endpoint = "/v2/prices/";
+    endpoint += coinID;
     endpoint += "/buy";
 
     DynamicJsonDocument *root = CoinbaseService.issueGET(endpoint, ReplyJSONSize, NULL, SiteValidation);
@@ -102,8 +105,8 @@
     //    $ curl https://api.coinbase.com/v2/prices/BTC-USD/buy
     //    {"data":{"base":"BTC","currency":"USD","amount":"34909.53"}}
 
-    WTBasics::setStringContent(currency, (*root)["data"]["currency"]);
-    WTBasics::setStringContent(currency, (*root)["data"]["amount"]);
+    currency = (*root)["data"]["currency"].as<const char*>();
+    price = (*root)["data"]["amount"].as<const char*>();
 
     delete root;
 
