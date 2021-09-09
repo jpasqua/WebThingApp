@@ -11,7 +11,7 @@
 //                                  Third Party Libraries
 #include <TimeLib.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <GenericESP.h>
 #include <gui/Display.h>
 #include <gui/Theme.h>
 #include <gui/ScreenMgr.h>
@@ -107,7 +107,10 @@ HomeScreen::HomeScreen() {
     Log.verbose(F("In HomeScreen Button Handler, id = %d"), id);
 
     if (type > Button::PressType::NormalPress) {
-      ScreenMgr::display("Utility");
+      String subheading = "Heap: Free/Frag = ";
+      String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
+      wtAppImpl->utilityScreen->setSub(subheading, subcontent);
+      ScreenMgr::display(wtAppImpl->utilityScreen);
     } else if (id == ClockAreaIndex) {
       cmApp->pluginMgr.displayPlugin(0);
     } else if (id == WeatherAreaIndex) {
