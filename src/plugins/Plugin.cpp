@@ -21,6 +21,7 @@
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
 //                                  WebThing Includes
+#include <GenericESP.h>
 #include <ESP_FS.h>
 #include <DataBroker.h>
 //                                  Local Includes
@@ -51,16 +52,24 @@ bool Plugin::init(const String& name, const String& piNamespace, const String& p
   // then allocating the JSON doc, then freeing the placeholder, we leave space "before" the JSON doc
   // for the FlexScreen items to consume. Then when the JSON doc is freed, it doesnt leave a hole since
   // it is freed from the end of the heap.
-  char* placeHolder = (char*)malloc(1024);
-  placeHolder[100] = 'C';   // Touch the memory or the compiler optimizes away the malloc
+  constexpr uint16_t PluginReserveSize = 2000;
+  constexpr uint16_t PlaceHolderSize = 2000;
+  char *placeHolder = nullptr;
+
+  if (GenericESP::getMaxFreeBlockSize() > PlaceHolderSize + PluginReserveSize) {
+    placeHolder = (char*)malloc(PluginReserveSize);
+    placeHolder[1] = 'C';   // Touch the memory or the compiler may optimize away the malloc
+
+  }
 
   DynamicJsonDocument* doc = PluginMgr::getDoc(_pluginDir + "/screen.json", MaxScreenDescriptorSize);
 
-  free(placeHolder);  // Free up the space for reuse by FlexScreen
+  if (placeHolder) free(placeHolder);  // Free up the space for reuse by FlexScreen
 
   if (doc == NULL) return false;
   _flexScreen = ScreenMgr::createFlexScreen(*doc, getUIRefreshInterval(), _mapper);
   delete doc;
+  
   return !(_flexScreen == NULL);
 }
 
