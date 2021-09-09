@@ -116,7 +116,7 @@ bool PluginMgr::validatePluginFiles(String pluginPath) {
   return false;
 }
 
-uint8_t PluginMgr::enumPlugins(String& pluginRoot, String* pluginDirNames) {
+uint8_t PluginMgr::enumPlugins(const String& pluginRoot, String* pluginDirNames) {
   uint8_t nPluginsFound = 0;
   uint8_t lengthOfPIPath = pluginRoot.length();
 
