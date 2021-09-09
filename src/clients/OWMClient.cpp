@@ -8,7 +8,6 @@
 #include <ArduinoLog.h>
 #include <JSONService.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
 //                                  Local Includes
 #include "OWMClient.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -25,11 +24,11 @@ static JSONService owmService(ServiceDetails(OWMServer, OWMPort));
 OWMClient::OWMClient(String key, int cityID, bool useMetric, String language) :
     _key(key), _cityID(cityID), _useMetric(useMetric), _lang(language)
 {
-  _endpoint.reserve(100);
+  _endpoint.reserve(132);
 }
 
 void OWMClient::update() {
-  WTBasics::setStringContent(_endpoint, "/data/2.5/group?id=");
+  _endpoint ="/data/2.5/group?id=";
   _endpoint.concat(_cityID);
   _endpoint.concat("&units=");
   _endpoint.concat(_useMetric ? "metric" : "imperial");
@@ -90,17 +89,17 @@ void OWMClient::update() {
   JsonObject city = (*root)["list"][0];
   weather.location.lat = city["coord"]["lat"];
   weather.location.lon = city["coord"]["lon"];
-  WTBasics::setStringContent(weather.location.country, city["sys"]["country"]);
-  weather.location.city = city["name"].as<String>();
+  weather.location.country = city["sys"]["country"].as<const char*>();
+  weather.location.city = city["name"].as<const char*>();
   weather.location.cityID = city["id"];
 
   weather.time.tz = city["sys"]["timezone"];
   weather.time.sunrise = city["sys"]["sunrise"];
   weather.time.sunset = city["sys"]["sunset"];
 
-  WTBasics::setStringContent(weather.description.basic, city["weather"][0]["main"]);
-  WTBasics::setStringContent(weather.description.longer, city["weather"][0]["description"]);
-  WTBasics::setStringContent(weather.description.icon, city["weather"][0]["icon"]);
+  weather.description.basic = city["weather"][0]["main"].as<const char*>();
+  weather.description.longer = city["weather"][0]["description"].as<const char*>();
+  weather.description.icon = city["weather"][0]["icon"].as<const char*>();
   weather.description.code = city["weather"][0]["id"];
 
   JsonObject cityMain = city["main"];
@@ -124,7 +123,7 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   filter["list"][0]["main"]["temp"] = true;
   filter["list"][0]["weather"][0]["icon"] = true;
 
-  WTBasics::setStringContent(_endpoint, "/data/2.5/forecast?id=");
+  _endpoint = "/data/2.5/forecast?id=";
   _endpoint.concat(_cityID);
   _endpoint.concat("&units=");
   _endpoint.concat(_useMetric ? "metric" : "imperial");
@@ -178,7 +177,7 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
     if (curTemp > curMax) {
       curMax = curTemp;
       timeOfMaxTemp = curDT;
-      WTBasics::setStringContent(curIcon, f["weather"][0]["icon"]);
+      curIcon = f["weather"][0]["icon"].as<const char*>();
     }
     if (curTemp < curMin) {
       curMin = curTemp;
