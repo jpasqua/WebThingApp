@@ -45,7 +45,7 @@ namespace CMWebUI {
         else if (key.equals(F("ER_KEY"))) val = cmSettings->rateApiKey;
       };
 
-      WebUIHelper::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
+      WebUI::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
     }
   } // ----- END: CMWebUI::Pages
 
@@ -71,7 +71,7 @@ namespace CMWebUI {
         WebUI::redirectHome();
       };
 
-      WebUIHelper::wrapWebAction("/updateCurrencyConfig", action);
+      WebUI::wrapWebAction("/updateCurrencyConfig", action);
     }
   }   // ----- END: CMWebUI::Endpoints
 

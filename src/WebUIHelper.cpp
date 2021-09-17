@@ -28,36 +28,6 @@ namespace WebUIHelper {
   
   ESPTemplateProcessor* templateHandler;
 
-  void showUpdatingIcon() {
-    ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
-  }
-
-  void hideUpdatingIcon() { ScreenMgr::hideUpdatingIcon(); }
-
-  void wrapWebAction(const char* actionName, std::function<void(void)> action, bool showIcon) {
-    Log.trace(F("Handling %s"), actionName);
-    if (!WebUI::authenticationOK()) { return; }
-
-    if (showIcon) showUpdatingIcon();
-    action();
-    if (showIcon) hideUpdatingIcon();
-  }
-
-  void wrapWebPage(
-      const char* pageName, const char* htmlTemplate,
-      ESPTemplateProcessor::Mapper mapper,
-      bool showIcon)
-  {
-    Log.trace(F("Handling %s"), pageName);
-    if (!WebUI::authenticationOK()) { return; }
-
-    if (showIcon) showUpdatingIcon();
-    WebUI::startPage();
-    templateHandler->send(htmlTemplate, mapper);
-    WebUI::finishPage();
-    if (showIcon) hideUpdatingIcon();
-  }
-
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
     const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
@@ -73,6 +43,11 @@ namespace WebUIHelper {
     const __FlashStringHelper* DEV_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/dev'>"
       "<i class='fa fa-gears'></i> Dev Settings</a>");
+
+    void showBusyStatus(bool busy) {
+      if (busy) ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
+      else ScreenMgr::hideUpdatingIcon();
+    }
   }
 
   // ----- END: WebUIHelper::Internal
@@ -82,7 +57,6 @@ namespace WebUIHelper {
   namespace Endpoints {
     void setBrightness() {
       auto action = []() {
-        showUpdatingIcon();
         uint8_t b = WebUI::arg(F("value")).toInt();
         if (b <= 0 || b > 100) {  // NOTE: 0 is not an allowed value!
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
@@ -93,7 +67,7 @@ namespace WebUIHelper {
         }
       };
 
-      wrapWebAction("/setBrightness", action);
+      WebUI::wrapWebAction("/setBrightness", action);
     }
 
     void updateStatus() {
@@ -102,7 +76,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/updateStatus", action, false);
+      WebUI::wrapWebAction("/updateStatus", action, false);
     }
 
     void updateWeatherConfig() {
@@ -122,7 +96,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/updateWeatherConfig", action);
+      WebUI::wrapWebAction("/updateWeatherConfig", action);
     }
 
     void updatePluginConfig() {
@@ -151,7 +125,7 @@ namespace WebUIHelper {
         }
       };
 
-      wrapWebAction("/updatePluginConfig", action);
+      WebUI::wrapWebAction("/updatePluginConfig", action);
     }
 
     void updateDisplayConfig() {
@@ -179,7 +153,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
       
-      wrapWebAction("/updateDisplayConfig", action);
+      WebUI::wrapWebAction("/updateDisplayConfig", action);
     }
   }   // ----- END: WebUIHelper::Endpoints
 
@@ -191,7 +165,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/dev/reboot", action, false);
+      WebUI::wrapWebAction("/dev/reboot", action, false);
     }
 
     void forceScreen() {
@@ -205,7 +179,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/dev/forceScreen", action, false);
+      WebUI::wrapWebAction("/dev/forceScreen", action, false);
     }
 
     void yieldSettings() {
@@ -216,7 +190,7 @@ namespace WebUIHelper {
         doc->clear();
         delete doc;
       };
-      wrapWebAction("/dev/settings", action);
+      WebUI::wrapWebAction("/dev/settings", action);
     }
 
     void yieldScreenShot() {
@@ -226,7 +200,7 @@ namespace WebUIHelper {
             Display::getSizeOfScreenShotAsBMP(),
             Display::streamScreenShotAsBMP);
       };
-      wrapWebAction("/dev/screenShot", action, false);
+      WebUI::wrapWebAction("/dev/screenShot", action, false);
     }
 
     void enableDevMenu() {
@@ -235,7 +209,7 @@ namespace WebUIHelper {
         wtApp->settings->write();
         WebUI::redirectHome();
       };
-      wrapWebAction("/dev/enableDevMenu", action);
+      WebUI::wrapWebAction("/dev/enableDevMenu", action);
     }
 
     void getDataBrokerValue() {
@@ -247,7 +221,7 @@ namespace WebUIHelper {
         WebUI::sendStringContent("text", result);
       };
 
-      wrapWebAction("/dev/data", action);
+      WebUI::wrapWebAction("/dev/data", action);
     }
   }   // ----- END: WebUIHelper::Dev
 
@@ -268,7 +242,7 @@ namespace WebUIHelper {
         WebUI::finishPage();
       };
 
-      wrapWebAction("/dev", action);
+      WebUI::wrapWebAction("/dev", action);
     }
 
     void updateDevConfig() {
@@ -278,7 +252,7 @@ namespace WebUIHelper {
         WebUI::redirectHome();
       };
 
-      wrapWebAction("/updateDevConfig", action);
+      WebUI::wrapWebAction("/updateDevConfig", action);
     }
 
     void homePage() {
@@ -298,7 +272,7 @@ namespace WebUIHelper {
         WebUI::finishPage();
       };
 
-      wrapWebAction("/", action);
+      WebUI::wrapWebAction("/", action);
     }
   }  // ----- END: WebUIHelper::Default
 
@@ -318,7 +292,7 @@ namespace WebUIHelper {
         else if (key.equals(F("USE_OWM")))  val = checkedOrNot[wtApp->settings->owmOptions.enabled];
       };
 
-      wrapWebPage("/presentWeatherConfig", "/wta/ConfigWeather.html", mapper);
+      WebUI::wrapWebPage("/presentWeatherConfig", "/wta/ConfigWeather.html", mapper);
     }
 
 
@@ -341,7 +315,7 @@ namespace WebUIHelper {
         }
       };
 
-      wrapWebPage("/presentPluginConfig", "/wta/ConfigPlugins.html", mapper);
+      WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigPlugins.html", mapper);
     }
 
     void presentDisplayConfig() {
@@ -361,7 +335,7 @@ namespace WebUIHelper {
         else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };
 
-      wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
+      WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
     }
   }   // ----- END: WebUIHelper::Pages
 
@@ -375,6 +349,7 @@ namespace WebUIHelper {
       WebUI::addDevMenuItems(Internal::DEV_MENU_ITEMS);
     }
 
+    WebUI::registerBusyCallback(Internal::showBusyStatus);
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
     WebUI::registerHandler("/presentPluginConfig",    Pages::presentPluginConfig);
@@ -391,12 +366,6 @@ namespace WebUIHelper {
     WebUI::registerHandler("/dev/forceScreen",        Dev::forceScreen);
     WebUI::registerHandler("/dev/enableDevMenu",      Dev::enableDevMenu);
     WebUI::registerHandler("/dev/data",               Dev::getDataBrokerValue);
-
-    WebUI::registerBusyCallback([](bool busy) -> void { 
-        if (busy) showUpdatingIcon();
-        else hideUpdatingIcon();
-      }
-    );
   }
 
 }
