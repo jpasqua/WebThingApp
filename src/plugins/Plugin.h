@@ -15,7 +15,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Libraries
-#include <WTBasics.h>
+#include <BPABasics.h>
 //                                  Local Includes
 #include "../gui/FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -63,7 +63,7 @@ protected:
 
 private:
   static const uint32_t MaxScreenDescriptorSize = 7*1024;
-  WTBasics::ReferenceMapper _mapper;
+  Basics::ReferenceMapper _mapper;
 };
 
 #endif // Plugin_h

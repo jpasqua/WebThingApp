@@ -11,7 +11,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <BPABasics.h>
 #include <DataBroker.h>
 //                                  Local Includes
 #include "Display.h"
@@ -86,7 +86,7 @@ FlexScreen::~FlexScreen() {
 bool FlexScreen::init(
     JsonObjectConst& screen,
     uint32_t refreshInterval,
-    const WTBasics::ReferenceMapper &mapper)
+    const Basics::ReferenceMapper &mapper)
 {
   FlexItem::init();
 
@@ -170,12 +170,12 @@ void FlexItem::fromJSON(JsonObjectConst& item) {
   _strokeWidth = item[F("strokeWidth")];
 }
 
-void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
+void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
     // Reuse the same value buffer across all FlexItems, so clear it out
-    WTBasics::resetString(_val);
+    Basics::resetString(_val);
     
     mapper(_key, _val);
 
@@ -214,7 +214,7 @@ void FlexItem::display(uint16_t bkg, WTBasics::ReferenceMapper mapper) {
           String msg = _val.substring(0, index);
           int code = _val.substring(index+1).toInt();
           if (strncasecmp(fmt, "#progress", 9) == 0) {
-            String showPct = WTBasics::EmptyString;
+            String showPct = Basics::EmptyString;
             if (fmt[9] == '|' && fmt[10] != 0) showPct = String(&fmt[10]);
             Button b(_x, _y, _w, _h, NULL, 0);
             b.drawProgress(

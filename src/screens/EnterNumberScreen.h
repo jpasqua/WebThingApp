@@ -33,7 +33,7 @@ public:
   virtual void processPeriodicActivity();
 
   void init(
-      const String& theTitle, float initialValue, WTBasics::FloatValCB cb, bool decimalsAllowed = false,
+      const String& theTitle, float initialValue, Basics::FloatValCB cb, bool decimalsAllowed = false,
       float minAllowed = 0.0, float maxAllowed = FLT_MAX);
 
 private:
@@ -42,7 +42,7 @@ private:
   float _initialValue;
   bool allowDecimals;
   String formattedValue;
-  WTBasics::FloatValCB newValueCB;
+  Basics::FloatValCB newValueCB;
 };
 
 #endif  // EnterNumberScreen_h

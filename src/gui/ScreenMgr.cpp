@@ -142,7 +142,7 @@ namespace ScreenMgr {
       // Test whether we should blank the screen
       if (State::uiOptions->screenBlankMinutes && !State::suspendedScreen) {
         uint32_t timeToBlankScreen = State::lastInteraction +
-            State::uiOptions->screenBlankMinutes * WTBasics::MillisPerMinute;
+            State::uiOptions->screenBlankMinutes * Basics::MillisPerMinute;
         if (curMillis > timeToBlankScreen) {
           Log.verbose("Going to sleep with millis() = %d", curMillis);
           State::suspendedScreen = State::curScreen;
@@ -219,7 +219,7 @@ namespace ScreenMgr {
   FlexScreen* createFlexScreen(
       const JsonDocument &doc,
       uint32_t refreshInterval,
-      const WTBasics::ReferenceMapper &mapper)
+      const Basics::ReferenceMapper &mapper)
   {
     FlexScreen* flexScreen = new FlexScreen();
     JsonObjectConst descriptor = doc.as<JsonObjectConst>();

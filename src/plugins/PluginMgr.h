@@ -16,7 +16,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <BPABasics.h>
 //                                  Local Includes
 #include "Plugin.h"
 //--------------- End:    Includes ---------------------------------------------

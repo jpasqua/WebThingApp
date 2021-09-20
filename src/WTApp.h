@@ -11,7 +11,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <BPABasics.h>
 //                                  Local Includes
 #include "WTAppSettings.h"
 #include "clients/OWMClient.h"

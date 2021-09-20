@@ -8,7 +8,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <BPABasics.h>
 #include <WebThing.h>
 //                                  Local Includes
 #include "../WTApp.h"
@@ -143,7 +143,7 @@ void WeatherScreen::display(bool activating) {
   tft.drawString(reading, XTopAreaInset, YReadingsArea);
   tft.setTextDatum(TR_DATUM);
   float pressure = wtApp->owmClient->weather.readings.pressure;
-  if (!metric) pressure = WTBasics::hpa_to_inhg(pressure);
+  if (!metric) pressure = Basics::hpa_to_inhg(pressure);
   reading = String(pressure) +  (metric ? "hPa" : "inHG"),
   tft.drawString(reading, Display::Width - XTopAreaInset, YReadingsArea);
 
@@ -153,7 +153,7 @@ void WeatherScreen::display(bool activating) {
   if (metric) { visibility /= 1000;  }
   else {
     units = "mi";
-    visibility = (uint16_t)WTBasics::km_to_m( ((float)(visibility+500)) / 1000.0);
+    visibility = (uint16_t)Basics::km_to_m( ((float)(visibility+500)) / 1000.0);
   }
   reading = "Visibility: " + String(visibility) +  units;
   tft.setTextDatum(TL_DATUM);

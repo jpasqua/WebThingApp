@@ -23,7 +23,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
-#include <WTBasics.h>
+#include <BPABasics.h>
 //                                  WebThing Includes
 //                                  Local Includes
 #include "Screen.h"
@@ -55,7 +55,7 @@ public:
   String _key;        // The key that will be used to get the value
   Type _dataType;
 
-  void display(uint16_t bkg, WTBasics::ReferenceMapper mapper);
+  void display(uint16_t bkg, Basics::ReferenceMapper mapper);
 };
 
 
@@ -69,7 +69,7 @@ public:
   bool init(
       JsonObjectConst& screen,
       uint32_t refreshInterval,
-      const WTBasics::ReferenceMapper &mapper);
+      const Basics::ReferenceMapper &mapper);
   String getScreenID() { return _screenID; }
 
   // ----- Functions defined in Screen class
@@ -86,7 +86,7 @@ private:
   String    _screenID;          // UUID of the screen. Not used in the UI, but human readable
                                 // is helpful for testing / debugging
   uint32_t _refreshInterval;    // How often to refresh the display
-  WTBasics::ReferenceMapper _mapper; // Maps a key from thee screen definition to a value
+  Basics::ReferenceMapper _mapper; // Maps a key from thee screen definition to a value
   uint32_t  lastDisplayTime;    // Last time the display() function ran
   uint32_t  lastClockTime;
   FlexItem* _clock;

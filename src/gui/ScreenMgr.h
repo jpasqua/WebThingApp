@@ -14,7 +14,7 @@
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Includes
-#include <WTBasics.h>
+#include <BPABasics.h>
 //                                  Local Includes
 #include "UIOptions.h"
 #include "DisplayOptions.h"
@@ -64,7 +64,7 @@ namespace ScreenMgr {
   FlexScreen* createFlexScreen(
       const JsonDocument &doc,
       uint32_t refreshInterval,
-      const WTBasics::ReferenceMapper &mapper);
+      const Basics::ReferenceMapper &mapper);
 
 
 };
