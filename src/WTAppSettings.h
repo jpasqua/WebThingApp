@@ -31,8 +31,8 @@ class WTAppSettings: public BaseSettings {
 public:
   // ----- Constructors and methods
   WTAppSettings();
-  void fromJSON(const JsonDocument &doc) override;
-  void toJSON(JsonDocument &doc);
+  virtual void fromJSON(const JsonDocument &doc) override;
+  virtual void toJSON(JsonDocument &doc) override;
   void logSettings();
 
   DisplayOptions displayOptions;

@@ -69,7 +69,6 @@ void WTAppImpl::begin() {
   settings->read();
   settings->logSettings();
 
-  DataBroker::begin();
   DataBroker::registerMapper( ([this](const String& key, String& value){ weatherDataSupplier(key, value); }), 'W' );
   app_registerDataSuppliers();
 

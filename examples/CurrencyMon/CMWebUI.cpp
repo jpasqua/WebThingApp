@@ -78,14 +78,9 @@ namespace CMWebUI {
   void init() {
     WebUIHelper::init(Internal::APP_MENU_ITEMS);
 
-    // Standard pages and endpoints
-    WebUI::registerHandler("/",                     WebUIHelper::Default::homePage);
-    WebUI::registerHandler("/dev",                  WebUIHelper::Default::devPage);
-    WebUI::registerHandler("/dev/updateSettings",   WebUIHelper::Default::updateDevConfig);
-
-    // CUSTOM: App-specific pages and endpoints
-    WebUI::registerHandler("/presentCurrencyConfig",Pages::currencyPage);
-    WebUI::registerHandler("/updateCurrencyConfig", Endpoints::updateCurrencyConfig);
+    WebUI::registerHandler("/",                       WebUIHelper::Default::homePage);
+    WebUI::registerHandler("/presentCurrencyConfig",  Pages::currencyPage);
+    WebUI::registerHandler("/updateCurrencyConfig",   Endpoints::updateCurrencyConfig);
   }
 
 }

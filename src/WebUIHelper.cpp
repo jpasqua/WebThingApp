@@ -9,6 +9,7 @@
 #include <FS.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
+#include <BPABasics.h>
 //                                  WebThing Includes
 #include <DataBroker.h>
 #include <WebThing.h>
@@ -26,8 +27,6 @@
 namespace WebUIHelper {
   constexpr char UpdatingSymbol = 'w';
   
-  ESPTemplateProcessor* templateHandler;
-
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
     const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
@@ -40,9 +39,10 @@ namespace WebUIHelper {
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
       "<i class='fa fa-plug'></i> Configure Plugins</a>");
 
-    const __FlashStringHelper* DEV_MENU_ITEMS = FPSTR(
-      "<a class='w3-bar-item w3-button' href='/dev'>"
-      "<i class='fa fa-gears'></i> Dev Settings</a>");
+    constexpr WebUI::Dev::Action ExtraDevButtons[] {
+      {"Take a screen shot", "/dev/screenShot", nullptr, nullptr}
+    };
+    constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
 
     void showBusyStatus(bool busy) {
       if (busy) ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
@@ -182,17 +182,6 @@ namespace WebUIHelper {
       WebUI::wrapWebAction("/dev/forceScreen", action, false);
     }
 
-    void yieldSettings() {
-      auto action = []() {
-        DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
-                                                           wtApp->settings->asJSON();
-        WebUI::sendJSONContent(doc);
-        doc->clear();
-        delete doc;
-      };
-      WebUI::wrapWebAction("/dev/settings", action);
-    }
-
     void yieldScreenShot() {
       auto action = []() {
         WebUI::sendArbitraryContent(
@@ -202,49 +191,11 @@ namespace WebUIHelper {
       };
       WebUI::wrapWebAction("/dev/screenShot", action, false);
     }
-
-    void enableDevMenu() {
-      auto action = []() {
-        wtApp->settings->uiOptions.showDevMenu = WebUI::hasArg("showDevMenu");
-        wtApp->settings->write();
-        WebUI::redirectHome();
-      };
-      WebUI::wrapWebAction("/dev/enableDevMenu", action);
-    }
-
-    void getDataBrokerValue() {
-      auto action = []() {
-        String key = "$" + WebUI::arg(F("key"));
-        String value;
-        DataBroker::map(key, value);
-        String result = key + ": " + value;
-        WebUI::sendStringContent("text", result);
-      };
-
-      WebUI::wrapWebAction("/dev/data", action);
-    }
   }   // ----- END: WebUIHelper::Dev
 
 
   // ----- BEGIN: WebUIHelper::Default
   namespace Default {
-    void devPage() {
-      auto action = []() {
-        auto mapper =[](const String& key, String& val) -> void {
-          if (key.equals(F("HEAP"))) { DataBroker::map("$S.heap", val); }
-          else if (key.equals("SHOW_DEV_MENU")) {
-            val = checkedOrNot[wtApp->settings->uiOptions.showDevMenu];
-          }
-        };
-
-        WebUI::startPage();
-        templateHandler->send("/wta/ConfigDev.html", mapper);
-        WebUI::finishPage();
-      };
-
-      WebUI::wrapWebAction("/dev", action);
-    }
-
     void updateDevConfig() {
       auto action = []() {
         wtApp->settings->uiOptions.showDevMenu = WebUI::hasArg("showDevMenu");
@@ -256,23 +207,17 @@ namespace WebUIHelper {
     }
 
     void homePage() {
-      auto action = []() {
-        auto mapper =[](const String& key, String &val) -> void {
-          if (key.equals(F("CITYID"))) {
-            if (wtApp->settings->owmOptions.enabled) val.concat(wtApp->settings->owmOptions.cityID);
-            else val.concat("5380748");  // Palo Alto, CA, USA
-          }
-          else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
-          else if (key.equals(F("UNITS"))) val.concat(wtApp->settings->uiOptions.useMetric ? "metric" : "imperial");
-          else if (key.equals(F("BRIGHT"))) val.concat(Display::getBrightness());
-        };
-
-        WebUI::startPage();
-        templateHandler->send("/wta/HomePage.html", mapper);
-        WebUI::finishPage();
+      auto mapper =[](const String& key, String &val) -> void {
+        if (key.equals(F("CITYID"))) {
+          if (wtApp->settings->owmOptions.enabled) val.concat(wtApp->settings->owmOptions.cityID);
+          else val.concat("5380748");  // Palo Alto, CA, USA
+        }
+        else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
+        else if (key.equals(F("UNITS"))) val.concat(wtApp->settings->uiOptions.useMetric ? "metric" : "imperial");
+        else if (key.equals(F("BRIGHT"))) val.concat(Display::getBrightness());
       };
 
-      WebUI::wrapWebAction("/", action);
+      WebUI::wrapWebPage("/", "/wta/HomePage.html", mapper);
     }
   }  // ----- END: WebUIHelper::Default
 
@@ -341,15 +286,13 @@ namespace WebUIHelper {
 
 
   void init(const __FlashStringHelper* appMenuItems) {
-    templateHandler = WebUI::getTemplateHandler();
+    WebUI::registerBusyCallback(Internal::showBusyStatus);
 
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
-    if (wtApp->settings->uiOptions.showDevMenu) {
-      WebUI::addDevMenuItems(Internal::DEV_MENU_ITEMS);
-    }
+    WebUI::Dev::init(&wtApp->settings->uiOptions.showDevMenu, wtApp->settings);
+    WebUI::Dev::addButtons(Internal::ExtraDevButtons, Internal::NumExtraDevButtons);
 
-    WebUI::registerBusyCallback(Internal::showBusyStatus);
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
     WebUI::registerHandler("/presentPluginConfig",    Pages::presentPluginConfig);
@@ -360,12 +303,9 @@ namespace WebUIHelper {
     WebUI::registerHandler("/updatePluginConfig",     Endpoints::updatePluginConfig);
     WebUI::registerHandler("/setBrightness",          Endpoints::setBrightness);
 
-    WebUI::registerHandler("/dev/reboot",             Dev::reboot);
-    WebUI::registerHandler("/dev/settings",           Dev::yieldSettings);
+    WebUI::registerHandler("/dev/reboot",             Dev::reboot); // Override the default from WebUI
     WebUI::registerHandler("/dev/screenShot",         Dev::yieldScreenShot);
     WebUI::registerHandler("/dev/forceScreen",        Dev::forceScreen);
-    WebUI::registerHandler("/dev/enableDevMenu",      Dev::enableDevMenu);
-    WebUI::registerHandler("/dev/data",               Dev::getDataBrokerValue);
   }
 
 }
