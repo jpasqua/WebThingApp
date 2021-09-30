@@ -54,7 +54,7 @@ public:
   // CUSTOM: Screens implemented by this app
   SplashScreen*   splashScreen;
   HomeScreen*     homeScreen;
-  // CUSTOM: Screen implemented by WebThingApp
+  // CUSTOM: Include Screen implemented by WebThingApp
   EnterNumberScreen* numpad;
 
   // CUSTOM: Data defined by this app which is available to the whole app
@@ -68,6 +68,9 @@ public:
   virtual void app_initClients() override;
   virtual void app_conditionalUpdate(bool force = false) override;
   virtual void app_loop() override;
+
+  // ----- Functions that *may* be provided by subclasses
+  virtual void app_registerButtons() override;
 
   // ----- Public functions
   CurrencyMonApp(CMSettings* settings);

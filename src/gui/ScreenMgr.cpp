@@ -7,6 +7,7 @@
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
+#include <map>
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 #include <ArduinoLog.h>
@@ -24,31 +25,20 @@ using Display::tft;
 
 namespace ScreenMgr {
   namespace State {
-    constexpr uint8_t MaxScreens = 20;
+    std::map<String, Screen*> screenFromName;
 
-    struct {
-      String name;
-      Screen* screen;
-    } map[MaxScreens];
-
-    uint8_t nScreens = 0;
     Screen* curScreen;
     Screen* homeScreen;
 
     UIOptions* uiOptions;
     DisplayOptions* displayOptions;
+    PhysicalButtonMgr* pbMgr;
 
     uint32_t lastInteraction = 0;
     Screen* suspendedScreen = nullptr;
   };
 
   namespace Internal {
-    constexpr uint16_t InfoIconSize = 32;
-    constexpr uint16_t InfoIconBorderSize = 5;
-    constexpr uint16_t InfoIconX = (320 - InfoIconSize);
-    constexpr uint16_t InfoIconY = 0;
-    uint16_t *savedPixels = NULL;
-    bool infoIconIsDisplayed = false;
 
     void unsuspend() {
       if (State::suspendedScreen) {
@@ -85,26 +75,6 @@ namespace ScreenMgr {
       void processPeriodicActivity() { }
     } blankScreen;
 
-    void drawInfoIcon(
-        uint16_t borderColor, char symbol, uint16_t fillColor, uint16_t textColor)
-    {
-      tft.readRect(InfoIconX, InfoIconY, InfoIconSize, InfoIconSize, savedPixels);
-      uint16_t centerX = InfoIconX+(InfoIconSize/2);
-      uint16_t centerY = InfoIconY+(InfoIconSize/2);
-      tft.fillCircle(centerX, centerY, InfoIconSize/2-1, borderColor);
-      tft.fillCircle(centerX, centerY, (InfoIconSize/2-1)-InfoIconBorderSize, fillColor);
-      tft.setTextDatum(MC_DATUM);
-      // tft.setFreeFont(&FreeSerifBoldItalic9pt7b);
-      tft.setFreeFont(&FreeSansBold9pt7b);
-      tft.setTextColor(textColor);
-      tft.drawString(String(symbol), centerX, centerY);
-    }
-
-    void initInfoIcon() {
-      // In theory it would be better to allocate/deallocate this as needed, but it causes
-      // a lot more fragmentation and potentially a crash.
-      savedPixels = (uint16_t *)malloc(InfoIconSize*InfoIconSize*sizeof(uint16_t));  // This is BIG!
-    }
 
     void processSchedules() {
       static uint32_t eveningExecutedOnDay = UINT32_MAX;
@@ -138,6 +108,7 @@ namespace ScreenMgr {
       bool pressed = Display::tft.getTouch(&tx, &ty);
       if (pressed) State::lastInteraction = curMillis;
       State::curScreen->processInput(pressed, tx, ty);
+      State::pbMgr->processInput();
 
       // Test whether we should blank the screen
       if (State::uiOptions->screenBlankMinutes && !State::suspendedScreen) {
@@ -150,14 +121,60 @@ namespace ScreenMgr {
         }
       }
     }
+
+    void dispatchPhysicalButtonPress(uint8_t id, BaseButton::PressType pt) {
+      Log.verbose("Physical button %d was pressed. PressType: %d", id, pt);
+      State::lastInteraction = millis();
+      if (!State::curScreen->physicalButtonHandler) return;
+
+      auto mapping = State::curScreen->screenButtonFromPhysicalButton.find(id);
+      if (mapping != State::curScreen->screenButtonFromPhysicalButton.end()) {
+        State::curScreen->physicalButtonHandler(mapping->second, pt);
+      }
+    }
+
   };  // ----- END: ScreenMgr::Internal
 
-  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
+  namespace InfoIcon {
+    constexpr uint16_t Size = 32;
+    constexpr uint16_t BorderSize = 5;
+    constexpr uint16_t X = (320 - Size);
+    constexpr uint16_t Y = 0;
+    uint16_t *savedPixels = NULL;
+    bool isDisplayed = false;
+
+    void draw(
+        uint16_t borderColor, char symbol, uint16_t fillColor, uint16_t textColor)
+    {
+      tft.readRect(X, Y, Size, Size, savedPixels);
+      uint16_t centerX = X+(Size/2);
+      uint16_t centerY = Y+(Size/2);
+      tft.fillCircle(centerX, centerY, Size/2-1, borderColor);
+      tft.fillCircle(centerX, centerY, (Size/2-1)-BorderSize, fillColor);
+      tft.setTextDatum(MC_DATUM);
+      // tft.setFreeFont(&FreeSerifBoldItalic9pt7b);
+      tft.setFreeFont(&FreeSansBold9pt7b);
+      tft.setTextColor(textColor);
+      tft.drawString(String(symbol), centerX, centerY);
+    }
+
+
+    void init() {
+      // In theory it would be better to allocate/deallocate this as needed, but it causes
+      // a lot more fragmentation and potentially a crash.
+      savedPixels = (uint16_t *)malloc(Size*Size*sizeof(uint16_t));  // This is BIG!
+    }
+  } // END: ScreenMgr::InfoIcon namespace
+
+  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions, PhysicalButtonMgr* pbMgr) {
     State::uiOptions = uiOptions;
     State::displayOptions = displayOptions;
+    State::pbMgr = pbMgr;
+
+    State::pbMgr->setDispatcher(Internal::dispatchPhysicalButtonPress);
     Display::begin(displayOptions);
     State::lastInteraction = millis();
-    Internal::initInfoIcon();
+    InfoIcon::init();
   }
 
   void loop() {
@@ -169,17 +186,11 @@ namespace ScreenMgr {
 
 
   bool registerScreen(String screenName, Screen* theScreen) {
-    if (State::nScreens == State::MaxScreens) {
-      Log.warning("No space for more screens while registering: %s", screenName.c_str());
-      return false;
-    }
-    if (find(screenName) != NULL) {
+    if (State::screenFromName[screenName] != NULL) {
       Log.warning("Trying to register a screen with a name that is in use: %s", screenName.c_str());
       return false;
     }
-    State::map[State::nScreens].name = screenName;
-    State::map[State::nScreens].screen = theScreen;
-    State::nScreens++;
+    State::screenFromName[screenName] = theScreen;
     return true;
   }
 
@@ -187,15 +198,8 @@ namespace ScreenMgr {
     State::homeScreen = screen;
   }
 
-  Screen* find(String name) {
-    for (int i = 0; i < State::nScreens; i++) {
-      if (State::map[i].name.equals(name)) return (State::map[i].screen);
-    }
-    return NULL;
-  }
-
   void display(String name) {
-    Screen* screen = find(name);
+    Screen* screen = State::screenFromName[name];
     if (screen == NULL) {
       Log.warning("Trying to display screen %s, but none is registered", name.c_str());
       return;
@@ -232,24 +236,20 @@ namespace ScreenMgr {
     return (flexScreen);
   }
 
-  void showUpdatingIcon(uint16_t accentColor, char symbol) {
-    if (Internal::infoIconIsDisplayed) return;
-    Internal::drawInfoIcon(
-      accentColor, symbol, Theme::Color_UpdatingFill, Theme::Color_UpdatingText);
-    Internal::infoIconIsDisplayed = true;
-  }
+    void showUpdatingIcon(uint16_t accentColor, char symbol) {
+      if (InfoIcon::isDisplayed) return;
+      InfoIcon::draw(
+        accentColor, symbol, Theme::Color_UpdatingFill, Theme::Color_UpdatingText);
+      InfoIcon::isDisplayed = true;
+    }
 
-  void showUpdatingIcon(uint16_t accentColor) {
-    showUpdatingIcon(accentColor, 'i');
-  }
-
-  void hideUpdatingIcon() {
-    if (!Internal::infoIconIsDisplayed) return;
-    tft.pushRect(
-      Internal::InfoIconX, Internal::InfoIconY, Internal::InfoIconSize,
-      Internal::InfoIconSize, Internal::savedPixels);
-    Internal::infoIconIsDisplayed = false;
-  }
+    void hideUpdatingIcon() {
+      if (!InfoIcon::isDisplayed) return;
+      tft.pushRect(
+        InfoIcon::X, InfoIcon::Y, InfoIcon::Size,
+        InfoIcon::Size, InfoIcon::savedPixels);
+      InfoIcon::isDisplayed = false;
+    }
 
 
 };

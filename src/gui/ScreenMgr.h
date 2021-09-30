@@ -18,13 +18,14 @@
 //                                  Local Includes
 #include "UIOptions.h"
 #include "DisplayOptions.h"
+#include "PhysicalButtonMgr.h"
 #include "FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
 namespace ScreenMgr {
 
-  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions);
+  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions, PhysicalButtonMgr* pbMgr);
   void loop();
 
   // ----- Screen Management functions
@@ -43,15 +44,9 @@ namespace ScreenMgr {
    * will be unresponsive in this period. Calling showUpdatingIcon()
    * when the icon is already displayed is safe and does nothing.
    * @param   accentColor   An accent color to indicate what's happening
-   */
-  void showUpdatingIcon(uint16_t accentColor);
-
-  /**
-   * Same as above, but allows the updating symbol to be set.
-   * @param   accentColor   An accent color to indicate what's happening
    * @param   symbol        The symbol to display within the icon
    */
-  void showUpdatingIcon(uint16_t accentColor, char symbol);
+  void showUpdatingIcon(uint16_t accentColor, char symbol = 'i');
 
   /**
    * Remove the "updating icon" from the current screen and restore the original
