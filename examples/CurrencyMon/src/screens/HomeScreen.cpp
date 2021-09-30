@@ -113,20 +113,20 @@ HomeScreen::HomeScreen() {
       String subheading = "Heap: Free/Frag = ";
       String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
       wtAppImpl->utilityScreen->setSub(subheading, subcontent);
-      ScreenMgr::display(wtAppImpl->utilityScreen);
+      ScreenMgr.display(wtAppImpl->utilityScreen);
     } else if (id == ClockAreaIndex || id == AdvanceButton) {
       cmApp->pluginMgr.displayPlugin(0);
     } else if (id == WeatherAreaIndex) {
-      ScreenMgr::display("Weather"); 
+      ScreenMgr.display("Weather"); 
     } else if (id >= Currency1Button && id <= Currency3Button) {
       activeCurrency = id - Currency1Button;
       if (cmApp->currencies[activeCurrency].inactive()) return;
 
       cmApp->numpad->init(
         "Amount", 1,
-        ([this](float a) { updateAmounts(a); ScreenMgr::display(this); }),
+        ([this](float a) { updateAmounts(a); ScreenMgr.display(this); }),
         true, 0.0, 100000.0);
-      ScreenMgr::display(cmApp->numpad);
+      ScreenMgr.display(cmApp->numpad);
     }
   };
 

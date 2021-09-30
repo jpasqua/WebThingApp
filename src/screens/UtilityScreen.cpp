@@ -74,8 +74,8 @@ UtilityScreen::UtilityScreen() {
     }
 
     if (id == RefreshButtonIndex) { wtAppImpl->updateAllData(); return;} 
-    if (id == CalButtonIndex) { ScreenMgr::display(wtAppImpl->calibrationScreen); return; }
-    if (id == HomeButtonIndex) { ScreenMgr::displayHomeScreen(); return; }
+    if (id == CalButtonIndex) { ScreenMgr.display(wtAppImpl->calibrationScreen); return; }
+    if (id == HomeButtonIndex) { ScreenMgr.displayHomeScreen(); return; }
   };
 
 

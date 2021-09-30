@@ -101,7 +101,6 @@ void GenericPlugin::typeSpecificMapper(const String& key, String& value) {
   (void)value;  // Unused parameter;
 }
 
-void GenericPlugin::refresh(bool force) {
+void GenericPlugin::refresh(bool) {
   // Nothing to update - we're relying on global content
-  (void)force; // Avoid compiler warning
 }

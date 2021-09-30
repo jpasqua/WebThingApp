@@ -214,11 +214,11 @@ void PluginMgr::map(const String& key, String& value) {
 void PluginMgr::displayPlugin(uint8_t pluginIndex) {
   if (pluginIndex >= _nPlugins) {
     curPlugin = -1;
-    ScreenMgr::displayHomeScreen();
+    ScreenMgr.displayHomeScreen();
     return;
   }
   Plugin *p = _plugins[(curPlugin = pluginIndex) ];
-  if (p && p->enabled()) { ScreenMgr::display(p->getFlexScreen()); }
+  if (p && p->enabled()) { ScreenMgr.display(p->getFlexScreen()); }
 }
 
 void PluginMgr::displayNextPlugin() {

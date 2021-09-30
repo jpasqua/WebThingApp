@@ -57,8 +57,7 @@ void CalibrationScreen::processPeriodicActivity() {
 
 void CalibrationScreen::init() {
 
-  auto buttonHandler =[this](int id, Button::PressType type) -> void {
-    (void)type; // We don't use this parameter - avoid a warning...
+  auto buttonHandler =[this](int id, Button::PressType) -> void {
     Log.verbose(F("In CalibrationScreenButtonHandler, id = %d"), id);
     switch (state) {
       case pre:
@@ -76,7 +75,7 @@ void CalibrationScreen::init() {
         Display::calibrate(&newCalibrationData);
         wtApp->settings->displayOptions.calibrationData = newCalibrationData;
         wtApp->settings->write();
-        ScreenMgr::displayHomeScreen();
+        ScreenMgr.displayHomeScreen();
         break;
       case post:
         // Assert: should never get here

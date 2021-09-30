@@ -45,8 +45,8 @@ namespace WebUIHelper {
     constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
 
     void showBusyStatus(bool busy) {
-      if (busy) ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
-      else ScreenMgr::hideUpdatingIcon();
+      if (busy) ScreenMgr.activityIcon.show(Theme::Color_WebRequest, UpdatingSymbol);
+      else ScreenMgr.activityIcon.hide();
     }
   }
 
@@ -173,8 +173,8 @@ namespace WebUIHelper {
         String screen = WebUI::arg(F("screen"));
         Log.trace(F("/dev/forceScreen?screen=%s"), screen.c_str());
         if (!screen.isEmpty()) {
-          if (screen.equalsIgnoreCase("home")) ScreenMgr::displayHomeScreen();
-          else ScreenMgr::display(screen);
+          if (screen.equalsIgnoreCase("home")) ScreenMgr.displayHomeScreen();
+          else ScreenMgr.display(screen);
         }
         WebUI::redirectHome();
       };

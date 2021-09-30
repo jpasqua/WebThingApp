@@ -67,7 +67,7 @@ bool Plugin::init(const String& name, const String& piNamespace, const String& p
   if (placeHolder) free(placeHolder);  // Free up the space for reuse by FlexScreen
 
   if (doc == NULL) return false;
-  _flexScreen = ScreenMgr::createFlexScreen(*doc, getUIRefreshInterval(), _mapper);
+  _flexScreen = ScreenMgr.createFlexScreen(*doc, getUIRefreshInterval(), _mapper);
   delete doc;
   
   return !(_flexScreen == NULL);

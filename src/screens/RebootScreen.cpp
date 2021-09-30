@@ -29,7 +29,7 @@ RebootScreen::RebootScreen() {
     auto buttonHandler =[&](int id, Button::PressType type) -> void {
       Log.verbose(F("In RebootScreen ButtonHandler, id = %d"), id);
       if (id == RebootButtonID && type > Button::PressType::NormalPress) { ESP.restart(); }
-      if (id == CancelButtonID) ScreenMgr::displayHomeScreen();
+      if (id == CancelButtonID) ScreenMgr.displayHomeScreen();
     };
 
     buttons = new Button[(nButtons = 2)];
@@ -37,8 +37,7 @@ RebootScreen::RebootScreen() {
     buttons[1].init(0, Display::Height/2, Display::Width, Display::Height/2, buttonHandler, CancelButtonID);
   }
 
-void RebootScreen::display(bool activating) {
-  (void)activating; // We don't use this parameter - avoid a warning...
+void RebootScreen::display(bool) {
   tft.fillScreen(Theme::Color_Background);
 
   Display::Font::setUsingID(Display::Font::FontID::SB12, tft);
@@ -71,7 +70,7 @@ void RebootScreen::display(bool activating) {
 }
 
 void RebootScreen::processPeriodicActivity() {
-  if (millis() >= autoCancelTime) ScreenMgr::displayHomeScreen();
+  if (millis() >= autoCancelTime) ScreenMgr.displayHomeScreen();
 }
 
 

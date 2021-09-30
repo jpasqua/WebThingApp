@@ -50,8 +50,8 @@ ForecastScreen::ForecastScreen() {
 
   auto buttonHandler =[&](int id, Button::PressType type) -> void {
     Log.verbose(F("In ForecastScreen Button Handler, id = %d, type = %d"), id, type);
-    if (type > Button::PressType::NormalPress) ScreenMgr::display("Weather");
-    ScreenMgr::displayHomeScreen();
+    if (type > Button::PressType::NormalPress) ScreenMgr.display("Weather");
+    ScreenMgr.displayHomeScreen();
   };
 
   buttons = new Button[(nButtons = 1)];
@@ -59,9 +59,7 @@ ForecastScreen::ForecastScreen() {
 }
 
 
-void ForecastScreen::display(bool activating) {
-  (void)activating; // We don't use this parameter - avoid a warning...
-
+void ForecastScreen::display(bool) {
   if (!wtApp->owmClient) return; // Make sure we've got an OpenWeatherMap client
 
   tft.fillScreen(Theme::Color_WeatherBkg);

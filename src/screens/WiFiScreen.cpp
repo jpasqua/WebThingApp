@@ -22,8 +22,7 @@ WiFiScreen::WiFiScreen() {
     buttons = NULL;
   }
 
-void WiFiScreen::display(bool activating) {
-  (void)activating; // We don't use this parameter - avoid a warning...
+void WiFiScreen::display(bool) {
   tft.fillScreen(Theme::Color_Background);
   uint16_t x = (Display::Width-WiFiLogo_Width)/2;
   uint16_t y = 30;  // A little space from the top of the screen

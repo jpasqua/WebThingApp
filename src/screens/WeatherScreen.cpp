@@ -66,8 +66,8 @@ WeatherScreen::WeatherScreen() {
 
   auto buttonHandler =[](int id, Button::PressType type) -> void {
     Log.verbose(F("In WeatherScreen Button Handler, id = %d, type = %d"), id, type);
-    if (type > Button::PressType::NormalPress) ScreenMgr::displayHomeScreen();
-    else ScreenMgr::display(wtAppImpl->forecastScreen);
+    if (type > Button::PressType::NormalPress) ScreenMgr.displayHomeScreen();
+    else ScreenMgr.display(wtAppImpl->forecastScreen);
   };
 
   nButtons = 1;
@@ -76,9 +76,7 @@ WeatherScreen::WeatherScreen() {
 }
 
 
-void WeatherScreen::display(bool activating) {
-  (void)activating; // We don't use this parameter. Avoid a warning...
-  
+void WeatherScreen::display(bool activating) {  
   // We should not get here if owm is disabled or we were unable to contact the
   // OWM service, but just double check...
   if (!wtApp->owmClient) return;

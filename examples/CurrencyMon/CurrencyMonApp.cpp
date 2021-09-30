@@ -126,7 +126,7 @@ void CurrencyMonApp::app_initClients() {
   // CUSTOM: If your app has any app-specific clients, initilize them now
   // In this example, we have one: RateClient
 
-  ScreenMgr::showUpdatingIcon(AppTheme::Color_UpdatingRates);
+  ScreenMgr.activityIcon.show(AppTheme::Color_UpdatingRates);
 
   for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
     currencies[i].id = cmSettings->currencies[i].id;
@@ -136,7 +136,7 @@ void CurrencyMonApp::app_initClients() {
   rateClient = new RateClient(
       cmSettings->rateApiKey, &(currencies[0]), CMSettings::MaxCurrencies);
 
-  ScreenMgr::hideUpdatingIcon();
+  ScreenMgr.activityIcon.hide();
 }
 
 void CurrencyMonApp::app_conditionalUpdate(bool force) {
@@ -144,11 +144,11 @@ void CurrencyMonApp::app_conditionalUpdate(bool force) {
 
   static uint32_t nextTimeForStatus = 0;
   if (millis() > nextTimeForStatus || force) {
-    ScreenMgr::showUpdatingIcon(AppTheme::Color_UpdatingRates);
+    ScreenMgr.activityIcon.show(AppTheme::Color_UpdatingRates);
 
     rateClient->updateRates();
 
-    ScreenMgr::hideUpdatingIcon();
+    ScreenMgr.activityIcon.hide();
     nextTimeForStatus = millis() + cmSettings->refreshInterval * 60 * 60 * 1000L;
   }      
 }
@@ -160,10 +160,10 @@ Screen* CurrencyMonApp::app_registerScreens() {
   splashScreen = new SplashScreen();
   homeScreen = new HomeScreen();
 
-  ScreenMgr::registerScreen("Splash", splashScreen);
-  ScreenMgr::registerScreen("Time", homeScreen);
+  ScreenMgr.registerScreen("Splash", splashScreen);
+  ScreenMgr.registerScreen("Time", homeScreen);
 
-  ScreenMgr::setAsHomeScreen(homeScreen);
+  ScreenMgr.setAsHomeScreen(homeScreen);
 
   return splashScreen;
 }

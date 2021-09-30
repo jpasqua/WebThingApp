@@ -23,8 +23,7 @@ ConfigScreen::ConfigScreen() {
   buttons = NULL;
 }
 
-void ConfigScreen::display(bool activating) {
-  (void)activating; // We don't use this parameter - avoid a warning...
+void ConfigScreen::display(bool) {
   tft.fillScreen(Theme::Color_Background);
   tft.drawBitmap(0, 0, Gears160x240, 160, 240, Theme::Color_AlertGood);
 
