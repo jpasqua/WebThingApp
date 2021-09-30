@@ -18,6 +18,7 @@
 #include <screens/EnterNumberScreen.h>
 //                                  Local Includes
 #include "../../CurrencyMonApp.h"
+#include "../hardware/PhysicalButtons.h"
 #include "HomeScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
@@ -92,7 +93,9 @@ static constexpr uint8_t NCurrencyButtons = Currency3Button + 1;
 
 static constexpr uint8_t WeatherAreaIndex = NCurrencyButtons;
 static constexpr uint8_t ClockAreaIndex = WeatherAreaIndex + 1;
-static constexpr uint8_t NTotalButtons = ClockAreaIndex + 1;
+static constexpr uint8_t NTouchButtons = ClockAreaIndex + 1;
+
+static constexpr uint8_t AdvanceButton = NTouchButtons;
 
 
 /*------------------------------------------------------------------------------
@@ -111,7 +114,7 @@ HomeScreen::HomeScreen() {
       String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
       wtAppImpl->utilityScreen->setSub(subheading, subcontent);
       ScreenMgr::display(wtAppImpl->utilityScreen);
-    } else if (id == ClockAreaIndex) {
+    } else if (id == ClockAreaIndex || id == AdvanceButton) {
       cmApp->pluginMgr.displayPlugin(0);
     } else if (id == WeatherAreaIndex) {
       ScreenMgr::display("Weather"); 
@@ -127,9 +130,10 @@ HomeScreen::HomeScreen() {
     }
   };
 
-  
+  physicalButtonHandler = buttonHandler;
+  screenButtonFromPhysicalButton[PhysicalButtons::Button01] = AdvanceButton;
 
-  buttons = new Button[(nButtons = NTotalButtons)];
+  buttons = new Button[(nButtons = NTouchButtons)];
   uint16_t x = CB_XOrigin;
   for (int i = 0; i < NCurrencyButtons; i++) {
     buttons[i].init(x, CB_YOrigin, CB_Width, CB_Height, buttonHandler, i);

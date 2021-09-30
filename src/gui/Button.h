@@ -29,15 +29,10 @@
 #if defined(ESP32)
   #include <functional>
 #endif
+#include "BaseButton.h"
 
-class Button {
-public:
-  using PressType = enum {NormalPress, LongPress, VeryLongPress};
-  using ButtonCallback = std::function<void(int, PressType)>;
-  
-  static constexpr uint32_t LongPressInterval = 500;
-  static constexpr uint32_t VeryLongPressInterval = 1000;
-  
+class Button : public BaseButton {
+public:  
   uint16_t _x;
   uint16_t _y;
   uint16_t _w;

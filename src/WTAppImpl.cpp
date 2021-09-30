@@ -72,7 +72,7 @@ void WTAppImpl::begin() {
   DataBroker::registerMapper( ([this](const String& key, String& value){ weatherDataSupplier(key, value); }), 'W' );
   app_registerDataSuppliers();
 
-  ScreenMgr::setup(&settings->uiOptions, &settings->displayOptions);
+  ScreenMgr::setup(&settings->uiOptions, &settings->displayOptions, &pbMgr);
   registerScreens();
   ScreenMgr::display(wifiScreen);
 

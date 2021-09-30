@@ -14,6 +14,7 @@
 //                                  Local Includes
 #include "WTApp.h"
 #include "plugins/PluginMgr.h"
+#include "gui/PhysicalButtonMgr.h"
 #include "screens/CalibrationScreen.h"
 #include "screens/ConfigScreen.h"
 #include "screens/ForecastScreen.h"
@@ -29,6 +30,7 @@
 class WTAppImpl : public WTApp {
 public:
   PluginMgr pluginMgr;
+  PhysicalButtonMgr pbMgr;
 
   CalibrationScreen*  calibrationScreen;
   ConfigScreen*       configScreen;
@@ -60,6 +62,9 @@ public:
   virtual void app_initClients() = 0;
   virtual void app_conditionalUpdate(bool force = false) = 0;
   virtual void app_loop() = 0;
+
+  // ----- Functions that *may* be provided by subclasses
+  virtual void app_registerButtons() {  };
 
 protected:
   // ----- Weather Functions

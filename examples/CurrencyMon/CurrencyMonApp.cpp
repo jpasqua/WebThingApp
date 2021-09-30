@@ -167,3 +167,14 @@ Screen* CurrencyMonApp::app_registerScreens() {
 
   return splashScreen;
 }
+
+/*------------------------------------------------------------------------------
+ *
+ * Optional WTAppImpl virtual functions
+ *
+ *----------------------------------------------------------------------------*/
+
+void CurrencyMonApp::app_registerButtons() {
+  // CUSTOM: Register any physical buttons that are connected
+  pbMgr.addButton(D2);
+}
