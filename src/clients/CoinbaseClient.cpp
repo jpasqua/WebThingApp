@@ -15,8 +15,7 @@
 
 
 #if defined(MockCoinbase)
-  bool CoinbaseClient::getPrice(const String& coinID, String& currency, String& price) {
-    (void)coinID;   // Unused in mock client
+  bool CoinbaseClient::getPrice(const String&, String& currency, String& price) {
     currency = "USD";
     price = String(random(0, 500000)/10.0, 2);
     return true;

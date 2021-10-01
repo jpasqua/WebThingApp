@@ -74,7 +74,7 @@ WeatherScreen::WeatherScreen() {
 }
 
 
-void WeatherScreen::display(bool activating) {  
+void WeatherScreen::display(bool) {  
   // We should not get here if owm is disabled or we were unable to contact the
   // OWM service, but just double check...
   if (!wtApp->owmClient) return;

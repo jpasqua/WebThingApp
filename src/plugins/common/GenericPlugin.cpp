@@ -96,11 +96,8 @@ bool GenericPlugin::typeSpecificInit() {
   return true;
 }
 
-void GenericPlugin::typeSpecificMapper(const String& key, String& value) {
-  (void)key;    // Unused parameter;
-  (void)value;  // Unused parameter;
-}
+void GenericPlugin::typeSpecificMapper(const String&, String&) { }
 
-void GenericPlugin::refresh(bool) {
+void GenericPlugin::refresh(bool) { }
   // Nothing to update - we're relying on global content
-}
+

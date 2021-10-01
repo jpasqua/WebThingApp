@@ -22,8 +22,6 @@
 #include "HomeScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-using Display::sprite;
 
 // ----- Coordinates of the various graphical elements
 // The weather area is on top, the buttons are on the bottom,
@@ -56,12 +54,12 @@ using Display::sprite;
 
 static constexpr float NotSet = -1;
 
-static constexpr auto WeatherFont = Display::Font::FontID::SB9;
+static constexpr auto WeatherFont = Display.fonts.FontID::SB9;
 static constexpr uint16_t WeatherFontHeight = 22;   // WeatherFont->yAdvance;
 static constexpr uint16_t WeatherXOrigin = 0;
 static constexpr uint16_t WeatherYOrigin = 0;
 static constexpr uint16_t WeatherHeight = WeatherFontHeight;
-static constexpr uint16_t WeatherWidth = Display::Width;
+static constexpr uint16_t WeatherWidth = Display.Width;
 
 // FC is short for Forecast
 static constexpr uint16_t FC_YOrigin = WeatherYOrigin + WeatherHeight + 2;
@@ -74,15 +72,15 @@ static constexpr uint16_t CB_FrameSize = 2;                             // Size 
 static constexpr uint16_t CB_Width = 106;                               // Includes Frame
 static constexpr uint16_t CB_Height = 42;                               // Includes Frame
 static constexpr uint16_t CB_XOrigin = 1;                               // X of origin of 1st currency button
-static constexpr uint16_t CB_YOrigin = Display::Height - CB_Height;     // Y Origin of all currency buttons
-static constexpr auto CB_Font = Display::Font::FontID::SB9;             // Font for currency value
+static constexpr uint16_t CB_YOrigin = Display.Height - CB_Height;     // Y Origin of all currency buttons
+static constexpr auto CB_Font = Display.fonts.FontID::SB9;             // Font for currency value
 static constexpr auto ButtonLabelFont = 2;                              // A small 5x7 font
 
 static constexpr uint16_t ClockXOrigin = 0;                             // Starts at left edge of screen
 static constexpr uint16_t ClockYOrigin = FC_YOrigin + FC_Height;        // Starts below the Playing area
-static constexpr uint16_t ClockWidth = Display::Width;                  // Full width of the screen
+static constexpr uint16_t ClockWidth = Display.Width;                  // Full width of the screen
 static constexpr uint16_t ClockHeight = CB_YOrigin-ClockYOrigin;        // The space between the other 2 areas
-static constexpr auto ClockFont = Display::Font::FontID::D100;
+static constexpr auto ClockFont = Display.fonts.FontID::D100;
 static constexpr uint16_t ClockFontHeight = 109;    // ClockFont->yAdvance;
 
 // Button Indices
@@ -145,15 +143,15 @@ HomeScreen::HomeScreen() {
   // right in the middle to make it easier to touch. It overlaps the Clock button area
   // but has priority as it is earlier in the button list
   buttons[WeatherAreaIndex].init(
-    0, WeatherYOrigin, Display::Width, /*WeatherHeight*/50,
+    0, WeatherYOrigin, Display.Width, /*WeatherHeight*/50,
     buttonHandler, WeatherAreaIndex);
   buttons[ClockAreaIndex].init(
-    0, ClockYOrigin, Display::Width, ClockHeight,
+    0, ClockYOrigin, Display.Width, ClockHeight,
     buttonHandler, ClockAreaIndex);
 }
 
 void HomeScreen::display(bool activating) {
-  if (activating) {tft.fillScreen(Theme::Color_Background); }
+  if (activating) { Display.tft.fillScreen(Theme::Color_Background); }
 
   drawClock(activating);
   drawWeather(activating);
@@ -190,6 +188,7 @@ void HomeScreen::drawClock(bool force) {
   time_t  t = now();
   int     hr = hour(t);
   int     min = minute(t);
+  auto&   sprite = Display.sprite;
 
   int compositeTime = hr * 100 + min;
   if (!force && (compositeTime == lastTimeDisplayed)) return;
@@ -213,7 +212,7 @@ void HomeScreen::drawClock(bool force) {
   sprite->createSprite(ClockWidth, ClockFontHeight);
   sprite->fillSprite(Theme::Mono_Background);
 
-  Display::Font::setUsingID(ClockFont, sprite);
+  Display.fonts.setUsingID(ClockFont, sprite);
   sprite->setTextColor(Theme::Mono_Foreground);
   // With this large font some manual "kerning" is required to make it fit
   uint16_t baseline = ClockFontHeight-1;
@@ -231,12 +230,12 @@ void HomeScreen::drawClock(bool force) {
   sprite->deleteSprite();
 }
 
-void HomeScreen::drawWeather(bool force) {
-  (void)force;  // We don't use this parameter. Avoid a warning...
+void HomeScreen::drawWeather(bool) {
   if (!wtApp->owmClient) { Log.verbose(F("owmClient = NULL")); return; }
   if (!wtApp->settings->owmOptions.enabled) return;
   String currentWeather;
   String outlook;
+  auto& sprite = Display.sprite;
 
   sprite->setColorDepth(1);
   sprite->createSprite(WeatherWidth, WeatherHeight);
@@ -264,7 +263,7 @@ void HomeScreen::drawWeather(bool force) {
     outlook += String(f[0].loTemp, 0);
   }
 
-  Display::Font::setUsingID(WeatherFont, sprite);
+  Display.fonts.setUsingID(WeatherFont, sprite);
   sprite->setTextColor(Theme::Mono_Foreground);
   sprite->setTextDatum(MC_DATUM);
   sprite->drawString(currentWeather, WeatherWidth/2, WeatherHeight/2);
@@ -289,10 +288,10 @@ void HomeScreen::drawCurrencyLabels(bool force) {
   if (!force) return;
 
   uint16_t yPos = CB_YOrigin;
-  uint16_t xDelta = Display::Width/NCurrencyButtons;
+  uint16_t xDelta = Display.Width/NCurrencyButtons;
   uint16_t xPos = 0 + xDelta/2;
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(Theme::Color_NormalText);
+  Display.tft.setTextDatum(BC_DATUM);
+  Display.tft.setTextColor(Theme::Color_NormalText);
   for (int i = 0; i < NCurrencyButtons; i++) {
     String label = cmSettings->currencies[i].nickname;
     uint32_t labelColor = Theme::Color_NormalText;
@@ -304,15 +303,13 @@ void HomeScreen::drawCurrencyLabels(bool force) {
       if (label.isEmpty()) label = cmSettings->currencies[i].id;
     }
 
-    tft.setTextColor(labelColor);
-    tft.drawString(label, xPos, yPos, ButtonLabelFont);      
+    Display.tft.setTextColor(labelColor);
+    Display.tft.drawString(label, xPos, yPos, ButtonLabelFont);      
     xPos += xDelta;
   }
 }
 
-void HomeScreen::drawCurrencyButtons(bool force) {
-  (void)force;  // We don't use this parameter. Avoid a warning...
-
+void HomeScreen::drawCurrencyButtons(bool) {
   for (int i = 0; i < NCurrencyButtons; i++) {
     uint32_t textColor = Theme::Color_NormalText;
     uint32_t bgColor = Theme::Color_Background;
