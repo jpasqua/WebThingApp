@@ -27,9 +27,6 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-using Display::tft;
-using Display::sprite;
-
 Button::Button() { }
 Button::Button(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id) {
   init(x, y, w, h, callback, id);
@@ -48,14 +45,18 @@ bool Button::processTouch(uint16_t tx, uint16_t ty, PressType type) {
 }
 
 void Button::clear(uint16_t bg) {
-  tft.fillRect(_x, _y, _w, _h, bg);
+  Display.tft.fillRect(_x, _y, _w, _h, bg);
 }
 
 void Button::drawSimple(
       const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor, uint16_t bgColor,
-      bool buffer) {
+      bool buffer)
+{
+  auto& tft = Display.tft;
+
   if (buffer) {
+    auto& sprite = Display.sprite;
     if (labelColor == borderColor) {  // We can do this with 1bpp
       sprite->setColorDepth(1);
       sprite->createSprite(_w, _h);
@@ -64,7 +65,7 @@ void Button::drawSimple(
       for (int i = 0; i < borderSize; i++) {      // Draw the frame
         sprite->drawRect(i, i, _w-(2*i), _h-(2*i), Theme::Mono_Foreground);
       }
-      Display::Font::setUsingID(font, sprite);
+      Display.fonts.setUsingID(font, sprite);
       sprite->setTextColor(Theme::Mono_Foreground);
       sprite->setTextDatum(MC_DATUM);
       sprite->drawString(label, (_w/2), (_h/2));
@@ -89,7 +90,7 @@ void Button::drawSimple(
       for (int i = 0; i < borderSize; i++) {      // Draw the frame
         sprite->drawRect(i, i, _w-(2*i), _h-(2*i), BorderIndex);
       }
-      Display::Font::setUsingID(font, sprite);
+      Display.fonts.setUsingID(font, sprite);
       sprite->setTextColor(LabelIndex);
       sprite->setTextDatum(MC_DATUM);
       sprite->drawString(label, (_w/2), (_h/2));
@@ -103,7 +104,7 @@ void Button::drawSimple(
       tft.drawRect(_x+i, _y+i, _w-(2*i), _h-(2*i), borderColor);
     }
 
-    Display::Font::setUsingID(font, tft);
+    Display.fonts.setUsingID(font, tft);
     tft.setTextColor(labelColor);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(label, _x + (_w/2), _y+(_h/2));
@@ -114,9 +115,13 @@ void Button::drawProgress(
       float pct, const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor,
       uint16_t barColor, uint16_t bgColor, const String& showPct,
-      bool buffer) {
+      bool buffer)
+{
+  auto& tft = Display.tft;
   String note = (label == showPct) ? String((int)(pct*100)) + "%" : label;
+
   if (buffer) {
+    auto& sprite = Display.sprite;
     constexpr uint8_t BackgroundIndex = 0;
     constexpr uint8_t BarIndex = 1;
     constexpr uint8_t TextIndex = 2;
@@ -141,7 +146,7 @@ void Button::drawProgress(
     sprite->fillRect(borderSize, borderSize, pct*(_w-2*borderSize), (_h-2*borderSize), BarIndex);
 
     // Draw the overlay text
-    Display::Font::setUsingID(font, sprite);
+    Display.fonts.setUsingID(font, sprite);
     sprite->setTextColor(TextIndex);
     sprite->setTextDatum(MC_DATUM);
     sprite->drawString(note, _w/2, _h/2);
@@ -159,7 +164,7 @@ void Button::drawProgress(
     tft.fillRect(_x+borderSize, _y+borderSize, pct*(_w-2*borderSize), (_h-2*borderSize), barColor);
 
     // Draw the overlay text
-    Display::Font::setUsingID(font, tft);
+    Display.fonts.setUsingID(font, tft);
     tft.setTextColor(labelColor);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(note, _x+_w/2, _y+_h/2);

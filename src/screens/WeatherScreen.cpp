@@ -20,8 +20,6 @@
 #include "WeatherIcons.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-using Display::sprite;
 
 /*------------------------------------------------------------------------------
  *
@@ -29,7 +27,7 @@ using Display::sprite;
  *
  *----------------------------------------------------------------------------*/
 
-static constexpr auto TimeFont = Display::Font::FontID::D20;
+static constexpr auto TimeFont = Display.fonts.FontID::D20;
 static constexpr uint16_t TimeFontWidth = 17;
 static constexpr uint16_t TimeFontHeight = 22;
 static constexpr uint16_t TimeFontColonWidth = 9;
@@ -38,11 +36,11 @@ static constexpr auto TempUnitsFont = TimeFont;
 static constexpr uint16_t TempUnitsFontWidth = TimeFontWidth;
 static constexpr uint16_t TempUnitsFontHeight = TimeFontHeight;
 
-static constexpr auto TempFont = Display::Font::FontID::D72;
+static constexpr auto TempFont = Display.fonts.FontID::D72;
 static constexpr uint16_t TempFontWidth = 60;
 static constexpr uint16_t TempFontHeight = 72;
 
-static constexpr auto ReadingsFont = Display::Font::FontID::S12;
+static constexpr auto ReadingsFont = Display.fonts.FontID::S12;
 static constexpr uint16_t ReadingsFontHeight = 29;
 
 
@@ -51,7 +49,7 @@ static constexpr uint16_t ImageInset = 2;
 static constexpr uint16_t YTopArea = 3;
 static constexpr uint16_t XTopAreaInset = 3;
 static constexpr uint16_t YTopAreaHeight = 22;
-static constexpr uint16_t YReadingsArea = Display::Height - 2*ReadingsFontHeight;
+static constexpr uint16_t YReadingsArea = Display.Height - 2*ReadingsFontHeight;
 
 static constexpr uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWidth;
 
@@ -72,7 +70,7 @@ WeatherScreen::WeatherScreen() {
 
   nButtons = 1;
   buttons = new Button[nButtons];
-  buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
+  buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
 }
 
 
@@ -81,19 +79,20 @@ void WeatherScreen::display(bool activating) {
   // OWM service, but just double check...
   if (!wtApp->owmClient) return;
 
+  auto& tft = Display.tft;
   bool metric = wtApp->settings->uiOptions.useMetric;
 
   tft.fillScreen(Theme::Color_WeatherBkg);
   if (wtApp->owmClient->weather.dt == 0) {
-    Display::Font::setUsingID(Display::Font::FontID::SB18, tft);
+    Display.fonts.setUsingID(Display.fonts.FontID::SB18, tft);
     tft.setTextColor(Theme::Color_AlertError);
     tft.setTextDatum(MC_DATUM);
-    tft.drawString(F("No Weather Data"), Display::XCenter, Display::YCenter);
+    tft.drawString(F("No Weather Data"), Display.XCenter, Display.YCenter);
     return;
   }
 
   // ----- Draw Summary line at the top of the screen
-  Display::Font::setUsingID(Display::Font::FontID::SB12, tft);
+  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
   tft.setTextColor(Theme::Color_WeatherTxt);
   tft.setTextDatum(TL_DATUM);
   String& city = wtApp->settings->owmOptions.nickname;
@@ -106,17 +105,17 @@ void WeatherScreen::display(bool activating) {
 
   tft.pushImage(ImageInset, YCentralArea, WI_Width, WI_Height,
       getWeatherIcon(wtApp->owmClient->weather.description.icon), WI_Transparent);
-  tft.pushImage(Display::Width-WI_Width-ImageInset, YCentralArea, WindIcon_Width, WindIcon_Height,
+  tft.pushImage(Display.Width-WI_Width-ImageInset, YCentralArea, WindIcon_Width, WindIcon_Height,
       getWindIcon(wtApp->owmClient->weather.readings.windSpeed), WI_Transparent);
 
   int textOffset = (WindIcon_Height-TempFontHeight)/2;
-  Display::Font::setUsingID(TempFont, tft);
+  Display.fonts.setUsingID(TempFont, tft);
   tft.setTextColor(Theme::Color_Progress);
   tft.setTextDatum(TL_DATUM);
   int nDigits = temp < 10 ? 1 : (temp < 100 ? 2 : 3);
-  int xLoc = Display::XCenter - ((nDigits*TempFontWidth+TempUnitsFontWidth)/2);
+  int xLoc = Display.XCenter - ((nDigits*TempFontWidth+TempUnitsFontWidth)/2);
   tft.drawString(String((int)temp), xLoc, YCentralArea-textOffset);
-  Display::Font::setUsingID(TimeFont, tft);
+  Display.fonts.setUsingID(TimeFont, tft);
   tft.drawString(
       (metric ? "C" : "F"),
       xLoc+(nDigits*TempFontWidth),
@@ -128,14 +127,14 @@ void WeatherScreen::display(bool activating) {
     wtApp->owmClient->weather.description.longer[0] = toUpperCase(firstChar);
   }
   tft.setTextColor(Theme::Color_WeatherTxt);
-  Display::Font::setUsingID(ReadingsFont, tft);
+  Display.fonts.setUsingID(ReadingsFont, tft);
   tft.drawString(
       wtApp->owmClient->weather.description.longer,
-      Display::XCenter,YCentralArea-textOffset+TempFontHeight + 5); // A little spacing in Y
+      Display.XCenter,YCentralArea-textOffset+TempFontHeight + 5); // A little spacing in Y
 
   // Readings Area
   tft.setTextColor(Theme::Color_WeatherTxt);
-  Display::Font::setUsingID(ReadingsFont, tft);
+  Display.fonts.setUsingID(ReadingsFont, tft);
   tft.setTextDatum(TL_DATUM);
   String reading = "Humidty: " + String(wtApp->owmClient->weather.readings.humidity) + "%";
   tft.drawString(reading, XTopAreaInset, YReadingsArea);
@@ -143,7 +142,7 @@ void WeatherScreen::display(bool activating) {
   float pressure = wtApp->owmClient->weather.readings.pressure;
   if (!metric) pressure = Basics::hpa_to_inhg(pressure);
   reading = String(pressure) +  (metric ? "hPa" : "inHG"),
-  tft.drawString(reading, Display::Width - XTopAreaInset, YReadingsArea);
+  tft.drawString(reading, Display.Width - XTopAreaInset, YReadingsArea);
 
   // NOTE: For some reason visibility seems to ignore the units setting and always return meters!!
   uint16_t visibility = (wtApp->owmClient->weather.readings.visibility);
@@ -163,8 +162,8 @@ void WeatherScreen::display(bool activating) {
   units = metric ? "C" : "F";
   reading = "Feels " + String((int)(feelsLike+0.5)) +  units;
   tft.setTextColor(Theme::Color_Progress);
-  Display::Font::setUsingID(Display::Font::FontID::SB12, tft);
-  tft.drawString(reading, Display::Width - XTopAreaInset, YReadingsArea+ReadingsFontHeight);
+  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
+  tft.drawString(reading, Display.Width - XTopAreaInset, YReadingsArea+ReadingsFontHeight);
 
   lastDT = wtApp->owmClient->weather.dt;
 }
@@ -182,13 +181,15 @@ void WeatherScreen::processPeriodicActivity() {
  *----------------------------------------------------------------------------*/
 
 void WeatherScreen::showTime() {
+  auto& sprite = Display.sprite;
+  
   sprite->setColorDepth(1);
   sprite->createSprite(TimeDisplayWidth, TimeFontHeight);
   sprite->fillSprite(Theme::Mono_Background);
 
   lastClockUpdate = millis();
 
-  Display::Font::setUsingID(TimeFont, sprite);
+  Display.fonts.setUsingID(TimeFont, sprite);
   sprite->setTextColor(Theme::Mono_Foreground);
   sprite->setTextDatum(TR_DATUM);
   sprite->drawString(
@@ -196,7 +197,7 @@ void WeatherScreen::showTime() {
       TimeDisplayWidth-1-XTopAreaInset, 0);
 
   sprite->setBitmapColor(Theme::Color_WeatherTxt, Theme::Color_WeatherBkg);
-  sprite->pushSprite(Display::Width - TimeDisplayWidth, YTopArea);
+  sprite->pushSprite(Display.Width - TimeDisplayWidth, YTopArea);
   sprite->deleteSprite();
 }
 

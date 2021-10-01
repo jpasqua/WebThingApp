@@ -25,28 +25,28 @@
 #include "CalibrationScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-
 
 CalibrationScreen::CalibrationScreen() {
   init();
 }
 
 void CalibrationScreen::display(bool activating) {
+  auto& tft = Display.tft;
+
   if (activating) state = pre;
 
   tft.fillScreen(Theme::Color_Background);
   if (state == pre) {
-    Display::Font::setUsingID(Display::Font::FontID::SB9, tft);
+    Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(
-      F("Touch to begin calibration"), Display::XCenter, Display::YCenter);
+      F("Touch to begin calibration"), Display.XCenter, Display.YCenter);
   } else if (state == post) {
-    Display::Font::setUsingID(Display::Font::FontID::SB9, tft);
+    Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
-    tft.drawString(F("Done! Touch to continue"), Display::XCenter, Display::YCenter);
+    tft.drawString(F("Done! Touch to continue"), Display.XCenter, Display.YCenter);
     state = complete;
   }
 }
@@ -58,21 +58,22 @@ void CalibrationScreen::processPeriodicActivity() {
 void CalibrationScreen::init() {
 
   auto buttonHandler =[this](int id, Button::PressType) -> void {
+    auto& tft = Display.tft;
     Log.verbose(F("In CalibrationScreenButtonHandler, id = %d"), id);
     switch (state) {
       case pre:
         tft.fillScreen(Theme::Color_Background);
-        Display::Font::setUsingID(Display::Font::FontID::SB9, tft);
+        Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
         tft.setTextColor(Theme::Color_AlertGood);
         tft.setTextDatum(MC_DATUM);
         tft.drawString(
-          F("Touch each corner arrow"), Display::XCenter, Display::YCenter);
+          F("Touch each corner arrow"), Display.XCenter, Display.YCenter);
         tft.calibrateTouch(
           newCalibrationData.readings, TFT_WHITE, TFT_BLACK, 15);
         state = post;
         break;
       case complete:
-        Display::calibrate(&newCalibrationData);
+        Display.calibrate(&newCalibrationData);
         wtApp->settings->displayOptions.calibrationData = newCalibrationData;
         wtApp->settings->write();
         ScreenMgr.displayHomeScreen();
@@ -84,6 +85,6 @@ void CalibrationScreen::init() {
   };
 
   buttons = new Button[(nButtons = 1)];
-  buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
+  buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
   state = pre;
 }

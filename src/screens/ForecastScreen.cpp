@@ -23,19 +23,17 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-using Display::tft;
-
 /*------------------------------------------------------------------------------
  *
  * CONSTANTS
  *
  *----------------------------------------------------------------------------*/
 
-static constexpr auto ReadingsFont = Display::Font::FontID::SB9;
+static constexpr auto ReadingsFont = Display.fonts.FontID::SB9;
 static constexpr uint16_t ReadingsFontHeight = 22;  // ReadingsFont->yAdvance;
 
-static constexpr uint16_t TileWidth = Display::Width/2;
-static constexpr uint16_t TileHeight = Display::Height/3;
+static constexpr uint16_t TileWidth = Display.Width/2;
+static constexpr uint16_t TileHeight = Display.Height/3;
 static constexpr uint16_t TextVPad = (TileHeight - (2*ReadingsFontHeight))/2;
 
 static constexpr int16_t TinyFont = 2;  // A small 5x7 font
@@ -55,14 +53,14 @@ ForecastScreen::ForecastScreen() {
   };
 
   buttons = new Button[(nButtons = 1)];
-  buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
+  buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
 }
 
 
 void ForecastScreen::display(bool) {
   if (!wtApp->owmClient) return; // Make sure we've got an OpenWeatherMap client
 
-  tft.fillScreen(Theme::Color_WeatherBkg);
+  Display.tft.fillScreen(Theme::Color_WeatherBkg);
   uint16_t x = 0, y = 0;
 
   // The first element of the forecast display is really the current temperature
@@ -87,7 +85,7 @@ void ForecastScreen::display(bool) {
     }
     displaySingleForecast(&f[i], x, y);
     if (i == 1) x += TileWidth;
-    y = (y + TileHeight) % Display::Height;
+    y = (y + TileHeight) % Display.Height;
   }
 }
 
@@ -96,6 +94,8 @@ void ForecastScreen::processPeriodicActivity() {
 }
 
 void ForecastScreen::displaySingleForecast(Forecast* f, uint16_t x, uint16_t y) {
+  auto& tft = Display.tft;
+  
   tft.pushImage(
       x, y+((TileHeight-WI_Height)/2),
       WI_Width, WI_Height,
@@ -114,7 +114,7 @@ void ForecastScreen::displaySingleForecast(Forecast* f, uint16_t x, uint16_t y) 
 
   y += TextVPad;
   tft.setTextColor(TFT_BLACK);
-  Display::Font::setUsingID(ReadingsFont, tft);
+  Display.fonts.setUsingID(ReadingsFont, tft);
   tft.drawString(reading, x, y);
 
   y += ReadingsFontHeight;

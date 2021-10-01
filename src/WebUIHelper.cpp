@@ -62,7 +62,7 @@ namespace WebUIHelper {
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
           WebUI::closeConnection(400, "Invalid Brightness: " + WebUI::arg(F("brightness")));
         } else {
-          Display::setBrightness(b);
+          Display.setBrightness(b);
           WebUI::closeConnection(200, F("Brightness Set"));
         }
       };
@@ -184,10 +184,11 @@ namespace WebUIHelper {
 
     void yieldScreenShot() {
       auto action = []() {
-        WebUI::sendArbitraryContent(
-            "image/bmp",
-            Display::getSizeOfScreenShotAsBMP(),
-            Display::streamScreenShotAsBMP);
+        // TO DO: FIX ME!!
+        // WebUI::sendArbitraryContent(
+        //     "image/bmp",
+        //     Display.getSizeOfScreenShotAsBMP(),
+        //     Display.streamScreenShotAsBMP);
       };
       WebUI::wrapWebAction("/dev/screenShot", action, false);
     }
@@ -214,7 +215,7 @@ namespace WebUIHelper {
         }
         else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
         else if (key.equals(F("UNITS"))) val.concat(wtApp->settings->uiOptions.useMetric ? "metric" : "imperial");
-        else if (key.equals(F("BRIGHT"))) val.concat(Display::getBrightness());
+        else if (key.equals(F("BRIGHT"))) val.concat(Display.getBrightness());
       };
 
       WebUI::wrapWebPage("/", "/wta/HomePage.html", mapper);

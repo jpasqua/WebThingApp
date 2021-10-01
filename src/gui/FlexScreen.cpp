@@ -19,9 +19,6 @@
 #include "FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-using Display::sprite;
-
 
 /*------------------------------------------------------------------------------
  *
@@ -31,7 +28,7 @@ using Display::sprite;
 
 inline uint16_t mapColor(String colorSpecifier) {
   uint32_t hexVal = strtol(colorSpecifier.c_str(), NULL, 16);
-  return tft.color24to16(hexVal);
+  return Display.tft.color24to16(hexVal);
 }
 
 FlexItem::Type mapType(String t) {
@@ -68,7 +65,7 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
     return;
   } 
 
-  gfxFont = Display::Font::idFromName(fontName);
+  gfxFont = Display.fonts.idFromName(fontName);
 } 
 
 /*------------------------------------------------------------------------------
@@ -94,14 +91,14 @@ bool FlexScreen::init(
   _refreshInterval = refreshInterval;
 
   buttons = new Button[(nButtons = 1)];
-  buttons[0].init(0, 0, Display::Width, Display::Height, _buttonDelegate, 0);
+  buttons[0].init(0, 0, Display.Width, Display.Height, _buttonDelegate, 0);
 
   _clock = NULL;
   return fromJSON(screen);
 }
 
 void FlexScreen::display(bool activating) {
-  if (activating) { tft.fillScreen(_bkg); }
+  if (activating) { Display.tft.fillScreen(_bkg); }
   for (int i = 0; i < _nItems; i++) {
     _items[i].display(_bkg, _mapper);
   }
@@ -174,8 +171,8 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
-    // Reuse the same value buffer across all FlexItems, so clear it out
-    Basics::resetString(_val);
+    auto& sprite = Display.sprite;
+    Basics::resetString(_val);    // Reuse the same value buffer across all FlexItems, so clear it out
     
     mapper(_key, _val);
 
@@ -184,7 +181,7 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
     sprite->fillSprite(Theme::Mono_Background);
 
     // TO DO: Use snprintf to determine the correct buffer size
-    int bufSize = Display::Width/6 + 1; // Assume 6 pixel spacing is smallest font
+    int bufSize = Display.Width/6 + 1; // Assume 6 pixel spacing is smallest font
     char buf[bufSize];
 
     switch (_dataType) {
@@ -228,7 +225,7 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         }
         break;
     }
-    if (_gfxFont >= 0) { Display::Font::setUsingID(_gfxFont, sprite); }
+    if (_gfxFont >= 0) { Display.fonts.setUsingID(_gfxFont, sprite); }
     else { sprite->setTextFont(_font);}
     sprite->setTextColor(Theme::Mono_Foreground);
     sprite->setTextDatum(_datum);
@@ -240,7 +237,7 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
   }
 
   for (int i = 0; i < _strokeWidth; i++) {
-    tft.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
+    Display.tft.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
   }
 }
 

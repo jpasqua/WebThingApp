@@ -21,10 +21,6 @@
 #include "FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-
-ScreenManager ScreenMgr;
-
 
 /*------------------------------------------------------------------------------
  *
@@ -42,16 +38,16 @@ public:
       // Let the screen redisplay while the brightness is off...
       ScreenMgr.unsuspend();
       // ...then let there be light
-      Display::setBrightness(lastBrightness);
+      Display.setBrightness(lastBrightness);
     };
 
     buttons = new Button[(nButtons = 1)];
-    buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
+    buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
   }
 
   void display(bool) override {
-    lastBrightness = Display::getBrightness();
-    Display::setBrightness(0);
+    lastBrightness = Display.getBrightness();
+    Display.setBrightness(0);
   }
 
   void processPeriodicActivity() override { }
@@ -95,11 +91,11 @@ void ScreenManager::processSchedules() {
       uint16_t curTime = hour() * 100 + minute();
       if (curTime >= evening || curTime < morning) {
         if (eveningExecutedOnDay != today) {
-          Display::setBrightness(_uiOptions->schedule.evening.brightness);
+          Display.setBrightness(_uiOptions->schedule.evening.brightness);
           eveningExecutedOnDay = today;
         }
       } else if (morningExecutedOnDay != today) {
-        Display::setBrightness(_uiOptions->schedule.morning.brightness);
+        Display.setBrightness(_uiOptions->schedule.morning.brightness);
         morningExecutedOnDay = today;
       }
     }
@@ -109,7 +105,7 @@ void ScreenManager::processSchedules() {
 void ScreenManager::processInput() {
   uint32_t curMillis = millis();
   uint16_t tx = 0, ty = 0;
-  bool pressed = tft.getTouch(&tx, &ty);
+  bool pressed = Display.tft.getTouch(&tx, &ty);
   if (pressed) _lastInteraction = curMillis;
   _curScreen->processInput(pressed, tx, ty);
   _pbMgr->processInput();
@@ -142,7 +138,7 @@ void ScreenManager::setup(UIOptions* uiOptions, DisplayOptions* displayOptions, 
   };
 
   _pbMgr->setDispatcher(dispatcher);
-  Display::begin(_displayOptions);
+  Display.begin(_displayOptions);
   _lastInteraction = millis();
   activityIcon.init();
 }
@@ -225,24 +221,34 @@ void ActivityIcon::init() {
 void ActivityIcon::show(uint16_t accentColor, char symbol) {
   if (isDisplayed) return;
 
-  tft.readRect(X, Y, Size, Size, savedPixels);
+  Display.tft.readRect(X, Y, Size, Size, savedPixels);
   uint16_t centerX = X+(Size/2);
   uint16_t centerY = Y+(Size/2);
-  tft.fillCircle(centerX, centerY, Size/2-1, accentColor);
-  tft.fillCircle(centerX, centerY, (Size/2-1)-BorderSize, Theme::Color_UpdatingFill);
-  tft.setTextDatum(MC_DATUM);
-  tft.setFreeFont(&FreeSansBold9pt7b);
-  tft.setTextColor(Theme::Color_UpdatingText);
+  Display.tft.fillCircle(centerX, centerY, Size/2-1, accentColor);
+  Display.tft.fillCircle(centerX, centerY, (Size/2-1)-BorderSize, Theme::Color_UpdatingFill);
+  Display.tft.setTextDatum(MC_DATUM);
+  Display.tft.setFreeFont(&FreeSansBold9pt7b);
+  Display.tft.setTextColor(Theme::Color_UpdatingText);
 
   char buf[2];
   buf[0] = symbol; buf[1] = '\0';
-  tft.drawString(buf, centerX, centerY);
+  Display.tft.drawString(buf, centerX, centerY);
 
   isDisplayed = true;
 }
 
 void ActivityIcon::hide() {
   if (!isDisplayed) return;
-  tft.pushRect(X, Y, Size, Size, savedPixels);
+  Display.tft.pushRect(X, Y, Size, Size, savedPixels);
   isDisplayed = false;
 }
+
+
+/*------------------------------------------------------------------------------
+ *
+ * GLOBAL STATE
+ *
+ *----------------------------------------------------------------------------*/
+
+ScreenManager ScreenMgr;
+

@@ -22,7 +22,6 @@
 #include "UtilityScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
 
 static const char *pis_label[6] = {"Dim", "Medium", "Bright", "Refresh", "Calibrate", "Home"};
 static const uint16_t pis_colors[6] = {
@@ -31,17 +30,17 @@ static const uint16_t pis_colors[6] = {
 
 static constexpr int16_t SubFont = 2; // A small 5x7 font
 
-static constexpr auto HeaderFont = Display::Font::FontID::SB12;
+static constexpr auto HeaderFont = Display.fonts.FontID::SB12;
 static constexpr uint16_t HeaderFontHeight = 29;
 
-static constexpr auto ButtonFont = Display::Font::FontID::SB9;
+static constexpr auto ButtonFont = Display.fonts.FontID::SB9;
 static constexpr uint16_t ButtonFontHeight = 22;
 
 static constexpr uint16_t ButtonFrameSize = 2;
 static constexpr uint16_t ButtonHeight = 40;
 static constexpr uint16_t ButtonInset = 1;
-static constexpr uint16_t HalfWidth = (Display::Width-(2*ButtonInset))/2;
-static constexpr uint16_t ThirdWidth = (Display::Width-(2*ButtonInset))/3;
+static constexpr uint16_t HalfWidth = (Display.Width-(2*ButtonInset))/2;
+static constexpr uint16_t ThirdWidth = (Display.Width-(2*ButtonInset))/3;
 
 static constexpr uint16_t PI_YOrigin = 60;
 
@@ -69,7 +68,7 @@ UtilityScreen::UtilityScreen() {
     }
 
     if (id <= BrightButtonIndex) {
-      Display::setBrightness(id == DimButtonIndex ? 20 : (id == MediumButtonIndex ? 50 : 90));
+      Display.setBrightness(id == DimButtonIndex ? 20 : (id == MediumButtonIndex ? 50 : 90));
       return;
     }
 
@@ -102,26 +101,28 @@ UtilityScreen::UtilityScreen() {
 }
 
 void UtilityScreen::display(bool activating) {
+  auto& tft = Display.tft;
+  
   if (activating) tft.fillScreen(Theme::Color_Background);
 
   int y = 0;
   tft.setTextColor(Theme::Color_AlertGood);
-  Display::Font::setUsingID(HeaderFont, tft);
+  Display.fonts.setUsingID(HeaderFont, tft);
   tft.setTextDatum(TC_DATUM);
   String appInfo = wtApp->appName + " v" + wtApp->appVersion;
-  tft.drawString(appInfo, Display::XCenter, 0);
-  drawWifiStrength(Display::Width-WifiBarsWidth-3, ButtonHeight-12, Theme::Color_NormalText);
+  tft.drawString(appInfo, Display.XCenter, 0);
+  drawWifiStrength(Display.Width-WifiBarsWidth-3, ButtonHeight-12, Theme::Color_NormalText);
   y += HeaderFontHeight;
 
-  Display::Font::setUsingID(ButtonFont, tft);
+  Display.fonts.setUsingID(ButtonFont, tft);
   tft.setTextColor(Theme::Color_NormalText);
   tft.setTextDatum(TC_DATUM);
   String address = WebThing::settings.hostname + " (" + WebThing::ipAddrAsString() + ")";
-  tft.drawString(address, Display::XCenter, y);
+  tft.drawString(address, Display.XCenter, y);
 
   tft.setTextColor(Theme::Color_NormalText);
   tft.setTextDatum(BC_DATUM);
-  tft.drawString(_subHeading + _subContent, Display::XCenter, PI_YOrigin-1, SubFont);
+  tft.drawString(_subHeading + _subContent, Display.XCenter, PI_YOrigin-1, SubFont);
 
   String name;
   uint16_t textColor = Theme::Color_NormalText;
@@ -163,6 +164,6 @@ void UtilityScreen::drawWifiStrength(uint16_t x, uint16_t y, uint32_t color) {
   int8_t quality = WebThing::wifiQualityAsPct();
   for (int i = 0; i < 4; i++) {
     int h = (quality > (25 * i)) ? 4*(i+1) : 1;
-    tft.drawRect(x+(i*4), y-h+1, 1, h, color);
+    Display.tft.drawRect(x+(i*4), y-h+1, 1, h, color);
   }
 }

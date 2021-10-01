@@ -15,7 +15,8 @@
 #include "images/WiFiLogo.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
+
+auto& tft = Display.tft;
 
 WiFiScreen::WiFiScreen() {
     nButtons = 0;
@@ -24,7 +25,7 @@ WiFiScreen::WiFiScreen() {
 
 void WiFiScreen::display(bool) {
   tft.fillScreen(Theme::Color_Background);
-  uint16_t x = (Display::Width-WiFiLogo_Width)/2;
+  uint16_t x = (Display.Width-WiFiLogo_Width)/2;
   uint16_t y = 30;  // A little space from the top of the screen
 #ifdef WiFiLogo_UseMono
   tft.drawBitmap(x, y, WiFiLogoMono, WiFiLogo_Width, WiFiLogo_Height, Theme::Color_WiFiBlue);
@@ -33,11 +34,11 @@ void WiFiScreen::display(bool) {
 #endif  // WiFiLogo_UseMono  
   y += WiFiLogo_Height;
 
-  Display::Font::setUsingID(Display::Font::FontID::SBO12, tft);
+  Display.fonts.setUsingID(Display.fonts.FontID::SBO12, tft);
   tft.setTextColor(Theme::Color_WiFiBlue);
   tft.setTextDatum(MC_DATUM);
-  x = Display::XCenter;
-  y += (Display::Height - y)/2;
+  x = Display.XCenter;
+  y += (Display.Height - y)/2;
   tft.drawString(F("Connecting..."), x, y);
 }
 

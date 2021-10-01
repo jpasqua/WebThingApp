@@ -17,8 +17,6 @@
 #include "EnterNumberScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
-
 
 // -- Button IDs
 static constexpr uint8_t FirstDigitButton = 0;
@@ -30,19 +28,19 @@ static constexpr uint8_t ValueButton = PlusMinusButton+1;
 static constexpr uint8_t TotalButtons = ValueButton+1;
 
 // Fonts
-static constexpr auto ValueFont = Display::Font::FontID::SB12;
+static constexpr auto ValueFont = Display.fonts.FontID::SB12;
 static constexpr uint16_t ValueFontHeight = 29;
 
-static constexpr auto DigitFont = Display::Font::FontID::SB9;
+static constexpr auto DigitFont = Display.fonts.FontID::SB9;
 static constexpr uint16_t DigitFontHeight = 22;
 
 // Field Locations
-static constexpr auto TitleFont = Display::Font::FontID::SB12;
+static constexpr auto TitleFont = Display.fonts.FontID::SB12;
 static constexpr uint16_t TitleFontHeight = 29;   // TitleFont->yAdvance;
 static constexpr uint16_t TitleXOrigin = 0;
 static constexpr uint16_t TitleYOrigin = 0;
 static constexpr uint16_t TitleHeight = TitleFontHeight;
-static constexpr uint16_t TitleWidth = Display::Width;
+static constexpr uint16_t TitleWidth = Display.Width;
 
 static constexpr uint16_t DigitWidth = 60;
 static constexpr uint16_t DigitHeight = 60;
@@ -176,9 +174,10 @@ void EnterNumberScreen::init(
 
 void EnterNumberScreen::display(bool activating) {
   if (activating) {
+    auto& tft = Display.tft;
     tft.fillScreen(Theme::Color_Background);
 
-    Display::Font::setUsingID(TitleFont, tft);
+    Display.fonts.setUsingID(TitleFont, tft);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(title, TitleWidth/2, TitleHeight/2);

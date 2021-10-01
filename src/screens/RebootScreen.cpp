@@ -19,7 +19,6 @@
 #include "images/RebootBitmap.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
 
 static constexpr uint16_t IconInset = 10;
 static constexpr uint8_t RebootButtonID = 0;
@@ -33,30 +32,32 @@ RebootScreen::RebootScreen() {
     };
 
     buttons = new Button[(nButtons = 2)];
-    buttons[0].init(0, 0,                Display::Width, Display::Height/2, buttonHandler, RebootButtonID);
-    buttons[1].init(0, Display::Height/2, Display::Width, Display::Height/2, buttonHandler, CancelButtonID);
+    buttons[0].init(0, 0,                Display.Width, Display.Height/2, buttonHandler, RebootButtonID);
+    buttons[1].init(0, Display.Height/2, Display.Width, Display.Height/2, buttonHandler, CancelButtonID);
   }
 
 void RebootScreen::display(bool) {
+  auto& tft = Display.tft;
+  
   tft.fillScreen(Theme::Color_Background);
 
-  Display::Font::setUsingID(Display::Font::FontID::SB12, tft);
+  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
   tft.setTextDatum(MC_DATUM);
 
-  uint16_t xc = (Display::Width + (IconInset+RebootIcon_Width))/2;
-  uint16_t yc = (Display::Height)/4;
+  uint16_t xc = (Display.Width + (IconInset+RebootIcon_Width))/2;
+  uint16_t yc = (Display.Height)/4;
   tft.drawRect(
       buttons[RebootButtonID]._x, buttons[RebootButtonID]._y,
       buttons[RebootButtonID]._w, buttons[RebootButtonID]._h, Theme::Color_AlertError);
   tft.drawBitmap(
-      IconInset, (Display::Height/2-RebootIcon_Height)/2, RebootIcon,
+      IconInset, (Display.Height/2-RebootIcon_Height)/2, RebootIcon,
       RebootIcon_Width, RebootIcon_Height,
       Theme::Color_AlertError);
   tft.setTextColor(Theme::Color_AlertError);
   tft.drawString(F("Reboot"), xc, yc);
 
-  xc = (Display::Width + (IconInset+CancelIcon_Width))/2;
-  yc = (Display::Height*3)/4;
+  xc = (Display.Width + (IconInset+CancelIcon_Width))/2;
+  yc = (Display.Height*3)/4;
   tft.drawRect(
       buttons[CancelButtonID]._x, buttons[CancelButtonID]._y,
       buttons[CancelButtonID]._w, buttons[CancelButtonID]._h, Theme::Color_AlertGood);

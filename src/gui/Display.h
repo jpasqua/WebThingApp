@@ -26,33 +26,11 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-namespace Display {
-  // ----- Constants
-  constexpr uint16_t Width = 320;
-  constexpr uint16_t Height = 240;
-  constexpr uint16_t XCenter = Width/2;
-  constexpr uint16_t YCenter = Height/2;
-
-
-  // ----- Data
-  extern TFT_eSPI tft;
-  extern TFT_eSprite* sprite;
-
-
-  // ----- Functions
-  void begin(DisplayOptions* displayOptions);
-  void calibrate(CalibrationData* newCalibrationData);
-
-  void setBrightness(uint8_t b);
-  uint8_t getBrightness();
-
-  uint32_t getSizeOfScreenShotAsBMP();
-  void streamScreenShotAsBMP(Stream &s);
-
-
-  // ----- Font-related data and Functions
-  namespace Font {
-    // ----- Data
+class DisplayObject {
+public:
+  // ----- Types
+  class FontMgr {
+  public:
     enum FontID {
       M9,  MB9,  MO9,  MBO9,
       S9,  SB9,  SO9,  SBO9,
@@ -63,12 +41,43 @@ namespace Display {
     };
 
     // ----- Functions
-    void setUsingID(uint8_t fontID, TFT_eSPI& t);
-    void setUsingID(uint8_t fontID, TFT_eSprite *s);
-    int8_t idFromName(String fontName);
-    uint8_t getHeight(uint8_t fontID);
-  }
+    void setUsingID(uint8_t fontID, TFT_eSPI& t) const;
+    void setUsingID(uint8_t fontID, TFT_eSprite *s) const;
+    int8_t idFromName(String fontName) const;
+    uint8_t getHeight(uint8_t fontID) const;
+  };
 
+  // ----- Constants
+  static constexpr uint16_t Width = 320;
+  static constexpr uint16_t Height = 240;
+  static constexpr uint16_t XCenter = Width/2;
+  static constexpr uint16_t YCenter = Height/2;
+
+  // ----- Constructors
+
+  // ----- Member Functions
+  void begin(DisplayOptions* displayOptions);
+  void calibrate(CalibrationData* newCalibrationData);
+
+  void setBrightness(uint8_t b);  // 0-100
+  inline uint8_t getBrightness() const { return _brightness; }
+
+  inline uint32_t getSizeOfScreenShotAsBMP() const {
+    // Pixel Buffer size + a 54 byte header...
+    return (2ul * Width * Height + 54);
+  }
+  void streamScreenShotAsBMP(Stream &s);
+
+  // ----- Data Members
+  FontMgr fonts;
+  TFT_eSPI tft;
+  TFT_eSprite *sprite;
+
+private:
+    uint8_t _brightness = 0;     // 0-100
+    DisplayOptions* _options;
 };
+
+extern DisplayObject Display;
 
 #endif	// Display_h

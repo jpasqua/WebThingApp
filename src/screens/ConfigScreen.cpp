@@ -16,7 +16,6 @@
 #include "images/Gears160x240.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
 
 ConfigScreen::ConfigScreen() {
   nButtons = 0;
@@ -24,10 +23,12 @@ ConfigScreen::ConfigScreen() {
 }
 
 void ConfigScreen::display(bool) {
+  auto& tft = Display.tft;
+  
   tft.fillScreen(Theme::Color_Background);
   tft.drawBitmap(0, 0, Gears160x240, 160, 240, Theme::Color_AlertGood);
 
-  Display::Font::setUsingID(Display::Font::FontID::S12, tft);
+  Display.fonts.setUsingID(Display.fonts.FontID::S12, tft);
   tft.setTextSize(1);
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(Theme::Color_NormalText);
