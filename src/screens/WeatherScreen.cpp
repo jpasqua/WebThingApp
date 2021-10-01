@@ -62,14 +62,14 @@ static constexpr uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWi
 
 WeatherScreen::WeatherScreen() {
 
-  auto buttonHandler =[](int id, Button::PressType type) -> void {
-    Log.verbose(F("In WeatherScreen Button Handler, id = %d, type = %d"), id, type);
-    if (type > Button::PressType::NormalPress) ScreenMgr.displayHomeScreen();
+  auto buttonHandler =[](int id, Label::PressType type) -> void {
+    Log.verbose(F("In WeatherScreen Label Handler, id = %d, type = %d"), id, type);
+    if (type > Label::PressType::NormalPress) ScreenMgr.displayHomeScreen();
     else ScreenMgr.display(wtAppImpl->forecastScreen);
   };
 
   nButtons = 1;
-  buttons = new Button[nButtons];
+  buttons = new Label[nButtons];
   buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
 }
 

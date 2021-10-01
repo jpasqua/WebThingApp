@@ -46,13 +46,13 @@ static constexpr int16_t TinyFont = 2;  // A small 5x7 font
 
 ForecastScreen::ForecastScreen() {
 
-  auto buttonHandler =[&](int id, Button::PressType type) -> void {
-    Log.verbose(F("In ForecastScreen Button Handler, id = %d, type = %d"), id, type);
-    if (type > Button::PressType::NormalPress) ScreenMgr.display("Weather");
+  auto buttonHandler =[&](int id, Label::PressType type) -> void {
+    Log.verbose(F("In ForecastScreen Label Handler, id = %d, type = %d"), id, type);
+    if (type > Label::PressType::NormalPress) ScreenMgr.display("Weather");
     ScreenMgr.displayHomeScreen();
   };
 
-  buttons = new Button[(nButtons = 1)];
+  buttons = new Label[(nButtons = 1)];
   buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
 }
 

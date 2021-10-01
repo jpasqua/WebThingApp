@@ -3,7 +3,7 @@
 
 #include <map>
 #include "Display.h"
-#include "Button.h"
+#include "Label.h"
 
 
 class Screen {
@@ -36,11 +36,11 @@ public:
         } else if (millis() - endOfPress > DebounceTime) {
           // Process the press
           // Ok, we got a press/release, see which button (if any) is associated
-          Button::PressType pt;
+          Label::PressType pt;
           uint32_t pressDuration = (millis() - startOfPress);
-          if (pressDuration >= Button::VeryLongPressInterval) pt = Button::PressType::VeryLongPress;
-          else if (pressDuration >= Button::LongPressInterval) pt = Button::PressType::LongPress;
-          else pt = Button::PressType::NormalPress;
+          if (pressDuration >= Label::VeryLongPressInterval) pt = Label::PressType::VeryLongPress;
+          else if (pressDuration >= Label::LongPressInterval) pt = Label::PressType::LongPress;
+          else pt = Label::PressType::NormalPress;
 
           for (int i = 0; i < nButtons; i++) {
             if (buttons[i].processTouch(lastX, lastY, pt)) break;
@@ -57,7 +57,7 @@ public:
   BaseButton::ButtonCallback physicalButtonHandler = nullptr;
   std::map<uint8_t/*physical*/, uint8_t/*screen*/> screenButtonFromPhysicalButton;
 
-  Button* buttons;
+  Label* buttons;
   uint8_t nButtons;
 
 

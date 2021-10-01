@@ -18,7 +18,7 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-// -- Button IDs
+// -- Label IDs
 static constexpr uint8_t FirstDigitButton = 0;
 static constexpr uint8_t LastDigitButton = 9;
 static constexpr uint8_t DecimalButton = 10;
@@ -58,7 +58,7 @@ static constexpr uint8_t DigitFrameSize = 1;
 
 EnterNumberScreen::EnterNumberScreen() {
   nButtons = 0; // No buttons until init is called!
-  buttons = new Button[TotalButtons];
+  buttons = new Label[TotalButtons];
 }
 
 void EnterNumberScreen::init(
@@ -78,10 +78,10 @@ void EnterNumberScreen::init(
     formattedValue = String(valAsLong);
   }
 
-  auto buttonHandler =[this](int id, Button::PressType type) -> void {
-    Log.verbose(F("In EnterNumberScreen Button Handler, id = %d, type = %d"), id, type);
+  auto buttonHandler =[this](int id, Label::PressType type) -> void {
+    Log.verbose(F("In EnterNumberScreen Label Handler, id = %d, type = %d"), id, type);
 
-    if (type > Button::PressType::NormalPress) {
+    if (type > Label::PressType::NormalPress) {
       if (id == BackspaceButton) {
         // Clear the whole value
         if (minVal > 0) formattedValue = String(minVal);

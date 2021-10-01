@@ -25,13 +25,13 @@ static constexpr uint8_t RebootButtonID = 0;
 static constexpr uint8_t CancelButtonID = 1;
 
 RebootScreen::RebootScreen() {
-    auto buttonHandler =[&](int id, Button::PressType type) -> void {
+    auto buttonHandler =[&](int id, Label::PressType type) -> void {
       Log.verbose(F("In RebootScreen ButtonHandler, id = %d"), id);
-      if (id == RebootButtonID && type > Button::PressType::NormalPress) { ESP.restart(); }
+      if (id == RebootButtonID && type > Label::PressType::NormalPress) { ESP.restart(); }
       if (id == CancelButtonID) ScreenMgr.displayHomeScreen();
     };
 
-    buttons = new Button[(nButtons = 2)];
+    buttons = new Label[(nButtons = 2)];
     buttons[0].init(0, 0,                Display.Width, Display.Height/2, buttonHandler, RebootButtonID);
     buttons[1].init(0, Display.Height/2, Display.Width, Display.Height/2, buttonHandler, CancelButtonID);
   }
@@ -47,8 +47,8 @@ void RebootScreen::display(bool) {
   uint16_t xc = (Display.Width + (IconInset+RebootIcon_Width))/2;
   uint16_t yc = (Display.Height)/4;
   tft.drawRect(
-      buttons[RebootButtonID]._x, buttons[RebootButtonID]._y,
-      buttons[RebootButtonID]._w, buttons[RebootButtonID]._h, Theme::Color_AlertError);
+      buttons[RebootButtonID].region.x, buttons[RebootButtonID].region.y,
+      buttons[RebootButtonID].region.w, buttons[RebootButtonID].region.h, Theme::Color_AlertError);
   tft.drawBitmap(
       IconInset, (Display.Height/2-RebootIcon_Height)/2, RebootIcon,
       RebootIcon_Width, RebootIcon_Height,
@@ -59,8 +59,8 @@ void RebootScreen::display(bool) {
   xc = (Display.Width + (IconInset+CancelIcon_Width))/2;
   yc = (Display.Height*3)/4;
   tft.drawRect(
-      buttons[CancelButtonID]._x, buttons[CancelButtonID]._y,
-      buttons[CancelButtonID]._w, buttons[CancelButtonID]._h, Theme::Color_AlertGood);
+      buttons[CancelButtonID].region.x, buttons[CancelButtonID].region.y,
+      buttons[CancelButtonID].region.w, buttons[CancelButtonID].region.h, Theme::Color_AlertGood);
   tft.drawBitmap(
       IconInset, yc-(CancelIcon_Height/2), CancelIcon,
       CancelIcon_Width, CancelIcon_Height,

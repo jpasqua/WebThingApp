@@ -57,7 +57,7 @@ void CalibrationScreen::processPeriodicActivity() {
 
 void CalibrationScreen::init() {
 
-  auto buttonHandler =[this](int id, Button::PressType) -> void {
+  auto buttonHandler =[this](int id, Label::PressType) -> void {
     auto& tft = Display.tft;
     Log.verbose(F("In CalibrationScreenButtonHandler, id = %d"), id);
     switch (state) {
@@ -84,7 +84,7 @@ void CalibrationScreen::init() {
     }
   };
 
-  buttons = new Button[(nButtons = 1)];
+  buttons = new Label[(nButtons = 1)];
   buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
   state = pre;
 }

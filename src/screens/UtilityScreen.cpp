@@ -59,8 +59,8 @@ static constexpr uint16_t WifiBarsHeight = 16;
 
 UtilityScreen::UtilityScreen() {
 
-  auto buttonHandler =[&](int id, Button::PressType type) -> void {
-    Log.verbose(F("In UtilityScreen Button Handler, id = %d, type = %d"), id, type);
+  auto buttonHandler =[&](int id, Label::PressType type) -> void {
+    Log.verbose(F("In UtilityScreen Label Handler, id = %d, type = %d"), id, type);
 
     if (id < MaxPlugins) {
       wtAppImpl->pluginMgr.displayPlugin(id);
@@ -78,7 +78,7 @@ UtilityScreen::UtilityScreen() {
   };
 
 
-  buttons = new Button[(nButtons = TotalButtons)];
+  buttons = new Label[(nButtons = TotalButtons)];
   for (int i = 0; i < MaxPlugins; i++) {
     buttons[i].init(
       ButtonInset + ((i%2) * HalfWidth), PI_YOrigin + (i/2) * ButtonHeight, HalfWidth, ButtonHeight, buttonHandler, i);        

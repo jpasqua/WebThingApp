@@ -74,7 +74,7 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
  *
  *----------------------------------------------------------------------------*/
 
-Button::ButtonCallback FlexScreen::_buttonDelegate;
+Label::ButtonCallback FlexScreen::_buttonDelegate;
 
 FlexScreen::~FlexScreen() {
   // TO DO: Cleanup!
@@ -90,7 +90,7 @@ bool FlexScreen::init(
   _mapper = mapper;
   _refreshInterval = refreshInterval;
 
-  buttons = new Button[(nButtons = 1)];
+  buttons = new Label[(nButtons = 1)];
   buttons[0].init(0, 0, Display.Width, Display.Height, _buttonDelegate, 0);
 
   _clock = NULL;
@@ -213,7 +213,7 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
           if (strncasecmp(fmt, "#progress", 9) == 0) {
             String showPct = Basics::EmptyString;
             if (fmt[9] == '|' && fmt[10] != 0) showPct = String(&fmt[10]);
-            Button b(_x, _y, _w, _h, NULL, 0);
+            Label b(_x, _y, _w, _h, NULL, 0);
             b.drawProgress(
               ((float)code)/100.0, msg, _font, _strokeWidth,
               Theme::Color_Border, Theme::Color_NormalText, 

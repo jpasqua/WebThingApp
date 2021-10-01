@@ -33,7 +33,7 @@ public:
   uint8_t lastBrightness;
 
   BlankScreen() {
-    auto buttonHandler =[this](int /*id*/, Button::PressType /*type*/) -> void {
+    auto buttonHandler =[this](int /*id*/, Label::PressType /*type*/) -> void {
       Log.verbose("Waking up with millis() = %d", millis());
       // Let the screen redisplay while the brightness is off...
       ScreenMgr.unsuspend();
@@ -41,7 +41,7 @@ public:
       Display.setBrightness(lastBrightness);
     };
 
-    buttons = new Button[(nButtons = 1)];
+    buttons = new Label[(nButtons = 1)];
     buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
   }
 
@@ -216,8 +216,6 @@ void ActivityIcon::init() {
   savedPixels = (uint16_t *)malloc(Size*Size*sizeof(uint16_t));  // This is BIG!
 }
 
-// TO DO: Consider passing a reference to a string rather than a char
-// Might end up faster than constructing a string from the char each time
 void ActivityIcon::show(uint16_t accentColor, char symbol) {
   if (isDisplayed) return;
 

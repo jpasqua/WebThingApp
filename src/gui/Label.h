@@ -1,25 +1,7 @@
 /*
- * Button.h:
+ * Label.h:
  *    A touch-based button class.
- *                    
- * Consider:
- * o Provide specializations of this class that implement
- *   button drawing in addition to handling the presses.
- *   + The subclasses would know how to draw themselves directly to the
- *     display and also to a sprite with appropriate depth and then copy
- *     themselves to the display.
- *   + Anticipated subclasses are:
- *     - SimpleButton: A border and a label. It would be able to display
- *       itself using a 1bpp sprite. The border and label would be one
- *       color and the button fill would be a second color
- *     - ProgressButton: A button that displays a border, a progress bar
- *       within the border, and a percentage OR label. This would require
- *       a 4bpp sprite.
- *     - Region: A button that could draw it's border, but would delegate
- *       more complex content to a drawHelper()
- * o Add double-taps to the types of presses.
  *
- * COMPLETE:
  *
  */
 
@@ -31,16 +13,22 @@
 #endif
 #include "BaseButton.h"
 
-class Button : public BaseButton {
-public:  
-  uint16_t _x;
-  uint16_t _y;
-  uint16_t _w;
-  uint16_t _h;
+class Label : public BaseButton {
+public:
+  // ----- Types
+  typedef struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t w;
+    uint16_t h;
+  } Region;
 
-  Button();
-  Button(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id);
+  // ----- Constructors
+  Label() = default;
+  Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id);
 
+  // ----- Member Functions
+  void init(Region& r, ButtonCallback callback, uint8_t id);
   void init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id);
 
   bool processTouch(uint16_t tx, uint16_t ty, PressType type);
@@ -86,6 +74,10 @@ public:
         uint16_t labelColor, uint16_t borderColor,
         uint16_t barColor, uint16_t bgColor, const String& showPct,
         bool buffer = false);
+
+
+  // ----- Data Members
+  Region region;
 
 private:
   ButtonCallback _callback;

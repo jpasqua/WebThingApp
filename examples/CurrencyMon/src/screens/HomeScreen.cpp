@@ -65,9 +65,9 @@ static constexpr uint16_t WeatherWidth = Display.Width;
 static constexpr uint16_t FC_YOrigin = WeatherYOrigin + WeatherHeight + 2;
 static constexpr uint16_t FC_Height = WeatherFontHeight;
 
-// CB is short for "Currency Button"
-// NOTE: The rightmost frame of Button[i] overlaps the leftmost frame
-//       of Button[i+1]
+// CB is short for "Currency Label"
+// NOTE: The rightmost frame of Label[i] overlaps the leftmost frame
+//       of Label[i+1]
 static constexpr uint16_t CB_FrameSize = 2;                             // Size of the Frame
 static constexpr uint16_t CB_Width = 106;                               // Includes Frame
 static constexpr uint16_t CB_Height = 42;                               // Includes Frame
@@ -83,7 +83,7 @@ static constexpr uint16_t ClockHeight = CB_YOrigin-ClockYOrigin;        // The s
 static constexpr auto ClockFont = Display.fonts.FontID::D100;
 static constexpr uint16_t ClockFontHeight = 109;    // ClockFont->yAdvance;
 
-// Button Indices
+// Label Indices
 static constexpr uint8_t Currency1Button = 0;
 static constexpr uint8_t Currency2Button = Currency1Button + 1;
 static constexpr uint8_t Currency3Button = Currency2Button + 1;
@@ -104,10 +104,10 @@ static constexpr uint8_t AdvanceButton = NTouchButtons;
 
 HomeScreen::HomeScreen() {
 
-  auto buttonHandler =[this](int id, Button::PressType type) -> void {
-    Log.verbose(F("In HomeScreen Button Handler, id = %d"), id);
+  auto buttonHandler =[this](int id, Label::PressType type) -> void {
+    Log.verbose(F("In HomeScreen Label Handler, id = %d"), id);
 
-    if (type > Button::PressType::NormalPress) {
+    if (type > Label::PressType::NormalPress) {
       String subheading = "Heap: Free/Frag = ";
       String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
       wtAppImpl->utilityScreen->setSub(subheading, subcontent);
@@ -131,7 +131,7 @@ HomeScreen::HomeScreen() {
   physicalButtonHandler = buttonHandler;
   screenButtonFromPhysicalButton[PhysicalButtons::Button01] = AdvanceButton;
 
-  buttons = new Button[(nButtons = NTouchButtons)];
+  buttons = new Label[(nButtons = NTouchButtons)];
   uint16_t x = CB_XOrigin;
   for (int i = 0; i < NCurrencyButtons; i++) {
     buttons[i].init(x, CB_YOrigin, CB_Width, CB_Height, buttonHandler, i);
