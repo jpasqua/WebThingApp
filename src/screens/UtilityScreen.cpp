@@ -33,33 +33,33 @@ static constexpr int16_t SubFont = 2; // A small 5x7 font
 static constexpr auto HeaderFont = Display.fonts.FontID::SB12;
 static constexpr uint16_t HeaderFontHeight = 29;
 
-static constexpr auto ButtonFont = Display.fonts.FontID::SB9;
-static constexpr uint16_t ButtonFontHeight = 22;
+static constexpr auto LabelFont = Display.fonts.FontID::SB9;
+static constexpr uint16_t LabelFontHeight = 22;
 
-static constexpr uint16_t ButtonFrameSize = 2;
-static constexpr uint16_t ButtonHeight = 40;
-static constexpr uint16_t ButtonInset = 1;
-static constexpr uint16_t HalfWidth = (Display.Width-(2*ButtonInset))/2;
-static constexpr uint16_t ThirdWidth = (Display.Width-(2*ButtonInset))/3;
+static constexpr uint16_t LabelFrameSize = 2;
+static constexpr uint16_t LabelHeight = 40;
+static constexpr uint16_t LabelInset = 1;
+static constexpr uint16_t HalfWidth = (Display.Width-(2*LabelInset))/2;
+static constexpr uint16_t ThirdWidth = (Display.Width-(2*LabelInset))/3;
 
 static constexpr uint16_t PI_YOrigin = 60;
 
-static constexpr uint8_t FirstPluginIndex = 0;
+static constexpr uint8_t FirstPluginLabel = 0;
 static constexpr uint8_t MaxPlugins = 4;
-static constexpr uint8_t DimButtonIndex = 4;
-static constexpr uint8_t MediumButtonIndex = 5;
-static constexpr uint8_t BrightButtonIndex = 6;
-static constexpr uint8_t RefreshButtonIndex = 7;
-static constexpr uint8_t CalButtonIndex = 8;
-static constexpr uint8_t HomeButtonIndex = 9;
-static constexpr uint8_t TotalButtons = 10;
+static constexpr uint8_t DimLabel = FirstPluginLabel + MaxPlugins;
+static constexpr uint8_t MediumLabel = 5;
+static constexpr uint8_t BrightLabel = 6;
+static constexpr uint8_t RefreshLabel = 7;
+static constexpr uint8_t CalLabel = 8;
+static constexpr uint8_t HomeLabel = 9;
+static constexpr uint8_t N_Labels = 10;
 
 static constexpr uint16_t WifiBarsWidth = 13;
 static constexpr uint16_t WifiBarsHeight = 16;
 
 UtilityScreen::UtilityScreen() {
 
-  auto buttonHandler =[&](int id, Label::PressType type) -> void {
+  buttonHandler =[&](int id, PressType type) -> void {
     Log.verbose(F("In UtilityScreen Label Handler, id = %d, type = %d"), id, type);
 
     if (id < MaxPlugins) {
@@ -67,37 +67,37 @@ UtilityScreen::UtilityScreen() {
       return;
     }
 
-    if (id <= BrightButtonIndex) {
-      Display.setBrightness(id == DimButtonIndex ? 20 : (id == MediumButtonIndex ? 50 : 90));
+    if (id <= BrightLabel) {
+      Display.setBrightness(id == DimLabel ? 20 : (id == MediumLabel ? 50 : 90));
       return;
     }
 
-    if (id == RefreshButtonIndex) { wtAppImpl->updateAllData(); return;} 
-    if (id == CalButtonIndex) { ScreenMgr.display(wtAppImpl->calibrationScreen); return; }
-    if (id == HomeButtonIndex) { ScreenMgr.displayHomeScreen(); return; }
+    if (id == RefreshLabel) { wtAppImpl->updateAllData(); return;} 
+    if (id == CalLabel) { ScreenMgr.display(wtAppImpl->calibrationScreen); return; }
+    if (id == HomeLabel) { ScreenMgr.displayHomeScreen(); return; }
   };
 
 
-  buttons = new Label[(nButtons = TotalButtons)];
+  labels = new Label[(nLabels = N_Labels)];
   for (int i = 0; i < MaxPlugins; i++) {
-    buttons[i].init(
-      ButtonInset + ((i%2) * HalfWidth), PI_YOrigin + (i/2) * ButtonHeight, HalfWidth, ButtonHeight, buttonHandler, i);        
+    labels[i].init(
+      LabelInset + ((i%2) * HalfWidth), PI_YOrigin + (i/2) * LabelHeight, HalfWidth, LabelHeight, i);        
   }
 
-  int x = ButtonInset;
-  buttons[DimButtonIndex].init(
-      x, 160, ThirdWidth, ButtonHeight, buttonHandler, DimButtonIndex);     x+= ThirdWidth;
-  buttons[MediumButtonIndex].init(
-      x, 160, ThirdWidth, ButtonHeight, buttonHandler, MediumButtonIndex);  x+= ThirdWidth;
-  buttons[BrightButtonIndex].init(
-      x, 160, ThirdWidth, ButtonHeight, buttonHandler, BrightButtonIndex);
-  x = ButtonInset;
-  buttons[RefreshButtonIndex].init(
-      x, 200, ThirdWidth, ButtonHeight, buttonHandler, RefreshButtonIndex); x+= ThirdWidth;
-  buttons[CalButtonIndex].init(
-      x, 200, ThirdWidth, ButtonHeight, buttonHandler, CalButtonIndex);     x+= ThirdWidth;
-  buttons[HomeButtonIndex].init(
-      x, 200, ThirdWidth, ButtonHeight, buttonHandler, HomeButtonIndex);
+  int x = LabelInset;
+  labels[DimLabel].init(
+      x, 160, ThirdWidth, LabelHeight, DimLabel);     x+= ThirdWidth;
+  labels[MediumLabel].init(
+      x, 160, ThirdWidth, LabelHeight, MediumLabel);  x+= ThirdWidth;
+  labels[BrightLabel].init(
+      x, 160, ThirdWidth, LabelHeight, BrightLabel);
+  x = LabelInset;
+  labels[RefreshLabel].init(
+      x, 200, ThirdWidth, LabelHeight, RefreshLabel); x+= ThirdWidth;
+  labels[CalLabel].init(
+      x, 200, ThirdWidth, LabelHeight, CalLabel);     x+= ThirdWidth;
+  labels[HomeLabel].init(
+      x, 200, ThirdWidth, LabelHeight, HomeLabel);
 }
 
 void UtilityScreen::display(bool activating) {
@@ -111,10 +111,10 @@ void UtilityScreen::display(bool activating) {
   tft.setTextDatum(TC_DATUM);
   String appInfo = wtApp->appName + " v" + wtApp->appVersion;
   tft.drawString(appInfo, Display.XCenter, 0);
-  drawWifiStrength(Display.Width-WifiBarsWidth-3, ButtonHeight-12, Theme::Color_NormalText);
+  drawWifiStrength(Display.Width-WifiBarsWidth-3, LabelHeight-12, Theme::Color_NormalText);
   y += HeaderFontHeight;
 
-  Display.fonts.setUsingID(ButtonFont, tft);
+  Display.fonts.setUsingID(LabelFont, tft);
   tft.setTextColor(Theme::Color_NormalText);
   tft.setTextDatum(TC_DATUM);
   String address = WebThing::settings.hostname + " (" + WebThing::ipAddrAsString() + ")";
@@ -128,7 +128,7 @@ void UtilityScreen::display(bool activating) {
   uint16_t textColor = Theme::Color_NormalText;
   uint8_t nPlugins = min(wtAppImpl->pluginMgr.getPluginCount(), MaxPlugins);
 
-  for (int i = 0; i < TotalButtons; i++) {
+  for (int i = 0; i < N_Labels; i++) {
     if (i < nPlugins) {
       Plugin *p = wtAppImpl->pluginMgr.getPlugin(i);
       if (!p->enabled()) textColor = Theme::Color_Inactive;
@@ -141,16 +141,16 @@ void UtilityScreen::display(bool activating) {
       name = pis_label[i-MaxPlugins];
       textColor = pis_colors[i-MaxPlugins];
     }
-    drawButton(name, i, textColor, activating);
+    drawLabel(name, i, textColor, activating);
   }
 }
 
 void UtilityScreen::processPeriodicActivity() {  }
 
-void UtilityScreen::drawButton(String label, int i, uint16_t textColor, bool clear) {
-  if (clear) buttons[i].clear(Theme::Color_Background);
-  buttons[i].drawSimple(
-      label, ButtonFont, ButtonFrameSize,
+void UtilityScreen::drawLabel(String label, int i, uint16_t textColor, bool clear) {
+  if (clear) labels[i].clear(Theme::Color_Background);
+  labels[i].drawSimple(
+      label, LabelFont, LabelFrameSize,
       textColor, Theme::Color_Border, Theme::Color_Background);
 }
 

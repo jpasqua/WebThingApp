@@ -19,13 +19,13 @@
 
 
 // -- Label IDs
-static constexpr uint8_t FirstDigitButton = 0;
-static constexpr uint8_t LastDigitButton = 9;
-static constexpr uint8_t DecimalButton = 10;
-static constexpr uint8_t BackspaceButton = DecimalButton+1;
-static constexpr uint8_t PlusMinusButton = BackspaceButton+1;
-static constexpr uint8_t ValueButton = PlusMinusButton+1;
-static constexpr uint8_t TotalButtons = ValueButton+1;
+static constexpr uint8_t FirstDigitLabel = 0;
+static constexpr uint8_t LastDigitLabel = 9;
+static constexpr uint8_t DecimalLabel = 10;
+static constexpr uint8_t BackspaceLabel = DecimalLabel+1;
+static constexpr uint8_t PlusMinusLabel = BackspaceLabel+1;
+static constexpr uint8_t ValueLabel = PlusMinusLabel+1;
+static constexpr uint8_t N_Labels = ValueLabel+1;
 
 // Fonts
 static constexpr auto ValueFont = Display.fonts.FontID::SB12;
@@ -57,8 +57,8 @@ static constexpr uint8_t ValueFrameSize = 2;
 static constexpr uint8_t DigitFrameSize = 1;
 
 EnterNumberScreen::EnterNumberScreen() {
-  nButtons = 0; // No buttons until init is called!
-  buttons = new Label[TotalButtons];
+  nLabels = 0; // No labels until init is called!
+  labels = new Label[N_Labels];
 }
 
 void EnterNumberScreen::init(
@@ -78,11 +78,11 @@ void EnterNumberScreen::init(
     formattedValue = String(valAsLong);
   }
 
-  auto buttonHandler =[this](int id, Label::PressType type) -> void {
+  buttonHandler =[this](int id, PressType type) -> void {
     Log.verbose(F("In EnterNumberScreen Label Handler, id = %d, type = %d"), id, type);
 
-    if (type > Label::PressType::NormalPress) {
-      if (id == BackspaceButton) {
+    if (type > PressType::Normal) {
+      if (id == BackspaceLabel) {
         // Clear the whole value
         if (minVal > 0) formattedValue = String(minVal);
         else formattedValue = "";
@@ -95,26 +95,26 @@ void EnterNumberScreen::init(
       return;
     }
 
-    if (id == ValueButton) {
+    if (id == ValueLabel) {
       if (newValueCB) newValueCB(formattedValue.toFloat());
       return;
     }
 
     String currentValue = formattedValue;
-    if (id >= FirstDigitButton && id <= LastDigitButton) {
+    if (id >= FirstDigitLabel && id <= LastDigitLabel) {
       if (formattedValue.toFloat() == 0 && formattedValue.indexOf('.') == -1) {
-        formattedValue = (char)('0' + (id-FirstDigitButton));
+        formattedValue = (char)('0' + (id-FirstDigitLabel));
       }
       else {
-        formattedValue += (char)('0' + (id-FirstDigitButton));
+        formattedValue += (char)('0' + (id-FirstDigitLabel));
       }
-    } else if (id == DecimalButton) {
+    } else if (id == DecimalLabel) {
       if (!allowDecimals) return;
       if (formattedValue.indexOf('.') == -1) formattedValue += '.';
-    } else if (id == BackspaceButton) {
+    } else if (id == BackspaceLabel) {
       int len = formattedValue.length();
       if (len > 0) formattedValue.remove(len-1);
-    } else if (id == PlusMinusButton && formattedValue.length() > 0) {
+    } else if (id == PlusMinusLabel && formattedValue.length() > 0) {
       if (formattedValue[0] == '-') formattedValue.remove(0, 1);
       else formattedValue = "-" + formattedValue;
     }
@@ -137,39 +137,35 @@ void EnterNumberScreen::init(
 
   uint16_t x = ValueXOrigin;
   uint16_t w = vW*DigitWidth;
-  buttons[ValueButton].init(
-      x, ValueYOrigin, w, DigitHeight, buttonHandler, ValueButton);   
+  labels[ValueLabel].init(x, ValueYOrigin, w, DigitHeight, ValueLabel);   
 
   x += w;
   w = bsW*DigitWidth; 
-  buttons[BackspaceButton].init(
-      x, ValueYOrigin, w, DigitHeight, buttonHandler, BackspaceButton);       
+  labels[BackspaceLabel].init(x, ValueYOrigin, w, DigitHeight, BackspaceLabel);       
 
   x += w;
   if (allowDecimals) {
     w = DigitWidth; 
-    buttons[DecimalButton].init(
-        x, ValueYOrigin, w, DigitHeight, buttonHandler, DecimalButton);      
+    labels[DecimalLabel].init(x, ValueYOrigin, w, DigitHeight, DecimalLabel);      
     x += w;
   } else {
-    buttons[DecimalButton].init(0, 0, 0, 0, buttonHandler, DecimalButton);      
+    labels[DecimalLabel].init(0, 0, 0, 0, DecimalLabel);      
   }
 
   if (minVal < 0) {
     w = DigitWidth; 
-    buttons[PlusMinusButton].init(
-        x, ValueYOrigin, w, DigitHeight, buttonHandler, PlusMinusButton);
+    labels[PlusMinusLabel].init(x, ValueYOrigin, w, DigitHeight, PlusMinusLabel);
   } else {
-    buttons[PlusMinusButton].init(0, 0, 0, 0, buttonHandler, PlusMinusButton);
+    labels[PlusMinusLabel].init(0, 0, 0, 0, PlusMinusLabel);
   }
 
-  for (int i = FirstDigitButton; i <= LastDigitButton; i++) {
-    buttons[i].init(
+  for (int i = FirstDigitLabel; i <= LastDigitLabel; i++) {
+    labels[i].init(
       DigitsXOrigin + ((i%5) * DigitWidth), DigitsYOrigin + (i/5) * DigitHeight,
-      DigitWidth, DigitHeight, buttonHandler, i);        
+      DigitWidth, DigitHeight, i);        
   }
 
-  nButtons = TotalButtons;
+  nLabels = N_Labels;
 }
 
 void EnterNumberScreen::display(bool activating) {
@@ -184,35 +180,35 @@ void EnterNumberScreen::display(bool activating) {
 
     String label(' ');
     // Draw all the static components -- everything except the value
-    for (int i = FirstDigitButton; i <= LastDigitButton; i++) {
-      label.setCharAt(0, (char)('0' + (i-FirstDigitButton)) );
-      buttons[i].drawSimple(
+    for (int i = FirstDigitLabel; i <= LastDigitLabel; i++) {
+      label.setCharAt(0, (char)('0' + (i-FirstDigitLabel)) );
+      labels[i].drawSimple(
           label, DigitFont, DigitFrameSize,
           Theme::Color_NormalText, Theme::Color_Border,
           Theme::Color_Background, false);
     }
 
-    buttons[BackspaceButton].drawSimple(
+    labels[BackspaceLabel].drawSimple(
         "DEL", DigitFont, DigitFrameSize,
         Theme::Color_AlertError, Theme::Color_Border,
         Theme::Color_Background, false);
 
     if (minVal < 0) {
-      buttons[PlusMinusButton].drawSimple(
+      labels[PlusMinusLabel].drawSimple(
           "+/-", DigitFont, DigitFrameSize,
           Theme::Color_NormalText, Theme::Color_Border,
           Theme::Color_Background, false);
     }
 
     if (allowDecimals) {
-      buttons[DecimalButton].drawSimple(
+      labels[DecimalLabel].drawSimple(
           ".", DigitFont, DigitFrameSize,
           Theme::Color_NormalText, Theme::Color_Border,
           Theme::Color_Background, false);
     }
   }
 
-  buttons[ValueButton].drawSimple(
+  labels[ValueLabel].drawSimple(
     formattedValue, ValueFont, ValueFrameSize,
     Theme::Color_AlertGood, Theme::Color_Border,
     Theme::Color_Background);

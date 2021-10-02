@@ -11,27 +11,31 @@
 #if defined(ESP32)
   #include <functional>
 #endif
-#include "BaseButton.h"
 
-class Label : public BaseButton {
+class Region {
 public:
-  // ----- Types
-  typedef struct {
-    uint16_t x;
-    uint16_t y;
-    uint16_t w;
-    uint16_t h;
-  } Region;
+  inline bool contains(uint16_t tx, uint16_t ty) {
+    return ((tx >= x) && (tx < x+w) && (ty >= y) && (ty < y+h));
+  }
 
+  inline uint16_t bottom() { return (y + h); }
+  inline uint16_t left() { return (x + w); }
+
+  uint16_t x;
+  uint16_t y;
+  uint16_t w;
+  uint16_t h;
+};
+
+class Label {
+public:
   // ----- Constructors
   Label() = default;
-  Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id);
+  Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id);
 
   // ----- Member Functions
-  void init(Region& r, ButtonCallback callback, uint8_t id);
-  void init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id);
-
-  bool processTouch(uint16_t tx, uint16_t ty, PressType type);
+  void init(const Region& r, uint8_t id);
+  void init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id);
 
   void clear(uint16_t bg);
 
@@ -78,9 +82,6 @@ public:
 
   // ----- Data Members
   Region region;
-
-private:
-  ButtonCallback _callback;
   uint8_t _id;  
 };
 

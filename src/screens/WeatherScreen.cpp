@@ -62,15 +62,15 @@ static constexpr uint16_t TimeDisplayWidth = 6*TimeFontWidth + 2*TimeFontColonWi
 
 WeatherScreen::WeatherScreen() {
 
-  auto buttonHandler =[](int id, Label::PressType type) -> void {
+  buttonHandler =[](int id, PressType type) -> void {
     Log.verbose(F("In WeatherScreen Label Handler, id = %d, type = %d"), id, type);
-    if (type > Label::PressType::NormalPress) ScreenMgr.displayHomeScreen();
+    if (type > PressType::Normal) ScreenMgr.displayHomeScreen();
     else ScreenMgr.display(wtAppImpl->forecastScreen);
   };
 
-  nButtons = 1;
-  buttons = new Label[nButtons];
-  buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
+  nLabels = 1;
+  labels = new Label[nLabels];
+  labels[0].init(0, 0, Display.Width, Display.Height, 0);
 }
 
 
@@ -80,14 +80,19 @@ void WeatherScreen::display(bool) {
   if (!wtApp->owmClient) return;
 
   auto& tft = Display.tft;
+  auto& weather = wtApp->owmClient->weather;
+  
   bool metric = wtApp->settings->uiOptions.useMetric;
 
   tft.fillScreen(Theme::Color_WeatherBkg);
-  if (wtApp->owmClient->weather.dt == 0) {
+  if (weather.dt == 0) {
     Display.fonts.setUsingID(Display.fonts.FontID::SB18, tft);
     tft.setTextColor(Theme::Color_AlertError);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(F("No Weather Data"), Display.XCenter, Display.YCenter);
+    lastDT = weather.dt;
+      // Don't keep flashing "No Weather Data". It will remain dispayed
+      // until owmClient->weather.dt is updated
     return;
   }
 
@@ -96,17 +101,17 @@ void WeatherScreen::display(bool) {
   tft.setTextColor(Theme::Color_WeatherTxt);
   tft.setTextDatum(TL_DATUM);
   String& city = wtApp->settings->owmOptions.nickname;
-  if (city.isEmpty()) { city = wtApp->owmClient->weather.location.city; }
+  if (city.isEmpty()) { city = weather.location.city; }
   tft.drawString(city, XTopAreaInset, YTopArea);
   showTime();
 
   // ----- Draw the central display area
-  float temp = wtApp->owmClient->weather.readings.temp;
+  float temp = weather.readings.temp;
 
   tft.pushImage(ImageInset, YCentralArea, WI_Width, WI_Height,
-      getWeatherIcon(wtApp->owmClient->weather.description.icon), WI_Transparent);
+      getWeatherIcon(weather.description.icon), WI_Transparent);
   tft.pushImage(Display.Width-WI_Width-ImageInset, YCentralArea, WindIcon_Width, WindIcon_Height,
-      getWindIcon(wtApp->owmClient->weather.readings.windSpeed), WI_Transparent);
+      getWindIcon(weather.readings.windSpeed), WI_Transparent);
 
   int textOffset = (WindIcon_Height-TempFontHeight)/2;
   Display.fonts.setUsingID(TempFont, tft);
@@ -122,30 +127,30 @@ void WeatherScreen::display(bool) {
       YCentralArea-textOffset+TempFontHeight-TempUnitsFontHeight);
 
   tft.setTextDatum(TC_DATUM);
-  char firstChar = wtApp->owmClient->weather.description.longer[0];
+  char firstChar = weather.description.longer[0];
   if (isLowerCase(firstChar)) {
-    wtApp->owmClient->weather.description.longer[0] = toUpperCase(firstChar);
+    weather.description.longer[0] = toUpperCase(firstChar);
   }
   tft.setTextColor(Theme::Color_WeatherTxt);
   Display.fonts.setUsingID(ReadingsFont, tft);
   tft.drawString(
-      wtApp->owmClient->weather.description.longer,
+      weather.description.longer,
       Display.XCenter,YCentralArea-textOffset+TempFontHeight + 5); // A little spacing in Y
 
   // Readings Area
   tft.setTextColor(Theme::Color_WeatherTxt);
   Display.fonts.setUsingID(ReadingsFont, tft);
   tft.setTextDatum(TL_DATUM);
-  String reading = "Humidty: " + String(wtApp->owmClient->weather.readings.humidity) + "%";
+  String reading = "Humidty: " + String(weather.readings.humidity) + "%";
   tft.drawString(reading, XTopAreaInset, YReadingsArea);
   tft.setTextDatum(TR_DATUM);
-  float pressure = wtApp->owmClient->weather.readings.pressure;
+  float pressure = weather.readings.pressure;
   if (!metric) pressure = Basics::hpa_to_inhg(pressure);
   reading = String(pressure) +  (metric ? "hPa" : "inHG"),
   tft.drawString(reading, Display.Width - XTopAreaInset, YReadingsArea);
 
   // NOTE: For some reason visibility seems to ignore the units setting and always return meters!!
-  uint16_t visibility = (wtApp->owmClient->weather.readings.visibility);
+  uint16_t visibility = (weather.readings.visibility);
   String units = "km";
   if (metric) { visibility /= 1000;  }
   else {
@@ -157,7 +162,7 @@ void WeatherScreen::display(bool) {
   tft.drawString(reading, XTopAreaInset, YReadingsArea+ReadingsFontHeight);
 
   tft.setTextDatum(TR_DATUM);
-  float feelsLike = wtApp->owmClient->weather.readings.feelsLike;
+  float feelsLike = weather.readings.feelsLike;
 
   units = metric ? "C" : "F";
   reading = "Feels " + String((int)(feelsLike+0.5)) +  units;
@@ -165,7 +170,7 @@ void WeatherScreen::display(bool) {
   Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
   tft.drawString(reading, Display.Width - XTopAreaInset, YReadingsArea+ReadingsFontHeight);
 
-  lastDT = wtApp->owmClient->weather.dt;
+  lastDT = weather.dt;
 }
 
 void WeatherScreen::processPeriodicActivity() {

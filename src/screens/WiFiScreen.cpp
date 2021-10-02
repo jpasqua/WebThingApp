@@ -19,8 +19,8 @@
 auto& tft = Display.tft;
 
 WiFiScreen::WiFiScreen() {
-    nButtons = 0;
-    buttons = NULL;
+    nLabels = 0;
+    labels = nullptr;
   }
 
 void WiFiScreen::display(bool) {

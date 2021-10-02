@@ -24,7 +24,7 @@
 
 
 // ----- Coordinates of the various graphical elements
-// The weather area is on top, the buttons are on the bottom,
+// The weather area is on top, the labels are on the bottom,
 // and the clock area is defined to be the space in between
 
 /*
@@ -72,7 +72,7 @@ static constexpr uint16_t CB_FrameSize = 2;                             // Size 
 static constexpr uint16_t CB_Width = 106;                               // Includes Frame
 static constexpr uint16_t CB_Height = 42;                               // Includes Frame
 static constexpr uint16_t CB_XOrigin = 1;                               // X of origin of 1st currency button
-static constexpr uint16_t CB_YOrigin = Display.Height - CB_Height;     // Y Origin of all currency buttons
+static constexpr uint16_t CB_YOrigin = Display.Height - CB_Height;     // Y Origin of all currency labels
 static constexpr auto CB_Font = Display.fonts.FontID::SB9;             // Font for currency value
 static constexpr auto ButtonLabelFont = 2;                              // A small 5x7 font
 
@@ -104,10 +104,10 @@ static constexpr uint8_t AdvanceButton = NTouchButtons;
 
 HomeScreen::HomeScreen() {
 
-  auto buttonHandler =[this](int id, Label::PressType type) -> void {
+  buttonHandler =[this](uint8_t id, PressType type) -> void {
     Log.verbose(F("In HomeScreen Label Handler, id = %d"), id);
 
-    if (type > Label::PressType::NormalPress) {
+    if (type > PressType::Normal) {
       String subheading = "Heap: Free/Frag = ";
       String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
       wtAppImpl->utilityScreen->setSub(subheading, subcontent);
@@ -128,13 +128,13 @@ HomeScreen::HomeScreen() {
     }
   };
 
-  physicalButtonHandler = buttonHandler;
-  screenButtonFromPhysicalButton[PhysicalButtons::Button01] = AdvanceButton;
+  buttonMappings = new WTButton::Mapping[(nButtonMappings = 1)];
+  buttonMappings[0] = {PhysicalButtons::Button01 , AdvanceButton};
 
-  buttons = new Label[(nButtons = NTouchButtons)];
+  labels = new Label[(nLabels = NTouchButtons)];
   uint16_t x = CB_XOrigin;
   for (int i = 0; i < NCurrencyButtons; i++) {
-    buttons[i].init(x, CB_YOrigin, CB_Width, CB_Height, buttonHandler, i);
+    labels[i].init(x, CB_YOrigin, CB_Width, CB_Height, i);
     x += CB_Width - CB_FrameSize;
     displayedValues[i] = NotSet;
   }
@@ -142,12 +142,10 @@ HomeScreen::HomeScreen() {
   // Because the weather area is slim and at the top of the screen, we make a bigger button
   // right in the middle to make it easier to touch. It overlaps the Clock button area
   // but has priority as it is earlier in the button list
-  buttons[WeatherAreaIndex].init(
-    0, WeatherYOrigin, Display.Width, /*WeatherHeight*/50,
-    buttonHandler, WeatherAreaIndex);
-  buttons[ClockAreaIndex].init(
-    0, ClockYOrigin, Display.Width, ClockHeight,
-    buttonHandler, ClockAreaIndex);
+  labels[WeatherAreaIndex].init(
+    0, WeatherYOrigin, Display.Width, /*WeatherHeight*/50, WeatherAreaIndex);
+  labels[ClockAreaIndex].init(
+    0, ClockYOrigin, Display.Width, ClockHeight, ClockAreaIndex);
 }
 
 void HomeScreen::display(bool activating) {
@@ -323,7 +321,7 @@ void HomeScreen::drawCurrencyButtons(bool) {
       bgColor = Theme::Color_Inactive;
       value = "N/A";
     }
-    buttons[i].drawSimple(
+    labels[i].drawSimple(
       value, CB_Font, CB_FrameSize,
       textColor, Theme::Color_Border, bgColor, true);
   }

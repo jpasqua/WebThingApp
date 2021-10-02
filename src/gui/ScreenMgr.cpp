@@ -33,7 +33,7 @@ public:
   uint8_t lastBrightness;
 
   BlankScreen() {
-    auto buttonHandler =[this](int /*id*/, Label::PressType /*type*/) -> void {
+    buttonHandler =[this](int /*id*/, PressType /*type*/) -> void {
       Log.verbose("Waking up with millis() = %d", millis());
       // Let the screen redisplay while the brightness is off...
       ScreenMgr.unsuspend();
@@ -41,8 +41,8 @@ public:
       Display.setBrightness(lastBrightness);
     };
 
-    buttons = new Label[(nButtons = 1)];
-    buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
+    labels = new Label[(nLabels = 1)];
+    labels[0].init(0, 0, Display.Width, Display.Height, 0);
   }
 
   void display(bool) override {
@@ -107,8 +107,7 @@ void ScreenManager::processInput() {
   uint16_t tx = 0, ty = 0;
   bool pressed = Display.tft.getTouch(&tx, &ty);
   if (pressed) _lastInteraction = curMillis;
-  _curScreen->processInput(pressed, tx, ty);
-  _pbMgr->processInput();
+  _curScreen->processTouch(pressed, tx, ty);
 
   // Test whether we should blank the screen
   if (_uiOptions->screenBlankMinutes && !isSuspended()) {
@@ -120,24 +119,18 @@ void ScreenManager::processInput() {
 // ----- Public Member Functions
 //
 
-void ScreenManager::setup(UIOptions* uiOptions, DisplayOptions* displayOptions, PhysicalButtonMgr* pbMgr) {
+void ScreenManager::setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
   Log.verbose("ScreenManager::setup called");
   _uiOptions = uiOptions;
   _displayOptions = displayOptions;
-  _pbMgr = pbMgr;
 
-  auto dispatcher = [this](uint8_t id, BaseButton::PressType pt) {
-    Log.verbose("Physical button %d was pressed. PressType: %d", id, pt);
+  auto dispatcher = [this](uint8_t pin, PressType pt) {
+    Log.verbose("Physical button %d was pressed. PressType: %d", pin, pt);
     _lastInteraction = millis();
-    if (!_curScreen->physicalButtonHandler) return;
-
-    auto mapping = _curScreen->screenButtonFromPhysicalButton.find(id);
-    if (mapping != _curScreen->screenButtonFromPhysicalButton.end()) {
-      _curScreen->physicalButtonHandler(mapping->second, pt);
-    }
+    _curScreen->physicalButtonPress(pin, pt);
   };
 
-  _pbMgr->setDispatcher(dispatcher);
+  WebThing::buttonMgr.setDispatcher(dispatcher);
   Display.begin(_displayOptions);
   _lastInteraction = millis();
   activityIcon.init();

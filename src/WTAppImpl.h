@@ -14,7 +14,6 @@
 //                                  Local Includes
 #include "WTApp.h"
 #include "plugins/PluginMgr.h"
-#include "gui/PhysicalButtonMgr.h"
 #include "screens/CalibrationScreen.h"
 #include "screens/ConfigScreen.h"
 #include "screens/ForecastScreen.h"
@@ -30,7 +29,6 @@
 class WTAppImpl : public WTApp {
 public:
   PluginMgr pluginMgr;
-  PhysicalButtonMgr pbMgr;
 
   CalibrationScreen*  calibrationScreen;
   ConfigScreen*       configScreen;

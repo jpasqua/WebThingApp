@@ -26,24 +26,18 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-Label::Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id) {
-  init(x, y, w, h, callback, id);
+Label::Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
+  init(x, y, w, h, id);
 }
 
-void Label::init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ButtonCallback callback, uint8_t id) {
-  region.x = x; region.y = y; region.w = w; region.h = h; _callback = callback; _id = id;
+void Label::init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
+  region.x = x; region.y = y; region.w = w; region.h = h;
+  _id = id;
 }
 
-void Label::init(Region& r, ButtonCallback callback, uint8_t id) {
-  region = r; _callback = callback; _id = id;
-}
-
-bool Label::processTouch(uint16_t tx, uint16_t ty, PressType type) {
-  if ((tx >= region.x) && (tx < region.x+region.w) && (ty >= region.y) && (ty < region.y+region.h)) {
-    _callback(_id, type);
-    return true;
-  }
-  return false;
+void Label::init(const Region& r, uint8_t id) {
+  region = r;
+  _id = id;
 }
 
 void Label::clear(uint16_t bg) {

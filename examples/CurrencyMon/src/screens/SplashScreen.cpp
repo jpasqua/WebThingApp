@@ -12,8 +12,8 @@
 
 
 SplashScreen::SplashScreen() {
-  nButtons = 0;
-  buttons = NULL;
+  nLabels = 0;
+  labels = NULL;
 }
 
 void SplashScreen::display(bool) {

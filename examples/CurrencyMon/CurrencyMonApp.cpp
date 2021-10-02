@@ -16,6 +16,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  WebThing Includes
+#include <WebThing.h>
 #include <WebUI.h>
 #include <DataBroker.h>
 #include <gui/ScreenMgr.h>
@@ -176,5 +177,5 @@ Screen* CurrencyMonApp::app_registerScreens() {
 
 void CurrencyMonApp::app_registerButtons() {
   // CUSTOM: Register any physical buttons that are connected
-  pbMgr.addButton(D2);
+  WebThing::buttonMgr.addButton(D2);
 }

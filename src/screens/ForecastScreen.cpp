@@ -46,14 +46,14 @@ static constexpr int16_t TinyFont = 2;  // A small 5x7 font
 
 ForecastScreen::ForecastScreen() {
 
-  auto buttonHandler =[&](int id, Label::PressType type) -> void {
+  buttonHandler =[&](int id, PressType type) -> void {
     Log.verbose(F("In ForecastScreen Label Handler, id = %d, type = %d"), id, type);
-    if (type > Label::PressType::NormalPress) ScreenMgr.display("Weather");
+    if (type > PressType::Normal) ScreenMgr.display("Weather");
     ScreenMgr.displayHomeScreen();
   };
 
-  buttons = new Label[(nButtons = 1)];
-  buttons[0].init(0, 0, Display.Width, Display.Height, buttonHandler, 0);
+  labels = new Label[(nLabels = 1)];
+  labels[0].init(0, 0, Display.Width, Display.Height, 0);
 }
 
 
@@ -74,15 +74,6 @@ void ForecastScreen::display(bool) {
 
   Forecast *f = wtApp->owmClient->getForecast();
   for (int i = 0; i < OWMClient::ForecastElements; i++) {
-    // It's possible that the current temperature is higher than what was
-    // forecast. If so, update the forecast with the known higher temp
-    if (i == 0 && day(f[i].dt) == day(current.dt)) {
-      if (f[i].hiTemp < current.hiTemp) {
-        f[i].dt = current.dt;
-        f[i].hiTemp = current.hiTemp;
-        f[i].icon = current.icon;
-      }
-    }
     displaySingleForecast(&f[i], x, y);
     if (i == 1) x += TileWidth;
     y = (y + TileHeight) % Display.Height;

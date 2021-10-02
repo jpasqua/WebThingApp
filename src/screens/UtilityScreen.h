@@ -33,10 +33,10 @@ private:
   String _subContent;
   RefreshCallback _updateAllData;
 
-  void drawButton(String label, int i, uint16_t textColor, bool clear = false);
-
   // (x, y) represents the bottom left corner of the wifi strength bars
   void drawWifiStrength(uint16_t x, uint16_t y, uint32_t color);
+
+  void drawLabel(String label, int i, uint16_t textColor, bool clear);
 
 };
 

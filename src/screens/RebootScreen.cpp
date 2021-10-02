@@ -21,19 +21,19 @@
 
 
 static constexpr uint16_t IconInset = 10;
-static constexpr uint8_t RebootButtonID = 0;
-static constexpr uint8_t CancelButtonID = 1;
+static constexpr uint8_t RebootLabel = 0;
+static constexpr uint8_t CancelLabel = 1;
 
 RebootScreen::RebootScreen() {
-    auto buttonHandler =[&](int id, Label::PressType type) -> void {
+    buttonHandler =[&](int id, PressType type) -> void {
       Log.verbose(F("In RebootScreen ButtonHandler, id = %d"), id);
-      if (id == RebootButtonID && type > Label::PressType::NormalPress) { ESP.restart(); }
-      if (id == CancelButtonID) ScreenMgr.displayHomeScreen();
+      if (id == RebootLabel && type > PressType::Normal) { ESP.restart(); }
+      if (id == CancelLabel) ScreenMgr.displayHomeScreen();
     };
 
-    buttons = new Label[(nButtons = 2)];
-    buttons[0].init(0, 0,                Display.Width, Display.Height/2, buttonHandler, RebootButtonID);
-    buttons[1].init(0, Display.Height/2, Display.Width, Display.Height/2, buttonHandler, CancelButtonID);
+    labels = new Label[(nLabels = 2)];
+    labels[0].init(0, 0,                Display.Width, Display.Height/2, RebootLabel);
+    labels[1].init(0, Display.Height/2, Display.Width, Display.Height/2, CancelLabel);
   }
 
 void RebootScreen::display(bool) {
@@ -47,8 +47,8 @@ void RebootScreen::display(bool) {
   uint16_t xc = (Display.Width + (IconInset+RebootIcon_Width))/2;
   uint16_t yc = (Display.Height)/4;
   tft.drawRect(
-      buttons[RebootButtonID].region.x, buttons[RebootButtonID].region.y,
-      buttons[RebootButtonID].region.w, buttons[RebootButtonID].region.h, Theme::Color_AlertError);
+      labels[RebootLabel].region.x, labels[RebootLabel].region.y,
+      labels[RebootLabel].region.w, labels[RebootLabel].region.h, Theme::Color_AlertError);
   tft.drawBitmap(
       IconInset, (Display.Height/2-RebootIcon_Height)/2, RebootIcon,
       RebootIcon_Width, RebootIcon_Height,
@@ -59,8 +59,8 @@ void RebootScreen::display(bool) {
   xc = (Display.Width + (IconInset+CancelIcon_Width))/2;
   yc = (Display.Height*3)/4;
   tft.drawRect(
-      buttons[CancelButtonID].region.x, buttons[CancelButtonID].region.y,
-      buttons[CancelButtonID].region.w, buttons[CancelButtonID].region.h, Theme::Color_AlertGood);
+      labels[CancelLabel].region.x, labels[CancelLabel].region.y,
+      labels[CancelLabel].region.w, labels[CancelLabel].region.h, Theme::Color_AlertGood);
   tft.drawBitmap(
       IconInset, yc-(CancelIcon_Height/2), CancelIcon,
       CancelIcon_Width, CancelIcon_Height,

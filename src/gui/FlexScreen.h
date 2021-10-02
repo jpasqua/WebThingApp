@@ -61,7 +61,7 @@ public:
 
 class FlexScreen : public Screen {
 public:
-  static void setButtonDelegate(Label::ButtonCallback delegate) { _buttonDelegate = delegate; }
+  static void setButtonDelegate(Screen::ButtonHandler delegate) { _buttonDelegate = delegate; }
 
   // ----- Functions that are specific to FlexScreen
   virtual ~FlexScreen();
@@ -78,7 +78,7 @@ public:
 
 
 private:
-  static   Label::ButtonCallback _buttonDelegate;
+  static   Screen::ButtonHandler _buttonDelegate;
 
   FlexItem* _items;             // An array of items on the screen
   uint8_t   _nItems;            // Number of items

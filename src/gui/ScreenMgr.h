@@ -11,6 +11,7 @@
 //                                  Core Libraries
 #include <Arduino.h>
 #include <functional>
+#include <map>
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
 //                                  WebThing Includes
@@ -18,7 +19,6 @@
 //                                  Local Includes
 #include "UIOptions.h"
 #include "DisplayOptions.h"
-#include "PhysicalButtonMgr.h"
 #include "FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
@@ -78,7 +78,7 @@ public:
   ScreenManager() = default;
 
   // ----- Member Functions
-  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions, PhysicalButtonMgr* pbMgr);
+  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions);
   void loop();
 
   // ----- Screen Management functions
@@ -119,7 +119,6 @@ protected:
 
   UIOptions*      _uiOptions;
   DisplayOptions* _displayOptions;
-  PhysicalButtonMgr* _pbMgr;
 
   uint32_t _lastInteraction = 0;
 };

@@ -158,7 +158,7 @@ void PluginMgr::setFactory(Factory theFactory) {
 
 void PluginMgr::loadAll(String pluginRoot) {
 
-  auto buttonHandler =[this](int id, Label::PressType type) -> void {
+  auto buttonHandler =[this](int id, PressType type) -> void {
     Log.verbose(F("FlexScreen button delegate: id = %d, type = %d"), id, type);
     displayNextPlugin();
   };
