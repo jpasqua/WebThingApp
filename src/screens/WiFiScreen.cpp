@@ -34,7 +34,7 @@ void WiFiScreen::display(bool) {
 #endif  // WiFiLogo_UseMono  
   y += WiFiLogo_Height;
 
-  Display.fonts.setUsingID(Display.fonts.FontID::SBO12, tft);
+  Display.setFont(Display.FontID::SBO12);
   tft.setTextColor(Theme::Color_WiFiBlue);
   tft.setTextDatum(MC_DATUM);
   x = Display.XCenter;

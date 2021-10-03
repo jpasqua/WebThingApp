@@ -29,7 +29,7 @@
  *
  *----------------------------------------------------------------------------*/
 
-static constexpr auto ReadingsFont = Display.fonts.FontID::SB9;
+static constexpr auto ReadingsFont = Display.FontID::SB9;
 static constexpr uint16_t ReadingsFontHeight = 22;  // ReadingsFont->yAdvance;
 
 static constexpr uint16_t TileWidth = Display.Width/2;
@@ -105,7 +105,7 @@ void ForecastScreen::displaySingleForecast(Forecast* f, uint16_t x, uint16_t y) 
 
   y += TextVPad;
   tft.setTextColor(TFT_BLACK);
-  Display.fonts.setUsingID(ReadingsFont, tft);
+  Display.setFont(ReadingsFont);
   tft.drawString(reading, x, y);
 
   y += ReadingsFontHeight;

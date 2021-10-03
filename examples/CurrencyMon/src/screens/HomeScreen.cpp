@@ -54,7 +54,7 @@
 
 static constexpr float NotSet = -1;
 
-static constexpr auto WeatherFont = Display.fonts.FontID::SB9;
+static constexpr auto WeatherFont = Display.FontID::SB9;
 static constexpr uint16_t WeatherFontHeight = 22;   // WeatherFont->yAdvance;
 static constexpr uint16_t WeatherXOrigin = 0;
 static constexpr uint16_t WeatherYOrigin = 0;
@@ -73,14 +73,14 @@ static constexpr uint16_t CB_Width = 106;                               // Inclu
 static constexpr uint16_t CB_Height = 42;                               // Includes Frame
 static constexpr uint16_t CB_XOrigin = 1;                               // X of origin of 1st currency button
 static constexpr uint16_t CB_YOrigin = Display.Height - CB_Height;     // Y Origin of all currency labels
-static constexpr auto CB_Font = Display.fonts.FontID::SB9;             // Font for currency value
+static constexpr auto CB_Font = Display.FontID::SB9;             // Font for currency value
 static constexpr auto ButtonLabelFont = 2;                              // A small 5x7 font
 
 static constexpr uint16_t ClockXOrigin = 0;                             // Starts at left edge of screen
 static constexpr uint16_t ClockYOrigin = FC_YOrigin + FC_Height;        // Starts below the Playing area
 static constexpr uint16_t ClockWidth = Display.Width;                  // Full width of the screen
 static constexpr uint16_t ClockHeight = CB_YOrigin-ClockYOrigin;        // The space between the other 2 areas
-static constexpr auto ClockFont = Display.fonts.FontID::D100;
+static constexpr auto ClockFont = Display.FontID::D100;
 static constexpr uint16_t ClockFontHeight = 109;    // ClockFont->yAdvance;
 
 // Label Indices
@@ -116,7 +116,10 @@ HomeScreen::HomeScreen() {
       cmApp->pluginMgr.displayPlugin(0);
     } else if (id == WeatherAreaIndex) {
       ScreenMgr.display("Weather"); 
-    } else if (id >= Currency1Button && id <= Currency3Button) {
+    } else if ((id >= Currency1Button) && (id <= Currency3Button)) {
+      // This   ^^^^^^^^^^^^^^^^^^^^^ comparison can cause a warning since id is
+      // an unsigned int (at least 0) and Currency1Button == 0. Leave the test in place
+      // since Currency1Button is an arbitrary constant and could change.
       activeCurrency = id - Currency1Button;
       if (cmApp->currencies[activeCurrency].inactive()) return;
 
@@ -210,7 +213,7 @@ void HomeScreen::drawClock(bool force) {
   sprite->createSprite(ClockWidth, ClockFontHeight);
   sprite->fillSprite(Theme::Mono_Background);
 
-  Display.fonts.setUsingID(ClockFont, sprite);
+  Display.setSpriteFont(ClockFont);
   sprite->setTextColor(Theme::Mono_Foreground);
   // With this large font some manual "kerning" is required to make it fit
   uint16_t baseline = ClockFontHeight-1;
@@ -261,7 +264,7 @@ void HomeScreen::drawWeather(bool) {
     outlook += String(f[0].loTemp, 0);
   }
 
-  Display.fonts.setUsingID(WeatherFont, sprite);
+  Display.setSpriteFont(WeatherFont);
   sprite->setTextColor(Theme::Mono_Foreground);
   sprite->setTextDatum(MC_DATUM);
   sprite->drawString(currentWeather, WeatherWidth/2, WeatherHeight/2);

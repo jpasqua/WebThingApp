@@ -41,7 +41,7 @@ void RebootScreen::display(bool) {
   
   tft.fillScreen(Theme::Color_Background);
 
-  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
+  Display.setFont(Display.FontID::SB12);
   tft.setTextDatum(MC_DATUM);
 
   uint16_t xc = (Display.Width + (IconInset+RebootIcon_Width))/2;

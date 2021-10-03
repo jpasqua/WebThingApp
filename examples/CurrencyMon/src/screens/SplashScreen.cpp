@@ -26,7 +26,7 @@ void SplashScreen::display(bool) {
 
   tft.drawBitmap(x, y, CMLogoMono, CMLogoMono_Width, CMLogoMono_Height, AppTheme::Color_SplashFG);
 
-  Display.fonts.setUsingID(Display.fonts.FontID::SBO24, tft);
+  Display.setFont(Display.FontID::SBO24);
   tft.setTextColor(AppTheme::Color_SplashText);
   tft.setTextDatum(BC_DATUM);
   tft.drawString(F("CurrencyMon"), Display.XCenter, Display.Height-1);

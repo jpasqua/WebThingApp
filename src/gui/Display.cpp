@@ -121,17 +121,13 @@ void DisplayObject::streamScreenShotAsBMP(Stream &s) {
 }
 
 
-/*------------------------------------------------------------------------------
- *
- * DisplayObject::FontMgr Implementation
- *
- *----------------------------------------------------------------------------*/
+// ----- Font-Related
 
 static constexpr struct  {
     const char *name;
     const GFXfont *font;
   } GFXFonts[] = {
-    // ORDER MUST MATCH Display.fonts.FontID enum
+    // ORDER MUST MATCH Display.FontID enum
     {"M9",    &FreeMono9pt7b},
     {"MB9",   &FreeMonoBold9pt7b},
     {"MO9",   &FreeMonoOblique9pt7b},
@@ -163,17 +159,17 @@ static constexpr struct  {
   };
 static constexpr uint8_t nGFXFonts = ARRAY_SIZE(GFXFonts);
 
-void DisplayObject::FontMgr::setUsingID(uint8_t fontID, TFT_eSPI& t) const { t.setFreeFont(GFXFonts[fontID].font); }
-void DisplayObject::FontMgr::setUsingID(uint8_t fontID, TFT_eSprite *s) const { s->setFreeFont(GFXFonts[fontID].font); }
+void DisplayObject::setFont(uint8_t fontID)  { tft.setFreeFont(GFXFonts[fontID].font); }
+void DisplayObject::setSpriteFont(uint8_t fontID) const { sprite->setFreeFont(GFXFonts[fontID].font); }
 
-int8_t DisplayObject::FontMgr::idFromName(String fontName) const {
+int8_t DisplayObject::fontIDFromName(String fontName) const {
   for (int i = 0; i < nGFXFonts; i++) {
     if (fontName == GFXFonts[i].name) return i;
   }
   return -1;
 }
 
-uint8_t DisplayObject::FontMgr::getHeight(uint8_t fontID) const { return GFXFonts[fontID].font->yAdvance; }
+uint8_t DisplayObject::getFontHeight(uint8_t fontID) const { return GFXFonts[fontID].font->yAdvance; }
 
 
 /*------------------------------------------------------------------------------

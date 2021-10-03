@@ -27,7 +27,7 @@
  *
  *----------------------------------------------------------------------------*/
 
-static constexpr auto TimeFont = Display.fonts.FontID::D20;
+static constexpr auto TimeFont = Display.FontID::D20;
 static constexpr uint16_t TimeFontWidth = 17;
 static constexpr uint16_t TimeFontHeight = 22;
 static constexpr uint16_t TimeFontColonWidth = 9;
@@ -36,11 +36,11 @@ static constexpr auto TempUnitsFont = TimeFont;
 static constexpr uint16_t TempUnitsFontWidth = TimeFontWidth;
 static constexpr uint16_t TempUnitsFontHeight = TimeFontHeight;
 
-static constexpr auto TempFont = Display.fonts.FontID::D72;
+static constexpr auto TempFont = Display.FontID::D72;
 static constexpr uint16_t TempFontWidth = 60;
 static constexpr uint16_t TempFontHeight = 72;
 
-static constexpr auto ReadingsFont = Display.fonts.FontID::S12;
+static constexpr auto ReadingsFont = Display.FontID::S12;
 static constexpr uint16_t ReadingsFontHeight = 29;
 
 
@@ -86,7 +86,7 @@ void WeatherScreen::display(bool) {
 
   tft.fillScreen(Theme::Color_WeatherBkg);
   if (weather.dt == 0) {
-    Display.fonts.setUsingID(Display.fonts.FontID::SB18, tft);
+    Display.setFont(Display.FontID::SB18);
     tft.setTextColor(Theme::Color_AlertError);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(F("No Weather Data"), Display.XCenter, Display.YCenter);
@@ -97,7 +97,7 @@ void WeatherScreen::display(bool) {
   }
 
   // ----- Draw Summary line at the top of the screen
-  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
+  Display.setFont(Display.FontID::SB12);
   tft.setTextColor(Theme::Color_WeatherTxt);
   tft.setTextDatum(TL_DATUM);
   String& city = wtApp->settings->owmOptions.nickname;
@@ -114,13 +114,13 @@ void WeatherScreen::display(bool) {
       getWindIcon(weather.readings.windSpeed), WI_Transparent);
 
   int textOffset = (WindIcon_Height-TempFontHeight)/2;
-  Display.fonts.setUsingID(TempFont, tft);
+  Display.setFont(TempFont);
   tft.setTextColor(Theme::Color_Progress);
   tft.setTextDatum(TL_DATUM);
   int nDigits = temp < 10 ? 1 : (temp < 100 ? 2 : 3);
   int xLoc = Display.XCenter - ((nDigits*TempFontWidth+TempUnitsFontWidth)/2);
   tft.drawString(String((int)temp), xLoc, YCentralArea-textOffset);
-  Display.fonts.setUsingID(TimeFont, tft);
+  Display.setFont(TimeFont);
   tft.drawString(
       (metric ? "C" : "F"),
       xLoc+(nDigits*TempFontWidth),
@@ -132,14 +132,14 @@ void WeatherScreen::display(bool) {
     weather.description.longer[0] = toUpperCase(firstChar);
   }
   tft.setTextColor(Theme::Color_WeatherTxt);
-  Display.fonts.setUsingID(ReadingsFont, tft);
+  Display.setFont(ReadingsFont);
   tft.drawString(
       weather.description.longer,
       Display.XCenter,YCentralArea-textOffset+TempFontHeight + 5); // A little spacing in Y
 
   // Readings Area
   tft.setTextColor(Theme::Color_WeatherTxt);
-  Display.fonts.setUsingID(ReadingsFont, tft);
+  Display.setFont(ReadingsFont);
   tft.setTextDatum(TL_DATUM);
   String reading = "Humidty: " + String(weather.readings.humidity) + "%";
   tft.drawString(reading, XTopAreaInset, YReadingsArea);
@@ -167,7 +167,7 @@ void WeatherScreen::display(bool) {
   units = metric ? "C" : "F";
   reading = "Feels " + String((int)(feelsLike+0.5)) +  units;
   tft.setTextColor(Theme::Color_Progress);
-  Display.fonts.setUsingID(Display.fonts.FontID::SB12, tft);
+  Display.setFont(Display.FontID::SB12);
   tft.drawString(reading, Display.Width - XTopAreaInset, YReadingsArea+ReadingsFontHeight);
 
   lastDT = weather.dt;
@@ -194,7 +194,7 @@ void WeatherScreen::showTime() {
 
   lastClockUpdate = millis();
 
-  Display.fonts.setUsingID(TimeFont, sprite);
+  Display.setSpriteFont(TimeFont);
   sprite->setTextColor(Theme::Mono_Foreground);
   sprite->setTextDatum(TR_DATUM);
   sprite->drawString(

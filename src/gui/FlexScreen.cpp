@@ -65,7 +65,7 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
     return;
   } 
 
-  gfxFont = Display.fonts.idFromName(fontName);
+  gfxFont = Display.fontIDFromName(fontName);
 } 
 
 /*------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         }
         break;
     }
-    if (_gfxFont >= 0) { Display.fonts.setUsingID(_gfxFont, sprite); }
+    if (_gfxFont >= 0) { Display.setSpriteFont(_gfxFont); }
     else { sprite->setTextFont(_font);}
     sprite->setTextColor(Theme::Mono_Foreground);
     sprite->setTextDatum(_datum);

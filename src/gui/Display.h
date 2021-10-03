@@ -29,22 +29,13 @@
 class DisplayObject {
 public:
   // ----- Types
-  class FontMgr {
-  public:
-    enum FontID {
-      M9,  MB9,  MO9,  MBO9,
-      S9,  SB9,  SO9,  SBO9,
-      S12, SB12, SO12, SBO12,
-      S18, SB18, SO18, SBO18,
-      S24, SB24, SO24, SBO24,
-      D20, D72,  D100
-    };
-
-    // ----- Functions
-    void setUsingID(uint8_t fontID, TFT_eSPI& t) const;
-    void setUsingID(uint8_t fontID, TFT_eSprite *s) const;
-    int8_t idFromName(String fontName) const;
-    uint8_t getHeight(uint8_t fontID) const;
+  enum FontID {
+    M9,  MB9,  MO9,  MBO9,
+    S9,  SB9,  SO9,  SBO9,
+    S12, SB12, SO12, SBO12,
+    S18, SB18, SO18, SBO18,
+    S24, SB24, SO24, SBO24,
+    D20, D72,  D100
   };
 
   // ----- Constants
@@ -68,8 +59,13 @@ public:
   }
   void streamScreenShotAsBMP(Stream &s);
 
+  // --- Font Related
+  void setFont(uint8_t fontID);
+  void setSpriteFont(uint8_t fontID) const;
+  int8_t fontIDFromName(String fontName) const;
+  uint8_t getFontHeight(uint8_t fontID) const;
+
   // ----- Data Members
-  FontMgr fonts;
   TFT_eSPI tft;
   TFT_eSprite *sprite;
 

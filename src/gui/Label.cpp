@@ -61,7 +61,7 @@ void Label::drawSimple(
       for (int i = 0; i < borderSize; i++) {      // Draw the frame
         sprite->drawRect(i, i, region.w-(2*i), region.h-(2*i), Theme::Mono_Foreground);
       }
-      Display.fonts.setUsingID(font, sprite);
+      Display.setSpriteFont(font);
       sprite->setTextColor(Theme::Mono_Foreground);
       sprite->setTextDatum(MC_DATUM);
       sprite->drawString(label, (region.w/2), (region.h/2));
@@ -86,7 +86,7 @@ void Label::drawSimple(
       for (int i = 0; i < borderSize; i++) {      // Draw the frame
         sprite->drawRect(i, i, region.w-(2*i), region.h-(2*i), BorderIndex);
       }
-      Display.fonts.setUsingID(font, sprite);
+      Display.setSpriteFont(font);
       sprite->setTextColor(LabelIndex);
       sprite->setTextDatum(MC_DATUM);
       sprite->drawString(label, (region.w/2), (region.h/2));
@@ -100,7 +100,7 @@ void Label::drawSimple(
       tft.drawRect(region.x+i, region.y+i, region.w-(2*i), region.h-(2*i), borderColor);
     }
 
-    Display.fonts.setUsingID(font, tft);
+    Display.setFont(font);
     tft.setTextColor(labelColor);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(label, region.x + (region.w/2), region.y+(region.h/2));
@@ -142,7 +142,7 @@ void Label::drawProgress(
     sprite->fillRect(borderSize, borderSize, pct*(region.w-2*borderSize), (region.h-2*borderSize), BarIndex);
 
     // Draw the overlay text
-    Display.fonts.setUsingID(font, sprite);
+    Display.setSpriteFont(font);
     sprite->setTextColor(TextIndex);
     sprite->setTextDatum(MC_DATUM);
     sprite->drawString(note, region.w/2, region.h/2);
@@ -160,7 +160,7 @@ void Label::drawProgress(
     tft.fillRect(region.x+borderSize, region.y+borderSize, pct*(region.w-2*borderSize), (region.h-2*borderSize), barColor);
 
     // Draw the overlay text
-    Display.fonts.setUsingID(font, tft);
+    Display.setFont(font);
     tft.setTextColor(labelColor);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(note, region.x+region.w/2, region.y+region.h/2);

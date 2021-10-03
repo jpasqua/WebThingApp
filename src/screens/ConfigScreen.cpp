@@ -28,7 +28,7 @@ void ConfigScreen::display(bool) {
   tft.fillScreen(Theme::Color_Background);
   tft.drawBitmap(0, 0, Gears160x240, 160, 240, Theme::Color_AlertGood);
 
-  Display.fonts.setUsingID(Display.fonts.FontID::S12, tft);
+  Display.setFont(Display.FontID::S12);
   tft.setTextSize(1);
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(Theme::Color_NormalText);

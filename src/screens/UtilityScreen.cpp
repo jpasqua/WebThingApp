@@ -30,10 +30,10 @@ static const uint16_t pis_colors[6] = {
 
 static constexpr int16_t SubFont = 2; // A small 5x7 font
 
-static constexpr auto HeaderFont = Display.fonts.FontID::SB12;
+static constexpr auto HeaderFont = Display.FontID::SB12;
 static constexpr uint16_t HeaderFontHeight = 29;
 
-static constexpr auto LabelFont = Display.fonts.FontID::SB9;
+static constexpr auto LabelFont = Display.FontID::SB9;
 static constexpr uint16_t LabelFontHeight = 22;
 
 static constexpr uint16_t LabelFrameSize = 2;
@@ -107,14 +107,14 @@ void UtilityScreen::display(bool activating) {
 
   int y = 0;
   tft.setTextColor(Theme::Color_AlertGood);
-  Display.fonts.setUsingID(HeaderFont, tft);
+  Display.setFont(HeaderFont);
   tft.setTextDatum(TC_DATUM);
   String appInfo = wtApp->appName + " v" + wtApp->appVersion;
   tft.drawString(appInfo, Display.XCenter, 0);
   drawWifiStrength(Display.Width-WifiBarsWidth-3, LabelHeight-12, Theme::Color_NormalText);
   y += HeaderFontHeight;
 
-  Display.fonts.setUsingID(LabelFont, tft);
+  Display.setFont(LabelFont);
   tft.setTextColor(Theme::Color_NormalText);
   tft.setTextDatum(TC_DATUM);
   String address = WebThing::settings.hostname + " (" + WebThing::ipAddrAsString() + ")";

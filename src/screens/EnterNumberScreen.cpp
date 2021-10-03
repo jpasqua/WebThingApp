@@ -28,14 +28,14 @@ static constexpr uint8_t ValueLabel = PlusMinusLabel+1;
 static constexpr uint8_t N_Labels = ValueLabel+1;
 
 // Fonts
-static constexpr auto ValueFont = Display.fonts.FontID::SB12;
+static constexpr auto ValueFont = Display.FontID::SB12;
 static constexpr uint16_t ValueFontHeight = 29;
 
-static constexpr auto DigitFont = Display.fonts.FontID::SB9;
+static constexpr auto DigitFont = Display.FontID::SB9;
 static constexpr uint16_t DigitFontHeight = 22;
 
 // Field Locations
-static constexpr auto TitleFont = Display.fonts.FontID::SB12;
+static constexpr auto TitleFont = Display.FontID::SB12;
 static constexpr uint16_t TitleFontHeight = 29;   // TitleFont->yAdvance;
 static constexpr uint16_t TitleXOrigin = 0;
 static constexpr uint16_t TitleYOrigin = 0;
@@ -173,7 +173,7 @@ void EnterNumberScreen::display(bool activating) {
     auto& tft = Display.tft;
     tft.fillScreen(Theme::Color_Background);
 
-    Display.fonts.setUsingID(TitleFont, tft);
+    Display.setFont(TitleFont);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(title, TitleWidth/2, TitleHeight/2);

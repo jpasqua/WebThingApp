@@ -37,13 +37,13 @@ void CalibrationScreen::display(bool activating) {
 
   tft.fillScreen(Theme::Color_Background);
   if (state == pre) {
-    Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
+    Display.setFont(Display.FontID::SB9);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(
       F("Touch to begin calibration"), Display.XCenter, Display.YCenter);
   } else if (state == post) {
-    Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
+    Display.setFont(Display.FontID::SB9);
     tft.setTextColor(Theme::Color_AlertGood);
     tft.setTextDatum(MC_DATUM);
     tft.drawString(F("Done! Touch to continue"), Display.XCenter, Display.YCenter);
@@ -63,7 +63,7 @@ void CalibrationScreen::init() {
     switch (state) {
       case pre:
         tft.fillScreen(Theme::Color_Background);
-        Display.fonts.setUsingID(Display.fonts.FontID::SB9, tft);
+        Display.setFont(Display.FontID::SB9);
         tft.setTextColor(Theme::Color_AlertGood);
         tft.setTextDatum(MC_DATUM);
         tft.drawString(
