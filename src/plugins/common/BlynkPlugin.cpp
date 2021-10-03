@@ -157,7 +157,7 @@ void BlynkPlugin::typeSpecificMapper(const String& key, String& value) {
 
 void BlynkPlugin::refresh(bool force) {
   if (!force && (_nextRefresh > millis())) return;
-  ScreenMgr.activityIcon.show(Theme::Color_UpdatingPlugins);
+  ScreenMgr.showActivityIcon(Theme::Color_UpdatingPlugins);
   for (int i = 0; i < settings.nPins; i++) {
     int index = settings.pins[i].indexOf('/');
     int blynkIndex = settings.pins[i].substring(0, index).toInt();
@@ -165,5 +165,5 @@ void BlynkPlugin::refresh(bool force) {
     BlynkClient::readPin(settings.blynkIDs[blynkIndex], rawPin, _pinVals[i]);
   }
   _nextRefresh = millis() + (settings.refreshInterval * settings.riScale);
-  ScreenMgr.activityIcon.hide();
+  ScreenMgr.hideActivityIcon();
 }

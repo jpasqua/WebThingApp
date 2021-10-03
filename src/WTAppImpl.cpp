@@ -128,16 +128,16 @@ void WTAppImpl::refreshWeatherData(bool force) {
   uint32_t threshold = (WebThing::settings.processingInterval * 60 * 1000L);
 
   if (force || ((curMillis - lastWeatherUpdate) > threshold)) {
-    ScreenMgr.activityIcon.show(Theme::Color_UpdatingWeather);
+    ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->update();
     lastWeatherUpdate = curMillis;
   }
   if (force || ((curMillis - lastForecastUpdate) > ForecastInterval)) {
-    ScreenMgr.activityIcon.show(Theme::Color_UpdatingWeather);
+    ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->updateForecast(WebThing::getGMTOffset());
     lastForecastUpdate = curMillis;
   }
-  ScreenMgr.activityIcon.hide();
+  ScreenMgr.hideActivityIcon();
 }
 
 void WTAppImpl::prepWeather() {

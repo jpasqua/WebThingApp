@@ -133,7 +133,7 @@ void ScreenManager::setup(UIOptions* uiOptions, DisplayOptions* displayOptions) 
   WebThing::buttonMgr.setDispatcher(dispatcher);
   Display.begin(_displayOptions);
   _lastInteraction = millis();
-  activityIcon.init();
+  initActivityIcon();
 }
 
 void ScreenManager::loop() {
@@ -203,20 +203,25 @@ FlexScreen* ScreenManager::createFlexScreen(
  *
  *----------------------------------------------------------------------------*/
 
-void ActivityIcon::init() {
+static constexpr uint16_t AI_Size = 32;
+static constexpr uint16_t AI_BorderSize = 5;
+static constexpr uint16_t AI_X = (320 - AI_Size);
+static constexpr uint16_t AI_Y = 0;
+
+void ScreenManager::initActivityIcon() {
   // In theory it would be better to allocate/deallocate this as needed, but it causes
   // a lot more fragmentation and potentially a crash.
-  savedPixels = (uint16_t *)malloc(Size*Size*sizeof(uint16_t));  // This is BIG!
+  savedPixels = (uint16_t *)malloc(AI_Size*AI_Size*sizeof(uint16_t));  // This is BIG!
 }
 
-void ActivityIcon::show(uint16_t accentColor, char symbol) {
+void ScreenManager::showActivityIcon(uint16_t accentColor, char symbol) {
   if (isDisplayed) return;
 
-  Display.tft.readRect(X, Y, Size, Size, savedPixels);
-  uint16_t centerX = X+(Size/2);
-  uint16_t centerY = Y+(Size/2);
-  Display.tft.fillCircle(centerX, centerY, Size/2-1, accentColor);
-  Display.tft.fillCircle(centerX, centerY, (Size/2-1)-BorderSize, Theme::Color_UpdatingFill);
+  Display.tft.readRect(AI_X, AI_Y, AI_Size, AI_Size, savedPixels);
+  uint16_t centerX = AI_X+(AI_Size/2);
+  uint16_t centerY = AI_Y+(AI_Size/2);
+  Display.tft.fillCircle(centerX, centerY, AI_Size/2-1, accentColor);
+  Display.tft.fillCircle(centerX, centerY, (AI_Size/2-1)-AI_BorderSize, Theme::Color_UpdatingFill);
   Display.tft.setTextDatum(MC_DATUM);
   Display.tft.setFreeFont(&FreeSansBold9pt7b);
   Display.tft.setTextColor(Theme::Color_UpdatingText);
@@ -228,9 +233,9 @@ void ActivityIcon::show(uint16_t accentColor, char symbol) {
   isDisplayed = true;
 }
 
-void ActivityIcon::hide() {
+void ScreenManager::hideActivityIcon() {
   if (!isDisplayed) return;
-  Display.tft.pushRect(X, Y, Size, Size, savedPixels);
+  Display.tft.pushRect(AI_X, AI_Y, AI_Size, AI_Size, savedPixels);
   isDisplayed = false;
 }
 

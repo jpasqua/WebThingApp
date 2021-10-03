@@ -45,8 +45,8 @@ namespace WebUIHelper {
     constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
 
     void showBusyStatus(bool busy) {
-      if (busy) ScreenMgr.activityIcon.show(Theme::Color_WebRequest, UpdatingSymbol);
-      else ScreenMgr.activityIcon.hide();
+      if (busy) ScreenMgr.showActivityIcon(Theme::Color_WebRequest, UpdatingSymbol);
+      else ScreenMgr.hideActivityIcon();
     }
   }
 
