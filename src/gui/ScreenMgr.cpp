@@ -138,7 +138,7 @@ void ScreenManager::setup(UIOptions* uiOptions, DisplayOptions* displayOptions) 
 
 void ScreenManager::loop() {
   if (_curScreen == NULL) return;
-  // processSchedules();
+  processSchedules();
   processInput();
   _curScreen->processPeriodicActivity();
 }
