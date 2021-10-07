@@ -5,7 +5,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 //                                  WebThing Includes
-#include <screens/EnterNumberScreen.h>
+#include <screens/touch/EnterNumberScreen.h>
 #include <gui/Screen.h>
 //                                  Local Includes
 //--------------- End:    Includes ---------------------------------------------

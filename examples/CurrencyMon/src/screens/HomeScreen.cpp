@@ -15,7 +15,7 @@
 #include <gui/Display.h>
 #include <gui/Theme.h>
 #include <gui/ScreenMgr.h>
-#include <screens/EnterNumberScreen.h>
+#include <screens/touch/EnterNumberScreen.h>
 //                                  Local Includes
 #include "../../CurrencyMonApp.h"
 #include "../hardware/PhysicalButtons.h"
