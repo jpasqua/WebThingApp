@@ -212,6 +212,8 @@ void WTAppImpl::prepWebThing() {
 void WTAppImpl::registerScreens() {
   // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
 
+#if DEVICE_TYPE == DEVICE_TYPE_TOUCH
+// ----------------------------------
   calibrationScreen = new CalibrationScreen();
   ScreenMgr.registerScreen("Calibration", calibrationScreen);
 
@@ -232,6 +234,22 @@ void WTAppImpl::registerScreens() {
 
   utilityScreen = new UtilityScreen();
   ScreenMgr.registerScreen("Utility", utilityScreen);
+
+// ----------------------------------
+#elif DEVICE_TYPE == DEVICE_TYPE_OLED
+  configScreen = new ConfigScreen();
+  ScreenMgr.registerScreen("Config", configScreen);
+
+  infoScreen = new InfoScreen();
+  ScreenMgr.registerScreen("Info", infoScreen);
+
+  rebootScreen = new RebootScreen();
+  ScreenMgr.registerScreen("Reboot", rebootScreen);
+
+  wifiScreen = new WiFiScreen();
+  ScreenMgr.registerScreen("WiFi", wifiScreen);
+  
+#endif
 
   splashScreen = app_registerScreens();
 }
