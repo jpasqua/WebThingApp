@@ -184,11 +184,9 @@ namespace WebUIHelper {
 
     void yieldScreenShot() {
       auto action = []() {
-        // TO DO: FIX ME!!
-        // WebUI::sendArbitraryContent(
-        //     "image/bmp",
-        //     Display.getSizeOfScreenShotAsBMP(),
-        //     Display.streamScreenShotAsBMP);
+        WebUI::sendArbitraryContent(
+            "image/bmp", Display.ScreenShotSize, 
+            [](Stream& s) { Display.streamScreenShotAsBMP(s); });
       };
       WebUI::wrapWebAction("/dev/screenShot", action, false);
     }
