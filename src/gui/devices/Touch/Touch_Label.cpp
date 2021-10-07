@@ -13,6 +13,9 @@
  *
  */
 
+#include "../DeviceSelect.h"
+#if DEVICE_TYPE == DEVICE_TYPE_TOUCH
+
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 #include <Arduino.h>
@@ -20,28 +23,13 @@
 #include <ArduinoLog.h>
 //                                  WebThing Includes
 //                                  Local Includes
-#include "Label.h"
-#include "Display.h"
-#include "Theme.h"
+#include "../../Label.h"
+#include "../../Display.h"
+#include "../../Theme.h"
 //--------------- End:    Includes ---------------------------------------------
 
-
-Label::Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
-  init(x, y, w, h, id);
-}
-
-void Label::init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
-  region.x = x; region.y = y; region.w = w; region.h = h;
-  _id = id;
-}
-
-void Label::init(const Region& r, uint8_t id) {
-  region = r;
-  _id = id;
-}
-
-void Label::clear(uint16_t bg) {
-  Display.tft.fillRect(region.x, region.y, region.w, region.h, bg);
+void Label::clear(uint16_t color) {
+  Display.tft.fillRect(region.x, region.y, region.w, region.h, color);
 }
 
 void Label::drawSimple(
@@ -166,3 +154,5 @@ void Label::drawProgress(
     tft.drawString(note, region.x+region.w/2, region.y+region.h/2);
   }
 }
+
+#endif

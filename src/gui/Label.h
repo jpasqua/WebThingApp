@@ -1,12 +1,10 @@
 /*
- * Label.h:
- *    A touch-based button class.
- *
+ * BaseLabel.h
  *
  */
 
-#ifndef Button_h
-#define Button_h
+#ifndef BaseLabel_h
+#define BaseLabel_h
 
 #if defined(ESP32)
   #include <functional>
@@ -27,36 +25,44 @@ public:
   uint16_t h;
 };
 
-class Label {
+class BaseLabel {
 public:
   // ----- Constructors
-  Label() = default;
-  Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id);
+  BaseLabel() = default;
+  ~BaseLabel() = default;
+
+  void init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
+    region.x = x; region.y = y; region.w = w; region.h = h;
+    _id = id;
+  }
+
+  void init(const Region& r, uint8_t id) {
+    region = r;
+    _id = id;
+  }
 
   // ----- Member Functions
-  void init(const Region& r, uint8_t id);
-  void init(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id);
+  
+  virtual void clear(uint16_t color) = 0;
 
-  void clear(uint16_t bg);
-
-  // Draw a simple button with a border, label, and interior background
+  // Draw a simple button with a border, BaseLabel, and interior background
   // The button can be drawn directly to the display or to a sprite,
   // then copied to the display to avoid flickering. If buffering is on, a 1bpp
-  // buffer will be used if possible (when labelColor == borderColor), otherwise
+  // buffer will be used if possible (when BaseLabelColor == borderColor), otherwise
   // a 4bpp buffer will be used.
   // 
-  // @param label       The text to be displayed. It is the callers responsibility to ensure
+  // @param BaseLabel       The text to be displayed. It is the callers responsibility to ensure
   //                    it will fit within the bounds of the button. It will be drawn middle center
-  // @param font        The font that will be used to draw the label
+  // @param font        The font that will be used to draw the BaseLabel
   // @param borderSize  The size in pixels of the border
-  // @param labelColor  The color to be used to draw the label
+  // @param BaseLabelColor  The color to be used to draw the BaseLabel
   // @param borderColor The color to be used to draw the border
   // @param bgColor     The color to be used to draw the interior of the button
   // @param buffer      Should this be buffered offscreen then copied to the display
-  void drawSimple(
+  virtual void drawSimple(
       const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor, uint16_t bgColor,
-      bool buffer = false);
+      bool buffer = false) = 0;
 
   // Draw a button whose interior represents a progress bar.
   // The button can be drawn directly to the display or to a 4bpp sprite,
@@ -65,19 +71,21 @@ public:
   // @param pct         The progess to be reflected in the bar (0.0-1.0).
   // @param label       The text to be displayed. It is the callers responsibility to ensure
   //                    it will fit within the bounds of the button. It will be drawn middle center.
-  //                    If label is equal to showPct, then the pct will be drawn rather than the label
-  // @param font        The font that will be used to draw the label
+  //                    If BaseLabel is equal to showPct, then the pct will be drawn rather than the BaseLabel
+  // @param font        The font that will be used to draw the BaseLabel
   // @param borderSize  The size in pixels of the border
-  // @param labelColor  The color to be used to draw the label
+  // @param labelColor  The color to be used to draw the BaseLabel
   // @param borderColor The color to be used to draw the border
   // @param barColor    The color to be used to draw the progress bar
   // @param bgColor     The color to be used for the unfilled part of the progress bar
+  // @param showPct     If the label is textually equal to this parameter, then the percentage
+  //                    value will be shown rather than the label text.
   // @param buffer      Should this be buffered offscreen then copied to the display
-  void drawProgress(
-        float pct, const String& label, uint8_t font, uint8_t borderSize,
-        uint16_t labelColor, uint16_t borderColor,
-        uint16_t barColor, uint16_t bgColor, const String& showPct,
-        bool buffer = false);
+  virtual void drawProgress(
+      float pct, const String& label, uint8_t font, uint8_t borderSize,
+      uint16_t labelColor, uint16_t borderColor,
+      uint16_t barColor, uint16_t bgColor, const String& showPct,
+      bool buffer = false) = 0;
 
 
   // ----- Data Members
@@ -85,4 +93,7 @@ public:
   uint8_t _id;  
 };
 
-#endif  // Button_h
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(Label)
+
+#endif  // BaseLabel_h

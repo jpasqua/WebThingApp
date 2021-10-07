@@ -5,6 +5,9 @@
  *                    
  */
 
+#include "../DeviceSelect.h"
+#if DEVICE_TYPE == DEVICE_TYPE_TOUCH
+
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
@@ -14,22 +17,19 @@
   #include <analogWrite.h>
   #define PWMRANGE 255
 #endif
-#include <ArduinoLog.h>
-//                                  WebThing Includes
 #include <BPABasics.h>
+//                                  WebThing Includes
 //                                  Local Includes
-#include "Display.h"
-#include "FlexScreen.h"
+#include "../../Display.h"
+#include "../../Theme.h"
 #include "fonts/DSEG7_Classic_Bold_22.h"
 #include "fonts/DSEG7_Classic_Bold_72.h"
 #include "fonts/DSEG7_Classic_Bold_100.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-void DisplayObject::begin(DisplayOptions* displayOptions) {
-  _options = displayOptions;
+void Touch_Display::device_begin() {
   if (TFT_LED != -1) pinMode(TFT_LED, OUTPUT);
-  setBrightness(80);
   tft.begin();
   tft.setSwapBytes(true);
   tft.setRotation(_options->invertDisplay ? 3 : 1);
@@ -38,7 +38,9 @@ void DisplayObject::begin(DisplayOptions* displayOptions) {
   calibrate(&_options->calibrationData);
 }
 
-void DisplayObject::calibrate(CalibrationData* calibrationData) {
+void Touch_Display::setDeviceOptions(const DisplayDeviceOptions*) { }
+
+void Touch_Display::calibrate(CalibrationData* calibrationData) {
   uint16_t sum = 0;
   for (int i = 0; i < CalibrationData::nCalReadings; i++) {
     sum += calibrationData->readings[i];
@@ -53,7 +55,7 @@ void DisplayObject::calibrate(CalibrationData* calibrationData) {
   }
 }
 
-void DisplayObject::setBrightness(uint8_t b) {
+void Touch_Display::setBrightness(uint8_t b) {
   if (TFT_LED == -1) return;
   if (b == _brightness) return;
   _brightness = b;
@@ -61,10 +63,39 @@ void DisplayObject::setBrightness(uint8_t b) {
   analogWrite(TFT_LED, analogValue);
 }
 
-void DisplayObject::streamScreenShotAsBMP(Stream &s) {
+void Touch_Display::drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
+  Display.tft.drawRect(x, y, w, h, color);
+}
+
+void Touch_Display::fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
+  Display.tft.fillRect(x, y, w, h, color);
+}
+
+void Touch_Display::drawStringInRegion(
+    const char *text, int8_t fontID, uint8_t alignment,
+    uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+    uint16_t xOff, uint16_t yOff, 
+    uint16_t fg, uint16_t bg)
+{
+  auto sprite = Display.sprite;
+
+  sprite->setColorDepth(1);
+  sprite->createSprite(w, h);
+  sprite->fillSprite(Theme::Mono_Background);
+
+  if (fontID >= 0) { Display.setSpriteFont(fontID); }
+  else { sprite->setTextFont(-fontID);}
+  sprite->setTextColor(Theme::Mono_Foreground);
+  sprite->setTextDatum(alignment);
+  sprite->drawString(text, xOff, yOff);
+
+  sprite->setBitmapColor(fg, bg);
+  sprite->pushSprite(x, y);
+  sprite->deleteSprite();
+}
+
+void Touch_Display::streamScreenShotAsBMP(Stream &s) {
   // Adapted form https://forum.arduino.cc/index.php?topic=406416.0
-  byte hiByte, loByte;
-  uint16_t i, j = 0;
 
   uint8_t bmFlHdr[14] = {
     'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0
@@ -100,14 +131,14 @@ void DisplayObject::streamScreenShotAsBMP(Stream &s) {
   s.write(bmFlHdr, sizeof(bmFlHdr));
   s.write(bmInHdr, sizeof(bmInHdr));
 
-  for (i = h; i > 0; i--) {
+  for (int16_t y = h-1; y >= 0; y--) {
     byte buf[w*2];
     byte *ptr = &buf[0];
-    for (j = 0; j < w; j++) {
-      uint16_t rgb = tft.readPixel(j,i);  // Get pixel in rgb565 format
+    for (uint16_t x = 0; x < w; x++) {
+      uint16_t rgb = tft.readPixel(x, y);  // Get pixel in rgb565 format
       
-      hiByte = (rgb & 0xFF00) >> 8;   // High Byte
-      loByte = (rgb & 0x00FF);        // Low Byte
+      uint8_t hiByte = (rgb & 0xFF00) >> 8;
+      uint8_t loByte = (rgb & 0x00FF);
       
       // RGB565 to RGB555 conversion... 555 is default for uncompressed BMP
       loByte = (hiByte << 7) | ((loByte & 0xC0) >> 1) | (loByte & 0x1f);
@@ -159,23 +190,18 @@ static constexpr struct  {
   };
 static constexpr uint8_t nGFXFonts = ARRAY_SIZE(GFXFonts);
 
-void DisplayObject::setFont(uint8_t fontID)  { tft.setFreeFont(GFXFonts[fontID].font); }
-void DisplayObject::setSpriteFont(uint8_t fontID) const { sprite->setFreeFont(GFXFonts[fontID].font); }
+void Touch_Display::setFont(uint8_t fontID)  { tft.setFreeFont(GFXFonts[fontID].font); }
+void Touch_Display::setSpriteFont(uint8_t fontID) const { sprite->setFreeFont(GFXFonts[fontID].font); }
 
-int8_t DisplayObject::fontIDFromName(String fontName) const {
+int8_t Touch_Display::fontIDFromName(String fontName) const {
   for (int i = 0; i < nGFXFonts; i++) {
     if (fontName == GFXFonts[i].name) return i;
   }
   return -1;
 }
 
-uint8_t DisplayObject::getFontHeight(uint8_t fontID) const { return GFXFonts[fontID].font->yAdvance; }
+uint8_t Touch_Display::getFontHeight(uint8_t fontID) const { return GFXFonts[fontID].font->yAdvance; }
 
-
-/*------------------------------------------------------------------------------
- *
- * GLOBAL STATE
- *
- *----------------------------------------------------------------------------*/
-
-DisplayObject Display;
+// ----- GLOBAL STATE
+Touch_Display Display;
+#endif

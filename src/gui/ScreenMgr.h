@@ -23,16 +23,11 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-/*------------------------------------------------------------------------------
- *
- * ScreenMgr Definition
- *
- *----------------------------------------------------------------------------*/
-
-class ScreenManager {
+class BaseScreenMgr {
 public:
   // ----- Constructors
-  ScreenManager() = default;
+  BaseScreenMgr() = default;
+  ~BaseScreenMgr() = default;
 
   // ----- Member Functions
   void setup(UIOptions* uiOptions, DisplayOptions* displayOptions);
@@ -47,10 +42,7 @@ public:
   void display(String name);
   void display(Screen* screen);
   void displayHomeScreen();
-
-  void suspend();
-  void unsuspend();
-  inline bool isSuspended() { return(_suspendedScreen != nullptr); }
+  void refresh();
 
   // ----- Plugin-related functions
   FlexScreen* createFlexScreen(
@@ -67,21 +59,27 @@ public:
    * @param   accentColor   An accent color to indicate what's happening
    * @param   symbol        The symbol to display within the icon
    */
-  void showActivityIcon(uint16_t accentColor, char symbol = 'i');
+  virtual void showActivityIcon(uint16_t accentColor, char symbol = 'i')  = 0;
 
   /**
    * Remove the activity icon from the current screen and restore the original
    * screen content. Calling hide() when no icon is displayed
    * is safe and does nothing.
    */
-  void hideActivityIcon();
+  virtual void hideActivityIcon() = 0;
 
+  // TO DO: These should be private (or at least protected), but the BlankScreen
+  // class needs to access them. Think about whether it's worth doing something about this.
+  void suspend();
+  void unsuspend();
 
 protected:
   // ----- Member Functions
   void processSchedules();
-  void processInput();
-  void initActivityIcon();
+  inline bool isSuspended() { return(_suspendedScreen != nullptr); }
+
+  virtual void device_setup() = 0;
+  virtual void device_processInput() = 0;
 
   // ----- Data Members
   std::map<String, Screen*> screenFromName;
@@ -93,11 +91,9 @@ protected:
   DisplayOptions* _displayOptions;
 
   uint32_t _lastInteraction = 0;
-
-private:
-    bool isDisplayed;
-    uint16_t *savedPixels = NULL;
 };
 
-extern ScreenManager ScreenMgr;
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(ScreenMgr)
+
 #endif  // ScreenMgr_h

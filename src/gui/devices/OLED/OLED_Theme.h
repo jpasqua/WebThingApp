@@ -1,0 +1,36 @@
+#ifndef OLED_Theme_h
+#define OLED_Theme_h
+
+#include <OLEDDisplay.h>
+
+namespace Theme {
+  constexpr OLEDDISPLAY_COLOR Color_Online = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_Offline = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_Progress = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_Inactive = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_AlertError = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_AlertGood = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_AlertWarning = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_NormalText = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_Border = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_Background = OLEDDISPLAY_COLOR::BLACK;
+
+  constexpr OLEDDISPLAY_COLOR Color_SplashBkg  = OLEDDISPLAY_COLOR::BLACK;
+  constexpr OLEDDISPLAY_COLOR Color_SplashText = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_WeatherTxt = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_WeatherBkg = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_WiFiBlue = OLEDDISPLAY_COLOR::WHITE;
+
+  constexpr OLEDDISPLAY_COLOR Color_WebRequest = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_UpdatingWeather = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_UpdatingPlugins = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_UpdatingText = OLEDDISPLAY_COLOR::WHITE;
+  constexpr OLEDDISPLAY_COLOR Color_UpdatingFill = OLEDDISPLAY_COLOR::BLACK;
+}
+
+#endif  // OLED_Theme_h

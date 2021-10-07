@@ -1,16 +1,8 @@
 /*
  * Display:
- *    A set of functions on top of the base display driver (TFT_eSPI) which
+ *    A set of functions on top of the base display driver which
  *    provide some conveniences (and efficiencies).
  *                    
- * NOTES:
- * o The Font functions are provided to work around an issue in TFT_eSPI.
- *   + It assumes that it will be used an application that only includes the header once. 
- *   + This is true for a "normal" Arduino application with all files in the top
- *     level sketch folder. These are effectively concatenated at build time into
- *     a single compilation unit.
- *   + With more sophisticated file structures, the font data gets included multiple
- *     times cause the ap size to balloon. 
  */
 
 #ifndef Display_h
@@ -25,55 +17,49 @@
 #include "DisplayOptions.h"
 //--------------- End:    Includes ---------------------------------------------
 
+class DisplayDeviceOptions;
 
-class DisplayObject {
+class BaseDisplay {
 public:
-  // ----- Types
-  enum FontID {
-    M9,  MB9,  MO9,  MBO9,
-    S9,  SB9,  SO9,  SBO9,
-    S12, SB12, SO12, SBO12,
-    S18, SB18, SO18, SBO18,
-    S24, SB24, SO24, SBO24,
-    D20, D72,  D100
-  };
-
-  // ----- Constants
-  static constexpr uint16_t Width = 320;
-  static constexpr uint16_t Height = 240;
-  static constexpr uint16_t XCenter = Width/2;
-  static constexpr uint16_t YCenter = Height/2;
-
   // ----- Constructors
+  BaseDisplay() = default;
+  ~BaseDisplay() = default;
 
   // ----- Member Functions
-  void begin(DisplayOptions* displayOptions);
-  void calibrate(CalibrationData* newCalibrationData);
+  void begin(DisplayOptions* displayOptions) {
+    _options = displayOptions;
+    device_begin();
+    setBrightness(80);
+  }
 
-  void setBrightness(uint8_t b);  // 0-100
+  virtual void device_begin() = 0;
+  virtual void setDeviceOptions(const DisplayDeviceOptions* options) = 0;
+
+  virtual void setBrightness(uint8_t b) = 0;  // 0-100
   inline uint8_t getBrightness() const { return _brightness; }
 
-  inline uint32_t getSizeOfScreenShotAsBMP() const {
-    // Pixel Buffer size + a 54 byte header...
-    return (2ul * Width * Height + 54);
-  }
-  void streamScreenShotAsBMP(Stream &s);
+  // Drawing functions
+  virtual void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) = 0;
+  virtual void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) = 0;
+  virtual void drawStringInRegion(
+    const char *text, int8_t fontID, uint8_t alignment,
+    uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+    uint16_t xOff, uint16_t yOff, 
+    uint16_t fg, uint16_t bg) = 0;
+  
+  virtual void streamScreenShotAsBMP(Stream &s) = 0;
 
   // --- Font Related
-  void setFont(uint8_t fontID);
-  void setSpriteFont(uint8_t fontID) const;
-  int8_t fontIDFromName(String fontName) const;
-  uint8_t getFontHeight(uint8_t fontID) const;
+  virtual void setFont(uint8_t fontID) = 0;
+  virtual int8_t fontIDFromName(String fontName) const = 0;
+  virtual uint8_t getFontHeight(uint8_t fontID) const = 0;
 
-  // ----- Data Members
-  TFT_eSPI tft;
-  TFT_eSprite *sprite;
-
-private:
+protected:
     uint8_t _brightness = 0;     // 0-100
     DisplayOptions* _options;
 };
 
-extern DisplayObject Display;
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(Display)
 
 #endif	// Display_h

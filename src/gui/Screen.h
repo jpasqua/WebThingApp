@@ -5,18 +5,20 @@
 #include "Label.h"
 #include <WTButton.h>
 
-class Screen {
+class BaseScreen {
 public:
   // ----- Types
   using ButtonHandler = std::function<void(uint8_t, PressType)>;
 
   // ----- Constructors
-  Screen() = default;
+  BaseScreen() = default;
+  ~BaseScreen() = default;
 
   // ----- Member Functions
   virtual void display(bool force = false) = 0;
   virtual void processPeriodicActivity() = 0;
-  virtual void activate();
+
+  void activate();
 
   // ----- ScreenMgr uses these functions to pass in input activity
   void processTouch(bool pressed, uint16_t tx, uint16_t ty);
@@ -42,5 +44,8 @@ private:
   uint16_t lastX, lastY;
 
 };
+
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(Screen)
 
 #endif // Screen_h

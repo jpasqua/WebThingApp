@@ -28,7 +28,12 @@
 
 inline uint16_t mapColor(String colorSpecifier) {
   uint32_t hexVal = strtol(colorSpecifier.c_str(), NULL, 16);
-  return Display.tft.color24to16(hexVal);
+
+  uint16_t r = (hexVal >> 8) & 0xF800;
+  uint16_t g = (hexVal >> 5) & 0x07E0;
+  uint16_t b = (hexVal >> 3) & 0x001F;
+
+  return (r | g | b);
 }
 
 FlexItem::Type mapType(String t) {
@@ -55,6 +60,7 @@ uint8_t mapDatum(String justify) {
   return TL_DATUM;
 }
 
+// Requires device-specific code
 void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
   // Use a default if no matching font is found
   font = 2;
@@ -99,10 +105,12 @@ bool FlexScreen::init(
 }
 
 void FlexScreen::display(bool activating) {
-  if (activating) { Display.tft.fillScreen(_bkg); }
+  // Requires device-specific code
+  if (activating) { Display.fillRect(0, 0, Display.Width, Display.Height, _bkg); }
   for (int i = 0; i < _nItems; i++) {
     _items[i].display(_bkg, _mapper);
   }
+  Display.flush();
   lastDisplayTime = lastClockTime = millis();
 }
 
@@ -172,15 +180,10 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
-    auto& sprite = Display.sprite;
     Basics::resetString(_val);    // Reuse the same value buffer across all FlexItems, so clear it out
     
     mapper(_key, _val);
-
-    sprite->setColorDepth(1);
-    sprite->createSprite(_w, _h);
-    sprite->fillSprite(Theme::Mono_Background);
-
+Log.verbose("FlexItem with (%s => %s)", _key.c_str(), _val.c_str());
     // TO DO: Use snprintf to determine the correct buffer size
     int bufSize = Display.Width/6 + 1; // Assume 6 pixel spacing is smallest font
     char buf[bufSize];
@@ -226,19 +229,15 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         }
         break;
     }
-    if (_gfxFont >= 0) { Display.setSpriteFont(_gfxFont); }
-    else { sprite->setTextFont(_font);}
-    sprite->setTextColor(Theme::Mono_Foreground);
-    sprite->setTextDatum(_datum);
-    sprite->drawString(buf, _xOff, _yOff);
 
-    sprite->setBitmapColor(_color, bkg);
-    sprite->pushSprite(_x, _y);
-    sprite->deleteSprite();
+    Display.drawStringInRegion(
+      buf, ((_gfxFont >= 0) ? _gfxFont : -_font), _datum,
+      _x, _y, _w, _h, _xOff, _yOff, _color, bkg);
   }
 
   for (int i = 0; i < _strokeWidth; i++) {
-    Display.tft.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
+    // Requires device-specific code
+    Display.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
   }
 }
 
