@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "x": 0, "y": 0, "w": 49,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "S10", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.city"
+    },
+    {
+    "x": 49, "y": 0, "w": 30,  "h": 10, "xOff": 15, "yOff": 0,
+    "justify": "TC", "font": "S10", "color": "0x00FF00", "format": "%0.0fF",
+    "type": "FLOAT", "key": "$W.temp"
+    },
+    {
+      "x": 79, "y": 0, "w": 49,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TR", "font": "S10", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.ldesc"
+    }
+  ],
+  "bkg": "0x000000",
+  "screenID": "Mix1"
+}
