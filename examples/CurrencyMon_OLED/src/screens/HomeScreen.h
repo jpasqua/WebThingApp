@@ -9,7 +9,7 @@
 //                                  WebThingApp
 #include <gui/Display.h>
 //                                  Local Includes
-#include "../../OLEDTestApp.h"
+#include "../../CurrencyMonApp.h"
 //--------------- End:    Includes ---------------------------------------------
 
 

@@ -1,17 +1,17 @@
 /*
- * OTWebUI:
+ * CMWebUI:
  *    Implements the WebUI additions for CurrencyMon
  *
  */
 
-#ifndef OTWebUI_h
-#define OTWebUI_h
+#ifndef CMWebUI_h
+#define CMWebUI_h
 
 #include <WebUI.h>
 
-namespace OTWebUI {
+namespace CMWebUI {
   // ----- Setup functions
   void init();
 }
 
-#endif  // OTWebUI_h
+#endif  // CMWebUI_h

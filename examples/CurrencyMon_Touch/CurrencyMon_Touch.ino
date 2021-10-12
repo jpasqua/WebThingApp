@@ -1,6 +1,6 @@
 /*
  * CurrencyMon:
- *    A monitor for a Green Mountain Grills BBQ 
+ *    A monitor for a Currency Exchange Rates 
  *
  * NOTES:
  * o This is just boilerplate that initializes the app from the setup() function
@@ -11,7 +11,7 @@
  */
 
 // CUSTOM: Define the name of your main class here. Don't change anything else
-#define MainClassName OLEDTestApp
+#define MainClassName CurrencyMonApp
 
 #define str(s) #s
 #define HEADER(c)  str(c.h)

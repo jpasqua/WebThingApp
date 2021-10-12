@@ -5,8 +5,9 @@
 #include <TimeLib.h>
 //                                  WebThingApp
 #include <gui/Display.h>
+#include <gui/Theme.h>
 //                                  Local Includes
-#include "../../OLEDTestApp.h"
+#include "../../CurrencyMonApp.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -16,7 +17,7 @@ static constexpr auto CL_Font = Display.FontID::S10;
 static constexpr uint16_t CL_FontHeight = 13;
 static constexpr uint16_t CL_XOrigin = 1;
 static constexpr uint16_t CL_YOrigin = 51;
-static constexpr uint16_t CL_Width = 42;
+static constexpr uint16_t CL_Width = 43;
 static constexpr uint16_t CL_Height = CL_FontHeight;
 static constexpr uint16_t CL_BorderSize = 1;
 
@@ -34,7 +35,7 @@ HomeScreen::HomeScreen() {
   labels = new Label[NCurrencyLabels];
   for (int i = 0; i < NCurrencyLabels; i++) {
     labels[i].init(x, CL_YOrigin, CL_Width, CL_Height, i);
-    x += CL_Width;
+    x += CL_Width - CL_BorderSize;  // Make the borders overlap
   }
 }
 
@@ -82,12 +83,12 @@ void HomeScreen::drawCurrencyNames() {
   Display.oled->setTextAlignment(TEXT_ALIGN_CENTER);
   Display.oled->setColor(Theme::Color_NormalText);
   for (int i = 0; i < NCurrencyLabels; i++) {
-    String label = otSettings->currencies[i].nickname;
+    String label = cmSettings->currencies[i].nickname;
 
-    if (otApp->currencies[i].inactive()) {
+    if (cmApp->currencies[i].inactive()) {
       label = "Unused";
     } else {
-      if (label.isEmpty()) label = otSettings->currencies[i].id;
+      if (label.isEmpty()) label = cmSettings->currencies[i].id;
     }
 
     Display.oled->setColor(Theme::Color_NormalText);
@@ -100,8 +101,8 @@ void HomeScreen::drawCurrencyNames() {
 void HomeScreen::drawCurrencies() {
   for (int i = 0; i < NCurrencyLabels; i++) {
     String value = "N/A";
-    if (otApp->currencies[i].active())
-      value = String(otApp->currencies[i].exchangeRate, 2);
+    if (cmApp->currencies[i].active())
+      value = String(cmApp->currencies[i].exchangeRate, 2);
 
     labels[i].drawSimple(
       value, CL_Font, CL_BorderSize, Theme::Color_NormalText, Theme::Color_Border, Theme::Color_Background);

@@ -19,6 +19,8 @@
 // HWConfig files with other types of display, or no display
 //
 
+// SECTION 0: Generic definitions
+#define UNUSED_PIN 255
 
 // SECTION 1: Select the general class of Display Device we're using.
 // The available types are defined in DeviceTypes.h
@@ -39,10 +41,10 @@
 #define Config_ESP32WithOLED 5
 
 // SECTION 4: [CUSTOMIZE] Choose a specific configuration
-#define SelectedConfig Config_ESP32WithOLED
+#define SelectedConfig Config_D1Mini
 
 // SECTION 5: The definitions of the available configurations
-// Add new
+// Add new configs below if you add an option
 #if (SelectedConfig == Config_D1Mini)
   // ----- Config Info for D1Mini with 1.4" SH1106 display
 
@@ -71,7 +73,7 @@
 
   // ----- Buttons
   constexpr uint8_t physicalButtons[] = { 13 };
-  constexpr uint8_t syntheticGrounds[] = { -1 };
+  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
 
 #elif (SelectedConfig == Config_ESP32WithOLED)
   //----- Config Info for ESP32 with embedded 0.96" OLED
@@ -85,11 +87,8 @@
   constexpr uint8_t DISPLAY_I2C_ADDRESS = 0x3c;
   
   // ----- Buttons
-  constexpr uint8_t buttonArray[] = { 13 };
-  constexpr const uint8_t* physicalButtons = &buttonArray[0];
-  constexpr uint8_t nPhysicalButtons = ARRAY_SIZE(buttonArray);
-  constexpr uint8_t* syntheticGrounds = nullptr;
-  constexpr uint8_t nSyntheticGrounds = 0;
+  constexpr uint8_t physicalButtons[] = { 13 };
+  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
 
 #elif (SelectedConfig == Config_EmbeddedOLED)
   // ----- Config Info for Wemos board with embedded 0.96" OLED
@@ -104,7 +103,7 @@
 
   // ----- Buttons
   constexpr uint8_t physicalButtons[] = { D3 };
-  constexpr uint8_t syntheticGrounds[] = { -1 };
+  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
 
 #elif (SelectedConfig ==  Config_Custom)
   /*------------------------------------------------------------------------------
@@ -124,7 +123,7 @@
 
   // ----- Buttons
   constexpr int8_t physicalButtons[] = { D3 };
-  constexpr int8_t syntheticGrounds[] = { -1 };
+  constexpr int8_t syntheticGrounds[] = { UNUSED_PIN };
 #else
     #error "Please set SelectedConfig"
 #endif
@@ -148,8 +147,8 @@ public:
 constexpr HWConfig hwConfig {
   { SCL_PIN, SDA_PIN },
   { DISPLAY_DRIVER, SCL_PIN, SDA_PIN, DISPLAY_I2C_ADDRESS },
-  physicalButtons, nPhysicalButtons,  
-  syntheticGrounds, nSyntheticGrounds 
+  physicalButtons, ARRAY_SIZE(physicalButtons),  
+  syntheticGrounds, ARRAY_SIZE(syntheticGrounds) 
 };
 
 #endif  // HWConfig_h

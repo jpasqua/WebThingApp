@@ -1,5 +1,5 @@
 /*
- * OTWebUI:
+ * CMWebUI:
  *    Implements a simple WebUI that displays and updates settings
  *
  */
@@ -15,21 +15,21 @@
 #include <WebUIHelper.h>
 #include <gui/Display.h>
 //                                  Local Includes
-#include "OLEDTestApp.h"
-#include "OTWebUI.h"
+#include "CurrencyMonApp.h"
+#include "CMWebUI.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-// ----- BEGIN: OTWebUI namespace
-namespace OTWebUI {
+// ----- BEGIN: CMWebUI namespace
+namespace CMWebUI {
 
   namespace Internal {
     const __FlashStringHelper* APP_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/presentCurrencyConfig'>"
       "<i class='fa fa-cog'></i> Set Currencies</a>");
-  } // ----- END: OTWebUI::Internal
+  } // ----- END: CMWebUI::Internal
 
-  // ----- BEGIN: OTWebUI::Pages
+  // ----- BEGIN: CMWebUI::Pages
   namespace Pages {
     void currencyPage() {
       auto mapper =[](const String& key, String& val) -> void {
@@ -37,31 +37,31 @@ namespace OTWebUI {
           // "key" is of the form: _CN_subkey, where N is a digit
           int i = (key.charAt(2) - '0');
           const char* subkey = &(key.c_str()[4]);
-          if (strcmp(subkey, "ID") == 0) val = otSettings->currencies[i].id;
-          else if (strcmp(subkey, "NICK") == 0) val = otSettings->currencies[i].nickname;
+          if (strcmp(subkey, "ID") == 0) val = cmSettings->currencies[i].id;
+          else if (strcmp(subkey, "NICK") == 0) val = cmSettings->currencies[i].nickname;
         }
-        else if (key.equals(F("RFRSH"))) val.concat(otSettings->refreshInterval);
-        else if (key.equals(F("ER_KEY"))) val = otSettings->rateApiKey;
+        else if (key.equals(F("RFRSH"))) val.concat(cmSettings->refreshInterval);
+        else if (key.equals(F("ER_KEY"))) val = cmSettings->rateApiKey;
       };
 
       WebUI::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
     }
-  } // ----- END: OTWebUI::Pages
+  } // ----- END: CMWebUI::Pages
 
 
-  // ----- BEGIN: OTWebUI::Endpoints
+  // ----- BEGIN: CMWebUI::Endpoints
   namespace Endpoints {
     void updateCurrencyConfig() {
       auto action = []() {
-        for (int i = 0; i < OTSettings::MaxCurrencies; i++) {
+        for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
           String prefix = "_c" + String(i) + "_";
-          otSettings->currencies[i].id = WebUI::arg(prefix + "id");
-          otSettings->currencies[i].nickname = WebUI::arg(prefix + "nick");
+          cmSettings->currencies[i].id = WebUI::arg(prefix + "id");
+          cmSettings->currencies[i].nickname = WebUI::arg(prefix + "nick");
         }
 
         uint32_t refreshInHours = WebUI::arg(F("refreshInterval")).toInt();
-        otSettings->refreshInterval = max<uint32_t>(refreshInHours, OTSettings::MinRefreshInterval);
-        otSettings->rateApiKey = WebUI::arg("erKey");
+        cmSettings->refreshInterval = max<uint32_t>(refreshInHours, CMSettings::MinRefreshInterval);
+        cmSettings->rateApiKey = WebUI::arg("erKey");
 
         wtApp->settings->write();
 
@@ -72,7 +72,7 @@ namespace OTWebUI {
 
       WebUI::wrapWebAction("/updateCurrencyConfig", action);
     }
-  }   // ----- END: OTWebUI::Endpoints
+  }   // ----- END: CMWebUI::Endpoints
 
 
   void init() {
@@ -84,4 +84,4 @@ namespace OTWebUI {
   }
 
 }
-// ----- END: OTWebUI
+// ----- END: CMWebUI

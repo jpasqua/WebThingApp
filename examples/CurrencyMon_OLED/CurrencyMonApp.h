@@ -1,15 +1,15 @@
 /*
- * OLEDTestApp:
+ * CurrencyMonApp:
  *    This is the core of the MultiMon functionality. It is invoked
  *    by the primary sketch ".ino" file.
  *
  * NOTES:
- * o OLEDTestApp is derived from WTAppImpl, which is itself derived
+ * o CurrencyMonApp is derived from WTAppImpl, which is itself derived
  *   from WTApp.
  * o This is a singleton and is made available to the whole app via
  *   an extern declaration in WTApp.h:
  *       WTApp* wtApp;
- * o This must be cast back to OLEDTestApp* in order to get to app-specific
+ * o This must be cast back to CurrencyMonApp* in order to get to app-specific
  *   data and functions. Technically this should be a dynamic_cast, but for
  *   efficiency, we perform a "C-style" cast.
  * o Macros are provided to easily get the app and settings in their
@@ -21,8 +21,8 @@
  */
 
 
-#ifndef OLEDTestApp_h
-#define OLEDTestApp_h
+#ifndef CurrencyMonApp_h
+#define CurrencyMonApp_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -31,7 +31,7 @@
 #include <WTAppImpl.h>
 #include <screens/touch/EnterNumberScreen.h>
 //                                  Local Includes
-#include "OTSettings.h"
+#include "CMSettings.h"
 #include "src/screens/SplashScreen.h"
 #include "src/screens/HomeScreen.h"
 #include "src/clients/RateClient.h"
@@ -39,13 +39,13 @@
 
 
 // A few convenience macros:
-// otApp simply yields the wtApp singleton cast as a OLEDTestApp*
-// otSettings yields the settings object from wtApp, cast as a OTSettings*
-#define otApp ((OLEDTestApp*)wtApp)
-#define otSettings ((OTSettings*)otApp->settings)
+// cmApp simply yields the wtApp singleton cast as a CurrencyMonApp*
+// cmSettings yields the settings object from wtApp, cast as a CMSettings*
+#define cmApp ((CurrencyMonApp*)wtApp)
+#define cmSettings ((CMSettings*)cmApp->settings)
 
 
-class OLEDTestApp : public WTAppImpl {
+class CurrencyMonApp : public WTAppImpl {
 public:
 
   static void create();
@@ -56,7 +56,7 @@ public:
 
   // CUSTOM: Data defined by this app which is available to the whole app
   RateClient* rateClient;
-  Currency currencies[OTSettings::MaxCurrencies];
+  Currency currencies[CMSettings::MaxCurrencies];
 
   // ----- Functions that *must* be provided by subclasses
   virtual void app_registerDataSuppliers() override;
@@ -70,8 +70,8 @@ public:
   virtual void app_registerButtons() override;
 
   // ----- Public functions
-  OLEDTestApp(OTSettings* settings);
+  CurrencyMonApp(CMSettings* settings);
 
 };
 
-#endif	// OLEDTestApp_h
+#endif	// CurrencyMonApp_h

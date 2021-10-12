@@ -1,5 +1,5 @@
 /*
- * OLEDTestApp:
+ * CurrencyMonApp:
  *    A simple example of a WebThingApp that display times and currency
  *    exchange rates.
  *
@@ -27,10 +27,10 @@
 #include <plugins/common/CryptoPlugin.h>
 //                                  Local Includes
 #include "src/hardware/HWConfig.h"
-#include "OLEDTestApp.h"
-#include "OTSettings.h"
-#include "OTWebUI.h"
-#include "OTDataSupplier.h"
+#include "CurrencyMonApp.h"
+#include "CMSettings.h"
+#include "CMWebUI.h"
+#include "CMDataSupplier.h"
 #include "src/screens/AppTheme.h"
 //--------------- End:    Includes ---------------------------------------------
 
@@ -43,8 +43,8 @@
 
 // CUSTOM: Update these strings for your app:
 static const char* VersionString = "0.0.5";
-static const char* AppName = "OLEDTest";
-static const char* AppPrefix = "OT-";
+static const char* AppName = "CurrencyMon";
+static const char* AppPrefix = "CM-";
 
 
 /*------------------------------------------------------------------------------
@@ -69,13 +69,13 @@ Plugin* pluginFactory(const String& type) {
 
 /*------------------------------------------------------------------------------
  *
- * Class function to create and start the OLEDTestApp singleton
+ * Class function to create and start the CurrencyMonApp singleton
  *
  *----------------------------------------------------------------------------*/
 
-static OTSettings theSettings;  // Allocate storage for the app settings
+static CMSettings theSettings;  // Allocate storage for the app settings
 
-void OLEDTestApp::create() {
+void CurrencyMonApp::create() {
   // CUSTOM: Perform any low level initialization that may be required, this
   // is often related to initializing hardware
   
@@ -85,13 +85,15 @@ void OLEDTestApp::create() {
   // Initialize the synthetic grounds
   for (int i = 0; i < hwConfig.nSyntheticGrounds; i++) {
     uint8_t pin = hwConfig.syntheticGrounds[i];
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
+    if (pin != UNUSED_PIN) {
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);      
+    }
   }
 
   // BOILERPLATE
   PluginMgr::setFactory(pluginFactory);
-  OLEDTestApp* app = new OLEDTestApp(&theSettings);
+  CurrencyMonApp* app = new CurrencyMonApp(&theSettings);
 
   app->begin();
 }
@@ -99,11 +101,11 @@ void OLEDTestApp::create() {
 
 /*------------------------------------------------------------------------------
  *
- * OLEDTestApp Public Functions
+ * CurrencyMonApp Public Functions
  *
  *----------------------------------------------------------------------------*/
 
-OLEDTestApp::OLEDTestApp(OTSettings* settings) :
+CurrencyMonApp::CurrencyMonApp(CMSettings* settings) :
     WTAppImpl(AppName, AppPrefix, VersionString, settings)
 {
   // CUSTOM: Perform any object initialization here
@@ -117,17 +119,17 @@ OLEDTestApp::OLEDTestApp(OTSettings* settings) :
  *
  *----------------------------------------------------------------------------*/
 
-void OLEDTestApp::app_registerDataSuppliers() {
+void CurrencyMonApp::app_registerDataSuppliers() {
   // BOILERPLATE
-  DataBroker::registerMapper(OTDataSupplier::dataSupplier, OTDataSupplier::ERPrefix);
+  DataBroker::registerMapper(CMDataSupplier::dataSupplier, CMDataSupplier::ERPrefix);
 }
 
-void OLEDTestApp::app_initWebUI() {
+void CurrencyMonApp::app_initWebUI() {
   // BOILERPLATE
-  OTWebUI::init();
+  CMWebUI::init();
 }
 
-void OLEDTestApp::app_loop() {
+void CurrencyMonApp::app_loop() {
   // CUSTOM: Perform any app-specific periodic activity
   // Note that app_conditionalUpdate() is called for you automatically on a
   // periodic basis, so no need to do that here.
@@ -135,24 +137,24 @@ void OLEDTestApp::app_loop() {
   // In this case, nothing app-specific is required
 }
 
-void OLEDTestApp::app_initClients() {
+void CurrencyMonApp::app_initClients() {
   // CUSTOM: If your app has any app-specific clients, initilize them now
   // In this example, we have one: RateClient
 
   ScreenMgr.showActivityIcon(AppTheme::Color_UpdatingRates);
 
-  for (int i = 0; i < OTSettings::MaxCurrencies; i++) {
-    currencies[i].id = otSettings->currencies[i].id;
+  for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
+    currencies[i].id = cmSettings->currencies[i].id;
     currencies[i].exchangeRate = 1.0;
   }
 
   rateClient = new RateClient(
-      otSettings->rateApiKey, &(currencies[0]), OTSettings::MaxCurrencies);
+      cmSettings->rateApiKey, &(currencies[0]), CMSettings::MaxCurrencies);
 
   ScreenMgr.hideActivityIcon();
 }
 
-void OLEDTestApp::app_conditionalUpdate(bool force) {
+void CurrencyMonApp::app_conditionalUpdate(bool force) {
   // CUSTOM: Update any app-specific clients
 
   static uint32_t nextTimeForStatus = 0;
@@ -162,11 +164,11 @@ void OLEDTestApp::app_conditionalUpdate(bool force) {
     rateClient->updateRates();
 
     ScreenMgr.hideActivityIcon();
-    nextTimeForStatus = millis() + otSettings->refreshInterval * 60 * 60 * 1000L;
+    nextTimeForStatus = millis() + cmSettings->refreshInterval * 60 * 60 * 1000L;
   }      
 }
 
-Screen* OLEDTestApp::app_registerScreens() {
+Screen* CurrencyMonApp::app_registerScreens() {
   // CUSTOM: Register any app-specific Screen objects
 
   splashScreen = new SplashScreen();
@@ -186,10 +188,10 @@ Screen* OLEDTestApp::app_registerScreens() {
  *
  *----------------------------------------------------------------------------*/
 
-void OLEDTestApp::app_registerButtons() {
+void CurrencyMonApp::app_registerButtons() {
   // CUSTOM: Register any physical buttons that are connected
   for (int i = 0; i < hwConfig.nPhysicalButtons; i++) {
     uint8_t pin = hwConfig.physicalButtons[i];
-    WebThing::buttonMgr.addButton(pin);
+    if (pin != UNUSED_PIN) WebThing::buttonMgr.addButton(pin);
   }
 }

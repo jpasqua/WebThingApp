@@ -1,6 +1,6 @@
 /*
  * CurrencyMon:
- *    A monitor for a Green Mountain Grills BBQ 
+ *    A monitor for a Currency Exchange Rates 
  *
  * NOTES:
  * o This is just boilerplate that initializes the app from the setup() function

@@ -1,5 +1,5 @@
 /*
- * OTDataSupplier:
+ * CMDataSupplier:
  *    Supplies app-specific data to the WebThing DataBroker
  *
  */
@@ -9,12 +9,12 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  Local Includes
-#include "OLEDTestApp.h"
-#include "OTDataSupplier.h"
+#include "CurrencyMonApp.h"
+#include "CMDataSupplier.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-namespace OTDataSupplier {
+namespace CMDataSupplier {
 
   // CUSTOM: If your app has a custom data source, publish that data to
   // plugins by implementing a data supplier that maps keys to values.
@@ -25,11 +25,11 @@ namespace OTDataSupplier {
     // of the Nth currency
     if (isDigit(key[0]) && key[1] == '.') {
       int index = (key[0] - '0') - 1;
-      if (index >= OTSettings::MaxCurrencies) return;
+      if (index >= CMSettings::MaxCurrencies) return;
       String subkey = key.substring(2);
-      if (subkey.equals("rate")) value += otApp->currencies[index].exchangeRate;
-      else if (subkey.equals("id")) value += otApp->currencies[index].id;
-      else if (subkey.equals("nick")) value += otSettings->currencies[index].nickname;
+      if (subkey.equals("rate")) value += cmApp->currencies[index].exchangeRate;
+      else if (subkey.equals("id")) value += cmApp->currencies[index].id;
+      else if (subkey.equals("nick")) value += cmSettings->currencies[index].nickname;
     }
   }
 

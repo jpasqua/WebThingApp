@@ -1,5 +1,5 @@
 /*
- * OTDataSupplier:
+ * CMDataSupplier:
  *    Supplies app-specific data to the WebThing DataBroker
  *
  * NOTES:
@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef OTDataSupplier_h
-#define OTDataSupplier_h
+#ifndef CMDataSupplier_h
+#define CMDataSupplier_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -26,11 +26,11 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-namespace OTDataSupplier {
+namespace CMDataSupplier {
   // CUSTOM: Choose a single character prefix to use for this data source
   constexpr char ERPrefix = 'R';
   
   extern void dataSupplier(const String& key, String& value);
 }
 
-#endif  // OTDataSupplier_h
+#endif  // CMDataSupplier_h

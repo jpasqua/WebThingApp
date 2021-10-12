@@ -1,5 +1,5 @@
 /*
- * OTSettings
+ * CMSettings
  *    Setting for the OTCurrencyApp.
  *
  */
@@ -12,22 +12,22 @@
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
 //                                  Local Includes
-#include "OLEDTestApp.h"
-#include "OTSettings.h"
+#include "CurrencyMonApp.h"
+#include "CMSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-OTSettings::OTSettings() {
+CMSettings::CMSettings() {
   maxFileSize = 4096;
-  version = OTSettings::CurrentVersion;
+  version = CMSettings::CurrentVersion;
   rateApiKey = "";
-  for (uint8_t i = 0; i < OTSettings::MaxCurrencies; i++) {
+  for (uint8_t i = 0; i < CMSettings::MaxCurrencies; i++) {
     currencies[i].id = "";
     currencies[i].nickname = "";
   }
 }
 
-void OTSettings::fromJSON(const JsonDocument &doc) {
+void CMSettings::fromJSON(const JsonDocument &doc) {
   refreshInterval = doc[F("refreshInterval")];
   refreshInterval = max<uint32_t>(refreshInterval, MinRefreshInterval);
 
@@ -38,19 +38,19 @@ void OTSettings::fromJSON(const JsonDocument &doc) {
   for (JsonObjectConst os : osArray) {
     currencies[i].id = os["id"].as<const char*>();
     currencies[i].nickname = os["nickname"].as<const char*>();
-    if (++i == OTSettings::MaxCurrencies) break;
+    if (++i == CMSettings::MaxCurrencies) break;
   }
 
   WTAppSettings::fromJSON(doc);
   logSettings();
 }
 
-void OTSettings::toJSON(JsonDocument &doc) {
+void CMSettings::toJSON(JsonDocument &doc) {
   doc[F("refreshInterval")] = refreshInterval;
   doc["rateApiKey"] = rateApiKey;
 
   JsonArray jsonCurrencies = doc.createNestedArray(F("currencies"));
-  for (int i = 0; i < OTSettings::MaxCurrencies; i++) {
+  for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
     JsonObject jsonCurrency = jsonCurrencies.createNestedObject();
     jsonCurrency["id"] = currencies[i].id;
     jsonCurrency["nickname"] = currencies[i].nickname;
@@ -59,11 +59,11 @@ void OTSettings::toJSON(JsonDocument &doc) {
   WTAppSettings::toJSON(doc);
 }
 
-void OTSettings::logSettings() {
+void CMSettings::logSettings() {
   Log.verbose(F("refreshInterval: %d"), refreshInterval);
   Log.verbose(F("Exchange Rate API Key: %s"), rateApiKey.c_str());
   Log.verbose(F("Currencies"));
-  for (int i = 0; i < OTSettings::MaxCurrencies; i++) {
+  for (int i = 0; i < CMSettings::MaxCurrencies; i++) {
     Log.verbose("  %s(%s)", currencies[i].id.c_str(), currencies[i].nickname.c_str());
   }
 

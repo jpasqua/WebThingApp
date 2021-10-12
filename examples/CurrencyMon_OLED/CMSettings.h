@@ -1,11 +1,11 @@
 /*
- * OTSettings.h
+ * CMSettings.h
  *    Setting for the OTCurrencyApp.
  *
  */
 
-#ifndef OTSettings_h
-#define OTSettings_h
+#ifndef CMSettings_h
+#define CMSettings_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -14,18 +14,18 @@
 //                                  WebThing Includes
 #include <WTAppSettings.h>
 //                                  Local Includes
-#include "OLEDTestApp.h"
+#include "CurrencyMonApp.h"
 #include "src/clients/RateClient.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-class OTSettings: public WTAppSettings {
+class CMSettings: public WTAppSettings {
 public:
   static constexpr uint8_t MaxCurrencies = 3;
   static constexpr uint8_t MinRefreshInterval = 4;
 
   // ----- Constructors and methods
-  OTSettings();
+  CMSettings();
   void fromJSON(const JsonDocument &doc) override;
   void toJSON(JsonDocument &doc);
   void logSettings();
@@ -42,4 +42,4 @@ private:
   // ----- Constants -----
   static constexpr uint32_t CurrentVersion = 0x0001;
 };
-#endif // OTSettings_h
+#endif // CMSettings_h
