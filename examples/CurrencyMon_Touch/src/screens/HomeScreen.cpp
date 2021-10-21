@@ -110,12 +110,12 @@ HomeScreen::HomeScreen() {
     if (type > PressType::Normal) {
       String subheading = "Heap: Free/Frag = ";
       String subcontent = String(ESP.getFreeHeap()) + ", " + String(GenericESP::getHeapFragmentation()) + "%"; 
-      wtAppImpl->utilityScreen->setSub(subheading, subcontent);
-      ScreenMgr.display(wtAppImpl->utilityScreen);
+      wtAppImpl->screens.utilityScreen->setSub(subheading, subcontent);
+      ScreenMgr.display(wtAppImpl->screens.utilityScreen);
     } else if (id == ClockAreaIndex || id == AdvanceButton) {
       cmApp->pluginMgr.displayPlugin(0);
     } else if (id == WeatherAreaIndex) {
-      ScreenMgr.display("Weather"); 
+      ScreenMgr.display(wtAppImpl->screens.weatherScreen); 
     } else if ((id >= Currency1Button) && (id <= Currency3Button)) {
       // This   ^^^^^^^^^^^^^^^^^^^^^ comparison can cause a warning since id is
       // an unsigned int (at least 0) and Currency1Button == 0. Leave the test in place

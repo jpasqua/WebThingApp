@@ -67,7 +67,7 @@ public:
   virtual void app_loop() override;
 
   // ----- Functions that *may* be provided by subclasses
-  virtual void app_registerButtons() override;
+  virtual void app_configureHW() override;
 
   // ----- Public functions
   CurrencyMonApp(CMSettings* settings);

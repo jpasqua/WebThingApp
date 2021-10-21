@@ -46,10 +46,14 @@
 // SECTION 5: The definitions of the available configurations
 // Add new configs below if you add an option
 #if (SelectedConfig == Config_D1Mini)
-  // ----- Config Info for D1Mini with 1.4" SH1106 display
+  /*------------------------------------------------------------------------------
+   *
+   * Config Info for D1Mini with 1.3" SH1106 display
+   *
+   *----------------------------------------------------------------------------*/
 
   // ----- I2C Settings
-  constexpr uint8_t SDA_PIN = D2;
+  constexpr uint8_t SDA_PIN = D3;
   constexpr uint8_t SCL_PIN = D5;
 
   // ----- Display Type
@@ -61,7 +65,11 @@
   constexpr uint8_t syntheticGrounds[] = { D8 };
 
 #elif (SelectedConfig == Config_ESP32Mini)
-  // -----Config Info for ESP32D1Mini with 1.4" SH1106 display
+  /*------------------------------------------------------------------------------
+   *
+   * Config Info for ESP32D1Mini with 1.3" SH1106 display
+   *
+   *----------------------------------------------------------------------------*/
 
   // ----- I2C Settings
   constexpr uint8_t SDA_PIN = 21;
@@ -76,7 +84,11 @@
   constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
 
 #elif (SelectedConfig == Config_ESP32WithOLED)
-  //----- Config Info for ESP32 with embedded 0.96" OLED
+  /*------------------------------------------------------------------------------
+   *
+   * Config Info for ESP32 with embedded 0.96" OLED
+   *
+   *----------------------------------------------------------------------------*/
 
   // ----- I2C Settings
   constexpr uint8_t SDA_PIN = 5;
@@ -91,7 +103,11 @@
   constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
 
 #elif (SelectedConfig == Config_EmbeddedOLED)
-  // ----- Config Info for Wemos board with embedded 0.96" OLED
+  /*------------------------------------------------------------------------------
+   *
+   * Config Info for Wemos board with embedded 0.96" OLED
+   *
+   *----------------------------------------------------------------------------*/
 
   // ----- I2C Settings
   constexpr uint8_t SDA_PIN = D1;
@@ -142,13 +158,17 @@ public:
   const uint8_t  nPhysicalButtons;
   const uint8_t* syntheticGrounds;
   const uint8_t  nSyntheticGrounds;
+
+  const uint8_t advanceButton;
+  const uint8_t previousButton;
 };
 
 constexpr HWConfig hwConfig {
   { SCL_PIN, SDA_PIN },
   { DISPLAY_DRIVER, SCL_PIN, SDA_PIN, DISPLAY_I2C_ADDRESS },
   physicalButtons, ARRAY_SIZE(physicalButtons),  
-  syntheticGrounds, ARRAY_SIZE(syntheticGrounds) 
+  syntheticGrounds, ARRAY_SIZE(syntheticGrounds),
+  physicalButtons[0], UNUSED_PIN
 };
 
 #endif  // HWConfig_h

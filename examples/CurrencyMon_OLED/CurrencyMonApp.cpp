@@ -170,14 +170,30 @@ void CurrencyMonApp::app_conditionalUpdate(bool force) {
 
 Screen* CurrencyMonApp::app_registerScreens() {
   // CUSTOM: Register any app-specific Screen objects
-
   splashScreen = new SplashScreen();
   homeScreen = new HomeScreen();
 
   ScreenMgr.registerScreen("Splash", splashScreen);
   ScreenMgr.registerScreen("Home", homeScreen);
-
   ScreenMgr.setAsHomeScreen(homeScreen);
+
+  // CUSTOM: Associate a confirm/cancel buttons with the reboot screen
+  screens.rebootScreen->setButtons(hwConfig.advanceButton, hwConfig.previousButton);
+
+  // CUSTOM: Add a sequence of screens that the user can cycle through
+  BaseScreenMgr::ScreenSequence* sequence = new BaseScreenMgr::ScreenSequence;
+  sequence->push_back(homeScreen);
+  sequence->push_back(wtAppImpl->screens.weatherScreen);
+  sequence->push_back(wtAppImpl->screens.forecastFirst3);
+  sequence->push_back(wtAppImpl->screens.forecastLast2);
+  // Add any plugins to the sequence
+  uint8_t nPlugins = pluginMgr.getPluginCount();
+  for (int i = 0; i < nPlugins; i++) {
+    Plugin* p = pluginMgr.getPlugin(i);
+    sequence->push_back(p->getFlexScreen());
+  }
+  sequence->push_back(wtAppImpl->screens.infoScreen);
+  ScreenMgr.setSequence(sequence);
 
   return splashScreen;
 }
@@ -188,10 +204,14 @@ Screen* CurrencyMonApp::app_registerScreens() {
  *
  *----------------------------------------------------------------------------*/
 
-void CurrencyMonApp::app_registerButtons() {
+void CurrencyMonApp::app_configureHW() {
   // CUSTOM: Register any physical buttons that are connected
   for (int i = 0; i < hwConfig.nPhysicalButtons; i++) {
     uint8_t pin = hwConfig.physicalButtons[i];
-    if (pin != UNUSED_PIN) WebThing::buttonMgr.addButton(pin);
+    if (pin != UNUSED_PIN) {
+      WebThing::buttonMgr.addButton(pin);
+    }
   }
+
+  ScreenMgr.setSequenceButtons(hwConfig.advanceButton, hwConfig.previousButton);
 }

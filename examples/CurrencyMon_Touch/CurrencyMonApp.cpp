@@ -175,7 +175,7 @@ Screen* CurrencyMonApp::app_registerScreens() {
  *
  *----------------------------------------------------------------------------*/
 
-void CurrencyMonApp::app_registerButtons() {
+void CurrencyMonApp::app_configureHW() {
   // CUSTOM: Register any physical buttons that are connected
   WebThing::buttonMgr.addButton(D2);
 }

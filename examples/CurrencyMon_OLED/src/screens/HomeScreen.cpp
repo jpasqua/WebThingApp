@@ -11,7 +11,7 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-static uint16_t compose(int h, int m) { return(h * 100 + m); }
+static inline uint16_t compose(int h, int m) { return(h * 100 + m); }
 
 static constexpr auto CL_Font = Display.FontID::S10;
 static constexpr uint16_t CL_FontHeight = 13;
@@ -47,6 +47,7 @@ void HomeScreen::display(bool) {
   bool am = true;
   int  m = minute();
   int  h = hour();
+  compositeTime = compose(h, m);
 
   if (h > 12) { h -= 12; am = false; }
   else if (h == 0) { h = 12;}
@@ -66,8 +67,6 @@ void HomeScreen::display(bool) {
   drawCurrencyNames();
 
   oled->display();
-
-  compositeTime = compose(h, m);
 }
 
 void HomeScreen::processPeriodicActivity() {
