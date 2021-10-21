@@ -9,6 +9,7 @@
 //                                  Third Party Libraries
 //                                  WebThing Includes
 #include <GenericESP.h>
+#include <Output.h>
 #include <WebThing.h>
 #include <WebUI.h>
 #include <DataBroker.h>
@@ -31,7 +32,7 @@ constexpr const char* SettingsFileName = "/settings.json";
 // ----- Utility functions for the rest of the app
 
 void WTAppImpl::askToReboot() {
-  ScreenMgr.display(rebootScreen);
+  ScreenMgr.display(screens.rebootScreen);
 }
 
 void WTAppImpl::saveSettings() {
@@ -68,23 +69,27 @@ void WTAppImpl::begin() {
   settings->init(SettingsFileName);
   settings->read();
   settings->logSettings();
+  Output::setOptions(&(settings->uiOptions.useMetric), &(settings->uiOptions.use24Hour));
 
+  app_configureHW();
+
+  pluginMgr.loadAll("/plugins");
   DataBroker::registerMapper( ([this](const String& key, String& value){ weatherDataSupplier(key, value); }), 'W' );
   app_registerDataSuppliers();
 
   ScreenMgr.setup(&settings->uiOptions, &settings->displayOptions);
-  registerScreens();
-  ScreenMgr.display(wifiScreen);
+  screens.registerScreens();
+  screens.splashScreen = app_registerScreens();
+
+  ScreenMgr.display(screens.wifiScreen);
 
   prepWebThing();
   app_initWebUI();
 
-  if (splashScreen) ScreenMgr.display(splashScreen);
+  if (screens.splashScreen) ScreenMgr.display(screens.splashScreen);
 
   app_initClients();
   prepWeather();
-
-  pluginMgr.loadAll("/plugins");
 
   conditionalUpdate(true);
 
@@ -144,17 +149,17 @@ void WTAppImpl::prepWeather() {
   if (settings->owmOptions.enabled) {
     if (settings->owmOptions.key.isEmpty()) { settings->owmOptions.enabled = false; }
     else {
-      if (owmClient != NULL) { /* TO DO: Do any necessary cleanup */ }
+      if (owmClient != nullptr) { /* TO DO: Do any necessary cleanup */ }
       owmClient = new OWMClient(
         settings->owmOptions.key, settings->owmOptions.cityID, settings->uiOptions.useMetric, settings->owmOptions.language);
     }
   } else {
-    owmClient = NULL;
+    owmClient = nullptr;
   }
 }
 
 void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
-  if (owmClient == NULL) return;
+  if (owmClient == nullptr) return;
   if (key.equalsIgnoreCase("temp")) value +=  owmClient->weather.readings.temp;
   else if (key.equalsIgnoreCase("desc")) value += owmClient->weather.description.basic;
   else if (key.equalsIgnoreCase("ldesc")) value += owmClient->weather.description.longer;
@@ -180,8 +185,8 @@ void WTAppImpl::baseConfigChange() {
 }
 
 void WTAppImpl::configModeCallback(const String &ssid, const String&) {
-  configScreen->setSSID(ssid);
-  ScreenMgr.display(configScreen);
+  screens.configScreen->setSSID(ssid);
+  ScreenMgr.display(screens.configScreen);
 }
 
 void WTAppImpl::prepWebThing() {
@@ -202,54 +207,3 @@ void WTAppImpl::prepWebThing() {
   setTitle();
 }
 
-
-/*------------------------------------------------------------------------------
- *
- * Private Functions
- *
- *----------------------------------------------------------------------------*/
-
-void WTAppImpl::registerScreens() {
-  // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
-
-#if DEVICE_TYPE == DEVICE_TYPE_TOUCH
-// ----------------------------------
-  calibrationScreen = new CalibrationScreen();
-  ScreenMgr.registerScreen("Calibration", calibrationScreen);
-
-  configScreen = new ConfigScreen();
-  ScreenMgr.registerScreen("Config", configScreen);
-
-  forecastScreen = new ForecastScreen();
-  ScreenMgr.registerScreen("Forecast", forecastScreen);
-
-  rebootScreen = new RebootScreen();
-  ScreenMgr.registerScreen("Reboot", rebootScreen);
-
-  weatherScreen = new WeatherScreen();
-  ScreenMgr.registerScreen("Weather", weatherScreen);
-
-  wifiScreen = new WiFiScreen();
-  ScreenMgr.registerScreen("WiFi", wifiScreen);
-
-  utilityScreen = new UtilityScreen();
-  ScreenMgr.registerScreen("Utility", utilityScreen);
-
-// ----------------------------------
-#elif DEVICE_TYPE == DEVICE_TYPE_OLED
-  configScreen = new ConfigScreen();
-  ScreenMgr.registerScreen("Config", configScreen);
-
-  infoScreen = new InfoScreen();
-  ScreenMgr.registerScreen("Info", infoScreen);
-
-  rebootScreen = new RebootScreen();
-  ScreenMgr.registerScreen("Reboot", rebootScreen);
-
-  wifiScreen = new WiFiScreen();
-  ScreenMgr.registerScreen("WiFi", wifiScreen);
-  
-#endif
-
-  splashScreen = app_registerScreens();
-}

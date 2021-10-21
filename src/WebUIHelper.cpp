@@ -38,16 +38,6 @@ namespace WebUIHelper {
       "<i class='fa fa-thermometer-three-quarters'></i> Configure Weather</a>"
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
       "<i class='fa fa-plug'></i> Configure Plugins</a>");
-
-    constexpr WebUI::Dev::Action ExtraDevButtons[] {
-      {"Take a screen shot", "/dev/screenShot", nullptr, nullptr}
-    };
-    constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
-
-    void showBusyStatus(bool busy) {
-      if (busy) ScreenMgr.showActivityIcon(Theme::Color_WebRequest, UpdatingSymbol);
-      else ScreenMgr.hideActivityIcon();
-    }
   }
 
   // ----- END: WebUIHelper::Internal
@@ -283,14 +273,19 @@ namespace WebUIHelper {
     }
   }   // ----- END: WebUIHelper::Pages
 
+  void showBusyStatus(bool busy) {
+    if (busy) ScreenMgr.showActivityIcon(Theme::Color_WebRequest, UpdatingSymbol);
+    else ScreenMgr.hideActivityIcon();
+  }
 
   void init(const __FlashStringHelper* appMenuItems) {
-    WebUI::registerBusyCallback(Internal::showBusyStatus);
+    WebUI::registerBusyCallback(showBusyStatus);
 
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
     WebUI::Dev::init(&wtApp->settings->uiOptions.showDevMenu, wtApp->settings);
-    WebUI::Dev::addButtons(Internal::ExtraDevButtons, Internal::NumExtraDevButtons);
+
+    WebUI::Dev::addButton({"Take a screen shot", "/dev/screenShot", nullptr, nullptr});
 
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
