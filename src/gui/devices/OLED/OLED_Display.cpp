@@ -16,8 +16,11 @@
 //                                  WebThing Includes
 //                                  Local Includes
 #include "../../Display.h"
-#include "fonts/OLED_Sans5.h"
+#include "fonts/OLED_Mono5x7.h"
+#include "fonts/OLED_Sans_Bold_12.h"
 #include "fonts/OLED_DSEG7_Classic_Bold_32.h"
+#include "fonts/OLED_DSEG7_Classic_Bold_16.h"
+#include "fonts/OLED_WeatherFonts.h"
 //--------------- End:    Includes ---------------------------------------------
 
 inline OLEDDISPLAY_COLOR mono(uint16_t color) {
@@ -185,11 +188,15 @@ static constexpr struct  {
     const uint8_t *font;
   } FontList[] = {
     // ORDER MUST MATCH Display.FontID enum
-    {"S5",    SansSerif_plain_5},
+    {"M5",    Mono_5x7},
     {"S10",   ArialMT_Plain_10},
+    {"SB12",  SansSerif_Bold_12},
     {"S16",   ArialMT_Plain_16},
     {"S24",   ArialMT_Plain_24},
+    {"D16",   DSEG7_Classic_Bold_16},
     {"D32",   DSEG7_Classic_Bold_32},
+    {"W21",   Meteocons_Plain_21},
+    {"W36",   Meteocons_Plain_36}
   };
 static constexpr uint8_t nFronts = ARRAY_SIZE(FontList);
 

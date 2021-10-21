@@ -76,7 +76,7 @@ UtilityScreen::UtilityScreen() {
     }
 
     if (id == RefreshLabel) { wtAppImpl->updateAllData(); return;} 
-    if (id == CalLabel) { ScreenMgr.display(wtAppImpl->calibrationScreen); return; }
+    if (id == CalLabel) { ScreenMgr.display(wtAppImpl->screens.calibrationScreen); return; }
     if (id == HomeLabel) { ScreenMgr.displayHomeScreen(); return; }
   };
 

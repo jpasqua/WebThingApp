@@ -20,11 +20,15 @@
 class RebootScreen : public Screen {
 public:
   RebootScreen();
-  void display(bool activating = false);
-  virtual void processPeriodicActivity();
+  virtual void display(bool activating = false) override;
+  virtual void processPeriodicActivity() override;
+
+  void setButtons(uint8_t confirmPin, uint8_t cancelPin = 255);
 
 private:
   uint32_t autoCancelTime = UINT32_MAX;
+  WTButton::Mapping confirmCancelMappings[2];
+
 };
 
 #endif // RebootScreen_h

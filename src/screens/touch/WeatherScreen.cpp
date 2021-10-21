@@ -68,7 +68,7 @@ WeatherScreen::WeatherScreen() {
   buttonHandler =[](int id, PressType type) -> void {
     Log.verbose(F("In WeatherScreen Label Handler, id = %d, type = %d"), id, type);
     if (type > PressType::Normal) ScreenMgr.displayHomeScreen();
-    else ScreenMgr.display(wtAppImpl->forecastScreen);
+    else ScreenMgr.display(wtAppImpl->screens.forecastScreen);
   };
 
   nLabels = 1;

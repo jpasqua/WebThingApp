@@ -6,24 +6,8 @@
 #ifndef BaseLabel_h
 #define BaseLabel_h
 
-#if defined(ESP32)
-  #include <functional>
-#endif
-
-class Region {
-public:
-  inline bool contains(uint16_t tx, uint16_t ty) {
-    return ((tx >= x) && (tx < x+w) && (ty >= y) && (ty < y+h));
-  }
-
-  inline uint16_t bottom() { return (y + h); }
-  inline uint16_t left() { return (x + w); }
-
-  uint16_t x;
-  uint16_t y;
-  uint16_t w;
-  uint16_t h;
-};
+#include <functional>
+#include "Region.h"
 
 class BaseLabel {
 public:
@@ -71,10 +55,10 @@ public:
   // @param pct         The progess to be reflected in the bar (0.0-1.0).
   // @param label       The text to be displayed. It is the callers responsibility to ensure
   //                    it will fit within the bounds of the button. It will be drawn middle center.
-  //                    If BaseLabel is equal to showPct, then the pct will be drawn rather than the BaseLabel
+  //                    If label is equal to showPct, then the pct will be drawn rather than label
   // @param font        The font that will be used to draw the BaseLabel
   // @param borderSize  The size in pixels of the border
-  // @param labelColor  The color to be used to draw the BaseLabel
+  // @param labelColor  The color to be used to draw the label
   // @param borderColor The color to be used to draw the border
   // @param barColor    The color to be used to draw the progress bar
   // @param bgColor     The color to be used for the unfilled part of the progress bar

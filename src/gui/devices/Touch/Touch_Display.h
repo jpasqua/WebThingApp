@@ -48,14 +48,13 @@ public:
   Touch_Display() = default;
   ~Touch_Display() = default;
 
-  // ----- Member Functions
-  virtual void device_begin() override;
-  virtual void setBrightness(uint8_t b) override;
+  // ----- Initialization -----
   virtual void setDeviceOptions(const DisplayDeviceOptions* options) override;
-  virtual void streamScreenShotAsBMP(Stream &s) override;
-  virtual void setFont(uint8_t fontID) override;
-  virtual int8_t fontIDFromName(String fontName) const override;
-  virtual uint8_t getFontHeight(uint8_t fontID) const override;
+
+  // ----- Brightness control -----
+  virtual void setBrightness(uint8_t b) override;
+
+  // ----- Drawing functions -----
   virtual void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) override;
   virtual void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) override;
   virtual void drawStringInRegion(
@@ -63,7 +62,15 @@ public:
     uint16_t x, uint16_t y, uint16_t w, uint16_t h,
     uint16_t xOff, uint16_t yOff, 
     uint16_t fg, uint16_t bg) override;
+  virtual void setFont(uint8_t fontID) override;
+  virtual int8_t fontIDFromName(String fontName) const override;
+  virtual uint8_t getFontHeight(uint8_t fontID) const override;
+  virtual void flush() { };
 
+  // ----- Screenshot functionality
+  virtual void streamScreenShotAsBMP(Stream &s) override;
+
+  // ----- Functions that unique to this device
   void calibrate(CalibrationData* newCalibrationData);
   void setSpriteFont(uint8_t fontID) const;
 
@@ -71,6 +78,10 @@ public:
   TFT_eSPI tft;
   TFT_eSprite *sprite;
   const DisplayDeviceOptions* deviceOptions;
+
+
+protected:
+  virtual void device_begin() override;
 };
 
 extern Touch_Display Display;

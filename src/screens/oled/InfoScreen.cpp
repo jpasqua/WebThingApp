@@ -22,31 +22,35 @@ void InfoScreen::display(bool) {
   char fmtBuf[BufSize];
 
   oled->clear();
-  Display.setFont(Display.FontID::S16);
+  Display.setFont(Display.FontID::SB12);
   oled->setTextAlignment(TEXT_ALIGN_CENTER);
-  snprintf(fmtBuf, BufSize, "%s v%s", wtApp->appName.c_str(), wtApp->appVersion.c_str());
-  oled->drawString(Display.XCenter, 5, fmtBuf);
+  snprintf(fmtBuf, BufSize, "%s", wtApp->appName.c_str());
+  oled->drawString(Display.XCenter, 4, fmtBuf);
 
+  Display.setFont(Display.FontID::M5);
+  oled->setTextAlignment(TEXT_ALIGN_CENTER);
+  snprintf(fmtBuf, BufSize, "v%s", wtApp->appVersion.c_str());
+  oled->drawString(Display.XCenter, 21, fmtBuf);
+
+  Display.setFont(Display.FontID::S16);
   snprintf(fmtBuf, BufSize, "%s", WebThing::settings.hostname.c_str());
-  oled->drawString(Display.XCenter, 29, fmtBuf);
+  oled->drawString(Display.XCenter, 34, fmtBuf);
 
+  Display.setFont(Display.FontID::S10);
   snprintf(fmtBuf, BufSize, "%s", WebThing::ipAddrAsString().c_str());
-  oled->drawString(Display.XCenter, 42, fmtBuf);
+  oled->drawString(Display.XCenter, 49, fmtBuf);
 
-  // snprintf(fmtBuf, BufSize, "Something else: %s", someString);
-  // oled->drawString(0, 50, fmtBuf);
-  
-  drawRssi();
+  drawRssi(112, 62);
 
   oled->display();
 }
 
-void InfoScreen::drawRssi() {
+void InfoScreen::drawRssi(uint16_t x, uint16_t y) {
   int8_t quality = WebThing::wifiQualityAsPct();
   for (int8_t i = 0; i < 4; i++) {
     for (int8_t j = 0; j < 3 * (i + 2); j++) {
       if (quality > i * 25 || j == 0) {
-        Display.oled->setPixel(114 + 4 * i, 63 - j);
+        Display.oled->setPixel(x + 4 * i, y - j);
       }
     }
   }

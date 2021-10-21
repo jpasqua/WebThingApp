@@ -9,6 +9,11 @@ public:
   Screen() = default;
   ~Screen() = default;
 
+  virtual void activate() {
+    startOfPress = endOfPress = 0;
+    BaseScreen::activate();
+  }
+
   void processTouch(bool pressed, uint16_t tx, uint16_t ty) {
     if (pressed) {
       if (startOfPress == 0) {
@@ -42,10 +47,6 @@ public:
       }
     }
   }
-
-protected:
-  Label* labels;
-  uint8_t nLabels;
 
 private:
   // ----- Constants

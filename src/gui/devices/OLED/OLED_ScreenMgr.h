@@ -22,56 +22,29 @@ public:
   OLED_ScreenMgr() = default;
   ~OLED_ScreenMgr() = default;
 
-  void device_setup() {
-    Display.begin(_displayOptions);
-    initActivityIcon();
-  }
+  virtual void device_setup() override;
 
-  void device_processInput() {
-    // Nothing to do here...
-  }
+  virtual void device_processInput() override;
   
-  void showActivityIcon(uint16_t accentColor, char symbol = 'i') {
-    if (isDisplayed) return;
+  virtual void showActivityIcon(uint16_t accentColor, char symbol = 'i') override;
 
-    uint16_t AI_X = Display.Width - AI_Size;
-    uint16_t AI_Y = 0;
-
-    uint16_t centerX = AI_X+(AI_Size/2);
-    uint16_t centerY = AI_Y+(AI_Size/2);
-
-    // Draw the border
-    OLEDDISPLAY_COLOR color = accentColor ? OLEDDISPLAY_COLOR::WHITE : OLEDDISPLAY_COLOR::BLACK;
-    Display.oled->setColor(color);
-    Display.oled->fillCircle(centerX, centerY, AI_Size/2-1);
-
-    // Draw the fill
-    Display.oled->setColor(Theme::Color_UpdatingFill);
-    Display.oled->fillCircle(centerX, centerY, (AI_Size/2-1)-AI_BorderSize);
-
-    // Draw the text
-    Display.oled->setColor(Theme::Color_UpdatingText);
-    Display.setFont(Display.FontID::S10);
-    char buf[2]; buf[0] = symbol; buf[1] = '\0';
-    Display.oled->drawString(centerX, centerY + Display.getFontHeight(Display.FontID::S10)/2, buf);
-
-    isDisplayed = true;
-  }
-
-  void hideActivityIcon() {
-    if (!isDisplayed) return;
-    refresh();
-    isDisplayed = false;
-  }
+  virtual void hideActivityIcon() override;
 
 
 private:
   static constexpr uint16_t AI_Size = 16;
   static constexpr uint16_t AI_BorderSize = 2;
+  static constexpr uint16_t PixelsPerByte = 8;
+  static constexpr size_t SavedPixelsSize = (AI_Size * AI_Size)/PixelsPerByte;
+  static constexpr size_t BufferOffsetOfAI = OLED_Display::Width - AI_Size;
+  static constexpr size_t RowSize = SavedPixelsSize/2;
 
-  void initActivityIcon() {  }
+  void initActivityIcon();
+  void saveBits();
+  void restoreBits();
 
-  bool isDisplayed = false;
+  bool aiDisplayed = false;
+  uint8_t savedPixels[SavedPixelsSize];
 };
 
 extern OLED_ScreenMgr ScreenMgr;

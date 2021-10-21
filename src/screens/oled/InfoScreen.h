@@ -1,5 +1,3 @@
-#include "../../gui/devices/DeviceSelect.h"
-#if DEVICE_TYPE == DEVICE_TYPE_OLED
 #ifndef InfoScreen_h
 #define InfoScreen_h
 
@@ -26,8 +24,7 @@ public:
   virtual void processPeriodicActivity() { }
 
 private:
-  void drawRssi();  
+  void drawRssi(uint16_t x, uint16_t y);  
 };
 
 #endif  // InfoScreen_h
-#endif

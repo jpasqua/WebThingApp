@@ -15,11 +15,6 @@ void Touch_ScreenMgr::device_processInput() {
   bool pressed = Display.tft.getTouch(&tx, &ty);
   if (pressed) _lastInteraction = curMillis;
   _curScreen->processTouch(pressed, tx, ty);
-
-  // Test whether we should blank the screen
-  if (_uiOptions->screenBlankMinutes && !isSuspended()) {
-    if (curMillis > _lastInteraction + minutesToMS(_uiOptions->screenBlankMinutes)) suspend();
-  }
 }
 
 void Touch_ScreenMgr::showActivityIcon(uint16_t accentColor, char symbol) {

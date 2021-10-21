@@ -44,6 +44,13 @@ public:
   void displayHomeScreen();
   void refresh();
 
+  // ----- Screen Sequence functions
+  using ScreenSequence = std::vector<Screen*>;
+  void setSequence(const ScreenSequence* sequence) { _sequence = sequence; }
+  void beginSequence();
+  void moveThroughSequence(bool forward);
+  void setSequenceButtons(uint8_t forward, uint8_t backward = 255);
+
   // ----- Plugin-related functions
   FlexScreen* createFlexScreen(
       const JsonDocument &doc,
@@ -86,6 +93,11 @@ protected:
   Screen*   _curScreen;
   Screen*   _homeScreen;
   Screen*   _suspendedScreen = nullptr;
+
+  const ScreenSequence* _sequence = nullptr;
+  uint8_t _curSequenceIndex = 0;
+  uint8_t _forwardButton = 255;   // No pin assigned
+  uint8_t _backwardButton = 255;  // No pin assigned
 
   UIOptions*      _uiOptions;
   DisplayOptions* _displayOptions;

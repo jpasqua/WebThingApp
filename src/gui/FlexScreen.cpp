@@ -27,7 +27,7 @@
  *----------------------------------------------------------------------------*/
 
 inline uint16_t mapColor(String colorSpecifier) {
-  uint32_t hexVal = strtol(colorSpecifier.c_str(), NULL, 16);
+  uint32_t hexVal = strtol(colorSpecifier.c_str(), nullptr, 16);
 
   uint16_t r = (hexVal >> 8) & 0xF800;
   uint16_t g = (hexVal >> 5) & 0x07E0;
@@ -100,7 +100,7 @@ bool FlexScreen::init(
   labels[0].init(0, 0, Display.Width, Display.Height, 0);
   buttonHandler = _buttonDelegate;
 
-  _clock = NULL;
+  _clock = nullptr;
   return fromJSON(screen);
 }
 
@@ -117,7 +117,7 @@ void FlexScreen::display(bool activating) {
 void FlexScreen:: processPeriodicActivity() {
   uint32_t curMillis = millis();
   if (curMillis - lastDisplayTime > _refreshInterval) display(false);
-  else if (_clock != NULL  && (curMillis - lastClockTime > 1000L)) {
+  else if (_clock != nullptr  && (curMillis - lastClockTime > 1000L)) {
     _clock->display(_bkg, _mapper);
     lastClockTime = curMillis;
   }
@@ -183,7 +183,6 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
     Basics::resetString(_val);    // Reuse the same value buffer across all FlexItems, so clear it out
     
     mapper(_key, _val);
-Log.verbose("FlexItem with (%s => %s)", _key.c_str(), _val.c_str());
     // TO DO: Use snprintf to determine the correct buffer size
     int bufSize = Display.Width/6 + 1; // Assume 6 pixel spacing is smallest font
     char buf[bufSize];

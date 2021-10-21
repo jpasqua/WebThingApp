@@ -20,7 +20,6 @@ Label::Label(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t id) {
 void Label::clear(uint16_t color) {
   Display.oled->setColor(color ? OLEDDISPLAY_COLOR::WHITE : OLEDDISPLAY_COLOR::BLACK);
   Display.oled->fillRect(region.x, region.y, region.w, region.h);
-  Display.oled->display();
 }
 
 void Label::drawSimple(
@@ -53,8 +52,6 @@ void Label::drawSimple(
   Display.setFont(font);
   oled->setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
   oled->drawString(region.x + (region.w/2), region.y+(region.h/2), label);
-
-  oled->display();
 }
 
 void Label::drawProgress(
@@ -93,8 +90,6 @@ void Label::drawProgress(
   Display.setFont(font);
   oled->setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
   oled->drawString(region.x + (region.w/2), region.y+(region.h/2), note);
-
-  oled->display();
 }
 
 #endif

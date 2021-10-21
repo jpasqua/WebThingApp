@@ -10,38 +10,46 @@ public:
   // ----- Types
   using ButtonHandler = std::function<void(uint8_t, PressType)>;
 
+  // ----- Constants
+  static constexpr uint8_t MaxLabels = 254;
+  static constexpr uint8_t MaxButtonMappings = 254;
+  static constexpr uint8_t PassAllRawButtons = 255;
+
   // ----- Constructors
   BaseScreen() = default;
   ~BaseScreen() = default;
 
-  // ----- Member Functions
+  // ----- The following must be implemented by subclasses
   virtual void display(bool force = false) = 0;
   virtual void processPeriodicActivity() = 0;
 
-  void activate();
+  // ---- The following may be implemented by subclasses
+  virtual void activate();
 
-  // ----- ScreenMgr uses these functions to pass in input activity
-  void processTouch(bool pressed, uint16_t tx, uint16_t ty);
+  // ----- ScreenMgr calls this to pass along a button press
   bool physicalButtonPress(uint8_t pin, PressType pt);
 
 protected:
   // ----- Data Members
+  // These must all be set be concrete subclasses
+
   ButtonHandler buttonHandler;
+    // The function to call when a button press of any type occurs
+    // It might be a physical button or a virtual touch button
 
-  Label* labels;
-  uint8_t nLabels;
+  Label* labels = nullptr;
+  uint8_t nLabels = 0;
+    // The label areas in use by this screen. This is only relevant
+    // to the Screen class if any of the labels correspond to touch
+    // targets on a touch screen display.
 
-  WTButton::Mapping* buttonMappings;
-  uint8_t nButtonMappings;
-
-private:
-  // ----- Constants
-  static constexpr uint32_t DebounceTime = 100;
-
-  // ----- Data Members
-  uint32_t startOfPress = 0;
-  uint32_t endOfPress = 0;
-  uint16_t lastX, lastY;
+  WTButton::Mapping* buttonMappings = nullptr;
+  uint8_t nButtonMappings = 0;
+    // The physical buttons that this screen cares about. If
+    // nButtonMappings is set to PassAllRawButtons, then the
+    // array of mappings is ignored and all button presses are
+    // passed to the buttonHandler with an ID that corresponds
+    // to the button's associated pin.
 
 };
 

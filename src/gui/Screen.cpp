@@ -2,11 +2,16 @@
 #include "Screen.h"
 
 void BaseScreen::activate() {
-  startOfPress = endOfPress = 0;
   display(true);
 }
 
 bool BaseScreen::physicalButtonPress(uint8_t pin, PressType pt) {
+  if (nButtonMappings == PassAllRawButtons) {
+    // We want every raw button press passed through...
+    buttonHandler(pin, pt);
+    return true;
+  }
+
   for (int i = 0; i < nButtonMappings; i++) {
     if (pin == buttonMappings[i].pin) {
       buttonHandler(buttonMappings[i].id, pt);
