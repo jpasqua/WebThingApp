@@ -34,8 +34,8 @@ public:
   virtual float getVal(uint16_t index) const = 0;
   virtual void getXLabels(String& xMin, String& xMax) const = 0;
   
-  virtual String getXLegend() { return ""; };
-  virtual String getYLegend() { return ""; };
+  virtual String getXLegend() const { return ""; };
+  virtual String getYLegend() const { return ""; };
 
 protected:  
   virtual void findMinMax() const {
