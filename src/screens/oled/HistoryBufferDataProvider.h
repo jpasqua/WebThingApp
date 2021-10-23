@@ -16,15 +16,18 @@
 
 class HistoryBufferDataProvider : public GraphDataProvider {
 public:
-  HistoryBufferDataProvider(const HistoryBufferBase& buffer, const char* yLegend)
-    : _buffer(buffer), _yLegend(yLegend)
-  { }
+  HistoryBufferDataProvider() = default;
 
-  virtual uint16_t count() const override { return _buffer.size(); };
+  void init(const HistoryBufferBase* buffer, const char* yLegend) {
+    _buffer = buffer;
+    _yLegend = yLegend;
+  }
+
+  virtual uint16_t count() const override { return _buffer->size(); };
 
   virtual void getXLabels(String& xMin, String& xMax) const override {
     time_t start, end;
-    _buffer.getTimeRange(start, end);
+    _buffer->getTimeRange(start, end);
     int32_t tzOffset = WebThing::getGMTOffset();
 
     WebThing::TimeFormatOptions tfo {true, true, false, false};
@@ -33,15 +36,15 @@ public:
   }
 
   virtual String getXLegend() const override {
-    String result(_buffer._name);
-    result[0] = toupper(_buffer._name[0]);
+    String result(_buffer->_name);
+    result[0] = toupper(_buffer->_name[0]);
     return result;
   }
 
   virtual String getYLegend() const override { return _yLegend; }
 
 protected:
-  const HistoryBufferBase& _buffer;
+  const HistoryBufferBase* _buffer;
   const char* _yLegend;
 };
 

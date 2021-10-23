@@ -17,14 +17,16 @@
 template <typename SensorMgr>
 class SensorGraphScreen : public HistoryBufferDataProvider, public GraphScreen {
 public:
-  SensorGraphScreen(const SensorMgr& mgr, const char* yLegend)
-    : HistoryBufferDataProvider(mgr.buffers[_range], yLegend), _mgr(mgr)
+  SensorGraphScreen(const SensorMgr& mgr, uint8_t range, const char* yLegend)
+    : _mgr(mgr), _range(range)
   {
+    HistoryBufferDataProvider::init(&_mgr.buffers[_range], yLegend);
     dataProvider = this;
   }
 
   void selectBuffer(uint8_t range) {
-    _buffer = _mgr.buffers[(_range = range)];
+    _range = range;
+    _buffer = &_mgr.buffers[(_range = range)];
   }
 
   const SensorMgr& _mgr;
