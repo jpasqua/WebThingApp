@@ -16,6 +16,7 @@
 //                                  WebThing Includes
 //                                  Local Includes
 #include "../../Display.h"
+#include "OLED_NullDriver.h"
 #include "fonts/OLED_Mono5x7.h"
 #include "fonts/OLED_Sans_Bold_12.h"
 #include "fonts/OLED_DSEG7_Classic_Bold_32.h"
@@ -32,12 +33,19 @@ void OLED_Display::setDeviceOptions(const DisplayDeviceOptions* options) {
 }
 
 void OLED_Display::device_begin() {
-  if (deviceOptions->deviceType == DisplayDeviceOptions::DeviceType::SH1106) {
-    oled = new SH1106Wire(deviceOptions->address, deviceOptions->sdaPin, deviceOptions->sclPin);
+  switch (deviceOptions->deviceType) {
+    case DisplayDeviceOptions::DeviceType::SH1106:
+      oled = new SH1106Wire(deviceOptions->address, deviceOptions->sdaPin, deviceOptions->sclPin);
+      break;
+    case DisplayDeviceOptions::DeviceType::SSD1306:
+      oled = new SSD1306Wire(deviceOptions->address, deviceOptions->sdaPin, deviceOptions->sclPin);
+      break;
+    case DisplayDeviceOptions::DeviceType::NONE:
+    default:
+      oled = new OLED_NullDriver();
+      break;
   }
-  else {  // opts->deviceType == DisplayDeviceOptions::DeviceType::SSD1306
-    oled = new SSD1306Wire(deviceOptions->address, deviceOptions->sdaPin, deviceOptions->sclPin);
-  }
+
   oled->init();
   setOrientation(_options->invertDisplay );
 }

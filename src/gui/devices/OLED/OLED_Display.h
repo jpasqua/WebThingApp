@@ -21,7 +21,7 @@
 
 class DisplayDeviceOptions {
 public:
-  enum DeviceType {SH1106, SSD1306};
+  enum DeviceType {NONE, SH1106, SSD1306};
   DeviceType deviceType;
   uint8_t sclPin;
   uint8_t sdaPin;
