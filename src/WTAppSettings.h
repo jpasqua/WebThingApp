@@ -9,6 +9,7 @@
 //                                  Local Includes
 #include "gui/DisplayOptions.h"
 #include "gui/UIOptions.h"
+#include "gui/ScreenSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -38,6 +39,7 @@ public:
   DisplayOptions displayOptions;
   UIOptions uiOptions;
   OWMOptions owmOptions;
+  ScreenSettings screenSettings;
 
 private:
 };

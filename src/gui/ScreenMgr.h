@@ -20,6 +20,7 @@
 #include "UIOptions.h"
 #include "DisplayOptions.h"
 #include "FlexScreen.h"
+#include "ScreenSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -46,7 +47,8 @@ public:
 
   // ----- Screen Sequence functions
   using ScreenSequence = std::vector<Screen*>;
-  void setSequence(const ScreenSequence* sequence) { _sequence = sequence; }
+  void setSequence(ScreenSequence& newSequence) { sequence = std::move(newSequence); }
+  void reconcileScreenSequence(ScreenSettings& screenSettings);
   void beginSequence();
   void moveThroughSequence(bool forward);
   void setSequenceButtons(uint8_t forward, uint8_t backward = 255);
@@ -80,6 +82,9 @@ public:
   void suspend();
   void unsuspend();
 
+  std::map<String, Screen*> screenFromName;
+  ScreenSequence sequence;
+
 protected:
   // ----- Member Functions
   void processSchedules();
@@ -89,12 +94,10 @@ protected:
   virtual void device_processInput() = 0;
 
   // ----- Data Members
-  std::map<String, Screen*> screenFromName;
   Screen*   _curScreen;
   Screen*   _homeScreen;
   Screen*   _suspendedScreen = nullptr;
 
-  const ScreenSequence* _sequence = nullptr;
   uint8_t _curSequenceIndex = 0;
   uint8_t _forwardButton = 255;   // No pin assigned
   uint8_t _backwardButton = 255;  // No pin assigned

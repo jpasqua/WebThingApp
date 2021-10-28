@@ -19,6 +19,7 @@
 #include "ScreenMgr.h"
 #include "Theme.h"
 #include "FlexScreen.h"
+#include "ScreenSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -114,6 +115,13 @@ bool BaseScreenMgr::registerScreen(String screenName, Screen* theScreen) {
     return false;
   }
   screenFromName[screenName] = theScreen;
+
+  // The map key will live as long as the screen is registered, so point to it from the screen obj
+  // TO DO: Is this too much work just to save another copy of the String??
+  const auto& el = screenFromName.find(screenName); // We just added it, so it will be there
+  auto keyPointer = &(el->first);       // Get a pointer to the key (String*)
+  theScreen->registeredAs = keyPointer; // Hold on to it in the Screen
+
   return true;
 }
 
@@ -210,21 +218,71 @@ void BaseScreenMgr::setSequenceButtons(uint8_t forward, uint8_t backward) {
 }
 
 void BaseScreenMgr::beginSequence() {
-  if (_sequence == nullptr || _sequence->empty()) { displayHomeScreen(); return; }
+  if (sequence.empty()) { displayHomeScreen(); return; }
   _curSequenceIndex = 0;
-  display(_sequence->at(_curSequenceIndex));
+  display(sequence.at(_curSequenceIndex));
 }
 
 void BaseScreenMgr::moveThroughSequence(bool forward) {
-  if (_sequence == nullptr || _sequence->empty()) { displayHomeScreen(); return; }
+  if (sequence.empty()) { displayHomeScreen(); return; }
   if (forward) {
     _curSequenceIndex++;
-    if (_curSequenceIndex == _sequence->size()) _curSequenceIndex = 0;
+    if (_curSequenceIndex == sequence.size()) _curSequenceIndex = 0;
   } else {
-    if (_curSequenceIndex == 0) _curSequenceIndex = _sequence->size()-1;
+    if (_curSequenceIndex == 0) _curSequenceIndex = sequence.size()-1;
     else _curSequenceIndex--;
   }
-  display(_sequence->at(_curSequenceIndex));
+  display(sequence.at(_curSequenceIndex));
 }
 
+void BaseScreenMgr::reconcileScreenSequence(ScreenSettings& screenSettings) {
+  auto& screenInfo = screenSettings.screenInfo;
+  int nSettingsScreens = screenInfo.size();
+  int nScreensInSequence = sequence.size();
 
+  // Step 1: Ensure that every screen in the settings
+  // is actually in the screen sequence. If we find one
+  // that's not, remove it from the list
+  for (int i = nSettingsScreens-1; i >= 0 ; i--) {
+    const String& id = screenInfo[i].id;
+    bool matched = false;
+    for (int j = 0; j < nScreensInSequence; j++) {
+      Screen* curScreen = sequence[j];
+      if (id.equals(*(curScreen->registeredAs))) {
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      screenInfo.erase(screenInfo.begin()+i);
+    }
+  }
+  nSettingsScreens = screenInfo.size();
+
+  // Step 2: Ensure that every screen in the screen sequence
+  // is in the settings. If we find one that's not, add it
+  for (int i = 0; i < nScreensInSequence; i++) {
+    const String* registeredName = sequence[i]->registeredAs;
+    bool matched = false;
+    for (int j = 0; j < nSettingsScreens; j++) {
+      if (screenInfo[j].id == *registeredName) {
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      screenInfo.emplace_back(ScreenSettings::ScreenInfo(*registeredName, true));
+    }
+  }
+  nSettingsScreens = screenInfo.size();
+
+  // Step 3: OK, we've reconciled the lists, now rebuild the sequence in the
+  // order specified by the settings. Leave out any item that is disabled
+  sequence.clear();
+  for (int i = 0; i < nSettingsScreens; i++) {
+    if (screenInfo[i].enabled) {
+      const auto& el = screenFromName.find(screenInfo[i].id);
+      sequence.push_back(el->second);
+    }
+  }
+}

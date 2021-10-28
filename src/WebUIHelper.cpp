@@ -145,6 +145,24 @@ namespace WebUIHelper {
       
       WebUI::wrapWebAction("/updateDisplayConfig", action);
     }
+
+    void updateScreenSelection() {
+      auto action = []() {
+        String newSequence = WebUI::arg("sequence");
+        if (newSequence.isEmpty()) {
+         WebUI::sendStringContent("text/plain", "No screens were selected", "400 Bad Request");
+          return;
+        }
+        wtAppImpl->settings->screenSettings.fromJSON(newSequence);
+        ScreenMgr.reconcileScreenSequence(wtAppImpl->settings->screenSettings);
+        ScreenMgr.beginSequence();
+          // Necessary to ensure we're in a sensible state after setting a new 
+          // sequence when we may be in the middle of the previous sequence
+        WebUI::sendStringContent("text/plain", "New screen sequence was saved");
+      };
+      
+      WebUI::wrapWebAction("/updateScreenSelection", action);
+    }
   }   // ----- END: WebUIHelper::Endpoints
 
   // ----- BEGIN: WebUIHelper::Dev
@@ -271,6 +289,16 @@ namespace WebUIHelper {
 
       WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
     }
+
+    void presentScreenConfig() {
+      UIOptions* uiOptions = &(wtApp->settings->uiOptions);
+
+      auto mapper =[uiOptions](const String& key, String& val) -> void {
+        if (key.equals(F("ORIG_SEQ"))) wtAppImpl->settings->screenSettings.toJSON(val);
+      };
+
+      WebUI::wrapWebPage("/presentScreenConfig", "/wta/ConfigScreens.html", mapper);
+    }
   }   // ----- END: WebUIHelper::Pages
 
   void showBusyStatus(bool busy) {
@@ -290,6 +318,7 @@ namespace WebUIHelper {
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
     WebUI::registerHandler("/presentPluginConfig",    Pages::presentPluginConfig);
+    WebUI::registerHandler("/presentScreenConfig",    Pages::presentScreenConfig);
 
     WebUI::registerHandler("/updateStatus",           Endpoints::updateStatus);
     WebUI::registerHandler("/updateWeatherConfig",    Endpoints::updateWeatherConfig);
