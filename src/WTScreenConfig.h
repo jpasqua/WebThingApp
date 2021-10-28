@@ -89,10 +89,10 @@ public:
 	  ScreenMgr.registerScreen("Config", configScreen);
 
 	  forecastFirst3 = new ForecastFirst3();
-	  ScreenMgr.registerScreen("Forecast3", forecastFirst3);
+	  ScreenMgr.registerScreen("Forecast-3", forecastFirst3);
 
 	  forecastLast2 = new ForecastLast2();
-	  ScreenMgr.registerScreen("Forecast2", forecastLast2);
+	  ScreenMgr.registerScreen("Forecast-2", forecastLast2);
 
 	  infoScreen = new InfoScreen();
 	  ScreenMgr.registerScreen("Info", infoScreen);
