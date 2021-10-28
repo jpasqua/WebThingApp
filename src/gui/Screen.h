@@ -29,6 +29,8 @@ public:
   // ----- ScreenMgr calls this to pass along a button press
   bool physicalButtonPress(uint8_t pin, PressType pt);
 
+  const String* registeredAs = nullptr;
+
 protected:
   // ----- Data Members
   // These must all be set be concrete subclasses
