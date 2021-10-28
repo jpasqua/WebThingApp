@@ -59,7 +59,7 @@ void UIOptions::toJSON(JsonDocument &doc) {
 }
 
 void UIOptions::logSettings() {
-  Log.verbose(F("Display Settings"));
+  Log.verbose(F("UI Settings"));
   Log.verbose(F("  use24Hour: %T"), use24Hour);
   Log.verbose(F("  useMetric: %T"), useMetric);
   Log.verbose(F("  show dev menu: %T"), showDevMenu);
