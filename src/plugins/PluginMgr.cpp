@@ -113,6 +113,10 @@ bool PluginMgr::validatePluginFiles(String pluginPath) {
       ESP_FS::exists(pluginPath + "/screen.json")) return true;
 
   Log.warning(F("For plugin %s, not all json files are present"), pluginPath.c_str());
+  Log.warning(F("plugin.json: %T"), ESP_FS::exists(pluginPath + "/plugin.json"));
+  Log.warning(F("form.json: %T"), ESP_FS::exists(pluginPath + "/form.json"));
+  Log.warning(F("settings.json: %T"), ESP_FS::exists(pluginPath + "/settings.json"));
+  Log.warning(F("screen.json: %T"), ESP_FS::exists(pluginPath + "/screen.json"));
   return false;
 }
 
