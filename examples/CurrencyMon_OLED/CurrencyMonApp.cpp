@@ -173,7 +173,7 @@ Screen* CurrencyMonApp::app_registerScreens() {
   splashScreen = new SplashScreen();
   homeScreen = new HomeScreen();
 
-  ScreenMgr.registerScreen("Splash", splashScreen);
+  ScreenMgr.registerScreen("Splash", splashScreen, true);
   ScreenMgr.registerScreen("Home", homeScreen);
   ScreenMgr.setAsHomeScreen(homeScreen);
 
@@ -181,19 +181,20 @@ Screen* CurrencyMonApp::app_registerScreens() {
   screens.rebootScreen->setButtons(hwConfig.advanceButton, hwConfig.previousButton);
 
   // CUSTOM: Add a sequence of screens that the user can cycle through
-  BaseScreenMgr::ScreenSequence* sequence = new BaseScreenMgr::ScreenSequence;
-  sequence->push_back(homeScreen);
-  sequence->push_back(wtAppImpl->screens.weatherScreen);
-  sequence->push_back(wtAppImpl->screens.forecastFirst3);
-  sequence->push_back(wtAppImpl->screens.forecastLast2);
+  auto& sequence = ScreenMgr.sequence;
+  sequence.push_back(homeScreen);
+  sequence.push_back(wtAppImpl->screens.weatherScreen);
+  sequence.push_back(wtAppImpl->screens.forecastFirst3);
+  sequence.push_back(wtAppImpl->screens.forecastLast2);
   // Add any plugins to the sequence
   uint8_t nPlugins = pluginMgr.getPluginCount();
   for (int i = 0; i < nPlugins; i++) {
     Plugin* p = pluginMgr.getPlugin(i);
-    sequence->push_back(p->getFlexScreen());
+    sequence.push_back(p->getFlexScreen());
   }
-  sequence->push_back(wtAppImpl->screens.infoScreen);
-  ScreenMgr.setSequence(sequence);
+  sequence.push_back(wtAppImpl->screens.infoScreen);
+
+  ScreenMgr.reconcileScreenSequence(cmSettings->screenSettings);
 
   return splashScreen;
 }
