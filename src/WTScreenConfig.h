@@ -41,19 +41,19 @@ public:
 	  ScreenMgr.registerScreen("Calibration", calibrationScreen);
 
 	  configScreen = new ConfigScreen();
-	  ScreenMgr.registerScreen("Config", configScreen);
+	  ScreenMgr.registerScreen("Config", configScreen, true);
 
 	  forecastScreen = new ForecastScreen();
 	  ScreenMgr.registerScreen("Forecast", forecastScreen);
 
 	  rebootScreen = new RebootScreen();
-	  ScreenMgr.registerScreen("Reboot", rebootScreen);
+	  ScreenMgr.registerScreen("Reboot", rebootScreen, true);
 
 	  weatherScreen = new WeatherScreen();
 	  ScreenMgr.registerScreen("Weather", weatherScreen);
 
 	  wifiScreen = new WiFiScreen();
-	  ScreenMgr.registerScreen("WiFi", wifiScreen);
+	  ScreenMgr.registerScreen("WiFi", wifiScreen, true);
 
 	  utilityScreen = new UtilityScreen();
 	  ScreenMgr.registerScreen("Utility", utilityScreen);
@@ -86,7 +86,7 @@ public:
 	  // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
 
 	  configScreen = new ConfigScreen();
-	  ScreenMgr.registerScreen("Config", configScreen);
+	  ScreenMgr.registerScreen("Config", configScreen, true);
 
 	  forecastFirst3 = new ForecastFirst3();
 	  ScreenMgr.registerScreen("Forecast-3", forecastFirst3);
@@ -98,13 +98,13 @@ public:
 	  ScreenMgr.registerScreen("Info", infoScreen);
 
 	  rebootScreen = new RebootScreen();
-	  ScreenMgr.registerScreen("Reboot", rebootScreen);
+	  ScreenMgr.registerScreen("Reboot", rebootScreen, true);
 
 	  weatherScreen = new WeatherScreen();
 	  ScreenMgr.registerScreen("Weather", weatherScreen);
 
 	  wifiScreen = new WiFiScreen();
-	  ScreenMgr.registerScreen("WiFi", wifiScreen);	  
+	  ScreenMgr.registerScreen("WiFi", wifiScreen, true);	  
 	}
 };
 #endif

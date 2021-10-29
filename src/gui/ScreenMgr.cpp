@@ -36,9 +36,8 @@ public:
 
   BlankScreen() {
     buttonHandler =[this](int /*id*/, PressType /*type*/) -> void {
-      Log.verbose("Waking up with millis() = %d", millis());
+      Log.verbose("Waking up with millis() = %d, restoring brightness to %d", millis(), lastBrightness);
       ScreenMgr.unsuspend();  // Let the screen redisplay while the brightness is off...
-Log.verbose("restoring brightness to %d", lastBrightness);
       Display.setBrightness(lastBrightness);  // ...then let there be light
       blanking = false;       // Remember we are no longer blanking
     };
@@ -61,10 +60,7 @@ Log.verbose("restoring brightness to %d", lastBrightness);
 
   void processPeriodicActivity() override { }
 
-  void updateSavedBrightness(uint8_t b) {
-    lastBrightness = b;
-Log.verbose("Updated lastBrightness to %d", lastBrightness);
-  }
+  void updateSavedBrightness(uint8_t b) { lastBrightness = b; }
 
 } blankScreen;
 
@@ -108,19 +104,20 @@ void BaseScreenMgr::loop() {
   _curScreen->processPeriodicActivity();
 }
 
+Screen* BaseScreenMgr::screenFromName(String& name) {
+  auto namesMatch = [name](Screen* screen) { return name == screen->name; };
+  auto pos = std::find_if(allScreens.begin(), allScreens.end(), namesMatch);
+  return (pos == allScreens.end()) ? nullptr : *pos;
+}
 
-bool BaseScreenMgr::registerScreen(String screenName, Screen* theScreen) {
-  if (screenFromName[screenName] != NULL) {
+bool BaseScreenMgr::registerScreen(String screenName, Screen* theScreen, bool special) {
+  if (screenFromName(screenName) != nullptr) {
     Log.warning("Trying to register a screen with a name that is in use: %s", screenName.c_str());
     return false;
   }
-  screenFromName[screenName] = theScreen;
-
-  // The map key will live as long as the screen is registered, so point to it from the screen obj
-  // TO DO: Is this too much work just to save another copy of the String??
-  const auto& el = screenFromName.find(screenName); // We just added it, so it will be there
-  auto keyPointer = &(el->first);       // Get a pointer to the key (String*)
-  theScreen->registeredAs = keyPointer; // Hold on to it in the Screen
+  theScreen->name = screenName;
+  theScreen->special = special;
+  allScreens.push_back(theScreen);
 
   return true;
 }
@@ -130,7 +127,7 @@ void BaseScreenMgr::setAsHomeScreen(Screen* screen) {
 }
 
 void BaseScreenMgr::display(String name) {
-  Screen* screen = screenFromName[name];
+  Screen* screen = screenFromName(name);
   if (screen == NULL) {
     Log.warning("Trying to display screen %s, but none is registered", name.c_str());
     return;
@@ -235,54 +232,55 @@ void BaseScreenMgr::moveThroughSequence(bool forward) {
   display(sequence.at(_curSequenceIndex));
 }
 
+void dumpScreenInfo(const char* title, ScreenSettings& screenSettings) {
+  Log.verbose("%s", title);
+  for (auto& s : screenSettings.screenInfo) {
+    Log.verbose("%s is %s", s.id.c_str(), s.enabled ? "on" : "off");
+  }
+}
+
 void BaseScreenMgr::reconcileScreenSequence(ScreenSettings& screenSettings) {
   auto& screenInfo = screenSettings.screenInfo;
-  int nSettingsScreens = screenInfo.size();
-  int nScreensInSequence = sequence.size();
+
+  // dumpScreenInfo("Before phase 1 reconcilation:", screenSettings);
 
   // Step 1: Ensure that every screen in the settings
-  // is actually in the screen sequence. If we find one
+  // is a real screen, and not special. If we find one
   // that's not, remove it from the list
-  for (int i = nSettingsScreens-1; i >= 0 ; i--) {
-    const String& id = screenInfo[i].id;
-    bool matched = false;
-    for (int j = 0; j < nScreensInSequence; j++) {
-      Screen* curScreen = sequence[j];
-      if (id.equals(*(curScreen->registeredAs))) {
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
+  for (int i = screenInfo.size()-1; i >= 0 ; i--) {
+    Screen* s = screenFromName(screenInfo[i].id);
+    if (s == nullptr || s->special) {
       screenInfo.erase(screenInfo.begin()+i);
     }
   }
-  nSettingsScreens = screenInfo.size();
+  // dumpScreenInfo("After phase 1 reconcilation:", screenSettings);
 
-  // Step 2: Ensure that every screen in the screen sequence
-  // is in the settings. If we find one that's not, add it
-  for (int i = 0; i < nScreensInSequence; i++) {
-    const String* registeredName = sequence[i]->registeredAs;
+  // Step 2: Ensure that every non-special screen shows up in the
+  // settings even if it is disabled. If we find one that's not,
+  // add it and make it disabled. The user can enable it if desired.
+  for (Screen* s : allScreens) {
     bool matched = false;
-    for (int j = 0; j < nSettingsScreens; j++) {
-      if (screenInfo[j].id == *registeredName) {
+    for (int j = screenInfo.size()-1; j >= 0; j--) {
+      if (screenInfo[j].id == s->name) {
         matched = true;
         break;
       }
     }
-    if (!matched) {
-      screenInfo.emplace_back(ScreenSettings::ScreenInfo(*registeredName, true));
+    if (!matched && !(s->special)) {
+      // Log.verbose("Adding screen named %s to settings.screenInfo", s->name.c_str());
+      screenInfo.emplace_back(ScreenSettings::ScreenInfo(s->name, true));
     }
   }
-  nSettingsScreens = screenInfo.size();
+  // dumpScreenInfo("After phase 2 reconcilation:", screenSettings);
 
   // Step 3: OK, we've reconciled the lists, now rebuild the sequence in the
   // order specified by the settings. Leave out any item that is disabled
   sequence.clear();
-  for (int i = 0; i < nSettingsScreens; i++) {
-    if (screenInfo[i].enabled) {
-      const auto& el = screenFromName.find(screenInfo[i].id);
-      sequence.push_back(el->second);
+  for (auto& si : screenInfo) {
+    if (si.enabled) {
+      Screen* screen = screenFromName(si.id);  // Guaranteed to be present
+      sequence.push_back(screen);
+      // Log.verbose("Adding %s to the screenSequence", screen->name.c_str());
     }
   }
 }

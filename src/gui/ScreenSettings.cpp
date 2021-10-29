@@ -29,6 +29,7 @@ void ScreenSettings::fromJSON(const String &json) {
 }
 
 void ScreenSettings::fromJSON(const JsonDocument &doc) {
+  screenInfo.clear();
   const JsonArrayConst& jsonScreens = doc["screens"].as<JsonArray>();
   ScreenInfo si;
   for (const auto& jsonScreen : jsonScreens) {

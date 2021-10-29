@@ -148,7 +148,13 @@ namespace WebUIHelper {
 
     void updateScreenSelection() {
       auto action = []() {
-        String newSequence = WebUI::arg("sequence");
+        for (int i = WebUI::args()-1; i >= 0; i--) {
+          Log.verbose("Arg(%d): %s = %s", i, WebUI::argName(i).c_str(), WebUI::arg(i).c_str());
+        }
+
+        // We are handling an HTTP POST with a JSON payload. There isn't a specific function
+        // to get the payload from the request, instead ask for the arg named "plain"
+        String newSequence = WebUI::arg("plain");
         if (newSequence.isEmpty()) {
          WebUI::sendStringContent("text/plain", "No screens were selected", "400 Bad Request");
           return;
@@ -158,6 +164,7 @@ namespace WebUIHelper {
         ScreenMgr.beginSequence();
           // Necessary to ensure we're in a sensible state after setting a new 
           // sequence when we may be in the middle of the previous sequence
+        wtApp->settings->write();
         WebUI::sendStringContent("text/plain", "New screen sequence was saved");
       };
       
@@ -324,6 +331,7 @@ namespace WebUIHelper {
     WebUI::registerHandler("/updateWeatherConfig",    Endpoints::updateWeatherConfig);
     WebUI::registerHandler("/updateDisplayConfig",    Endpoints::updateDisplayConfig);
     WebUI::registerHandler("/updatePluginConfig",     Endpoints::updatePluginConfig);
+    WebUI::registerHandler("/updateScreenSelection",  Endpoints::updateScreenSelection);
     WebUI::registerHandler("/setBrightness",          Endpoints::setBrightness);
 
     WebUI::registerHandler("/dev/reboot",             Dev::reboot); // Override the default from WebUI

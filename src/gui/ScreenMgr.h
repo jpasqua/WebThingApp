@@ -35,9 +35,9 @@ public:
   void loop();
 
   // ----- Screen Management functions
-  bool registerScreen(String screenName, Screen* theScreen);
+  bool registerScreen(String screenName, Screen* theScreen, bool special = false);
   void setAsHomeScreen(Screen* screen);
-  Screen* find(String name);
+  Screen* screenFromName(String& name);
 
   // ----- Screen Display functions
   void display(String name);
@@ -82,7 +82,7 @@ public:
   void suspend();
   void unsuspend();
 
-  std::map<String, Screen*> screenFromName;
+  std::vector<Screen*> allScreens;
   ScreenSequence sequence;
 
 protected:

@@ -29,7 +29,10 @@ public:
   // ----- ScreenMgr calls this to pass along a button press
   bool physicalButtonPress(uint8_t pin, PressType pt);
 
-  const String* registeredAs = nullptr;
+  String name;
+  bool special; // Is this a "one-off" screen like the splash screen, or
+                // will it be used in the normal course of operation
+                // e.g. in a sequence
 
 protected:
   // ----- Data Members
