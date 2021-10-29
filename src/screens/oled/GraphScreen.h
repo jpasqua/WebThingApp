@@ -20,13 +20,13 @@ class GraphDataProvider {
 public:
   GraphDataProvider() = default;
 
-  virtual float hiVal() const {
-    if (minVal > maxVal) findMinMax();
+  virtual float hiVal(bool recompute) const {
+    if (recompute || (minVal > maxVal)) findMinMax();
     return maxVal;
   }
 
-  virtual float loVal() const {
-    if (minVal > maxVal) findMinMax();
+  virtual float loVal(bool recompute) const {
+    if (recompute || (minVal > maxVal)) findMinMax();
     return minVal;
   }
 
