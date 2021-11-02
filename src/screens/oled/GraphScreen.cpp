@@ -25,7 +25,9 @@ static const char* fmts[] {
   "%.0fM",  // <   100,000,000
   "%.0fM"   // < 1,000,000,000
 };
-static size_t nFmts = sizeof(fmts)/sizeof(fmts[0]);
+static constexpr size_t nFmts = countof(fmts);
+
+#pragma message("nFmts =" nFmts)
 
 static String fourDigits(float val) {
   char buf[6];  // Space for -123M[NULL]
@@ -45,11 +47,7 @@ static String fourDigits(float val) {
   return String(negative ? "----" : "++++");
 }
 
-GraphScreen::GraphScreen() {
-  // TEST
-  // dataProvider = &testProvider;
-  // displayParams = &testParams;
-}
+GraphScreen::GraphScreen() { }
 
 void GraphScreen::display(bool activating) {
   auto& oled = Display.oled;
