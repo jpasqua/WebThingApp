@@ -10,6 +10,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <BPABasics.h>
+#include <Output.h>
 //                                  WebThing Includes
 #include <DataBroker.h>
 #include <WebThing.h>
@@ -30,14 +31,14 @@ namespace WebUIHelper {
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
     const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
-      "<a class='w3-bar-item w3-button' href='/updateStatus'>"
-      "<i class='fa fa-recycle'></i> Update Status</a>"
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
-      "<i class='fa fa-desktop'></i> Configure Display</a>"
+      "<i class='fa fa-desktop'></i>Configure Display</a>"
       "<a class='w3-bar-item w3-button' href='/presentWeatherConfig'>"
       "<i class='fa fa-thermometer-three-quarters'></i> Configure Weather</a>"
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
-      "<i class='fa fa-plug'></i> Configure Plugins</a>");
+      "<i class='fa fa-plug'></i> Configure Plugins</a>"
+      "<a class='w3-bar-item w3-button' href='/updateStatus'>"
+      "<i class='fa fa-recycle'></i> Update Status</a>");
   }
 
   // ----- END: WebUIHelper::Internal
@@ -87,6 +88,9 @@ namespace WebUIHelper {
       };
 
       WebUI::wrapWebAction("/updateWeatherConfig", action);
+      Output::setOptions(
+        &wtApp->settings->uiOptions.useMetric,
+        &wtApp->settings->uiOptions.use24Hour);
     }
 
     void updatePluginConfig() {
@@ -144,6 +148,9 @@ namespace WebUIHelper {
       };
       
       WebUI::wrapWebAction("/updateDisplayConfig", action);
+      Output::setOptions(
+        &wtApp->settings->uiOptions.useMetric,
+        &wtApp->settings->uiOptions.use24Hour);
     }
 
     void updateScreenSelection() {
@@ -161,14 +168,16 @@ namespace WebUIHelper {
         }
         wtAppImpl->settings->screenSettings.fromJSON(newSequence);
         ScreenMgr.reconcileScreenSequence(wtAppImpl->settings->screenSettings);
-        ScreenMgr.beginSequence();
-          // Necessary to ensure we're in a sensible state after setting a new 
-          // sequence when we may be in the middle of the previous sequence
         wtApp->settings->write();
         WebUI::sendStringContent("text/plain", "New screen sequence was saved");
       };
       
       WebUI::wrapWebAction("/updateScreenSelection", action);
+      ScreenMgr.beginSequence();
+        // Necessary to ensure we're in a sensible state after setting a new 
+        // sequence when we may be in the middle of the previous sequence
+        // Do this after wrapWebAction so the newly displayed screen doesn't end
+        // up having the ActivityIcon restored from the previous screen.
     }
   }   // ----- END: WebUIHelper::Endpoints
 
