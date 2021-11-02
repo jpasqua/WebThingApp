@@ -42,7 +42,8 @@
           var item = element.getElementsByClassName('order')[0];
           resultList.screens.push({id: item.name, on: item.checked});
         });
-        console.log(resultList);
+        $('#RESULT').attr('style', 'color: #808080');
+        $('#RESULT').html("Updating screen configuration...");
         $.ajax({
             //https://httpbin.org/get
             url: '/updateScreenSelection',
