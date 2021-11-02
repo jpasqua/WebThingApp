@@ -12,6 +12,7 @@
 #include <ArduinoLog.h>
 //                                  WebThing Includes
 #include <BPABasics.h>
+#include <Output.h>
 #include <DataBroker.h>
 //                                  Local Includes
 #include "Display.h"
@@ -198,12 +199,8 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         break;
       }
       case FlexItem::Type::CLOCK: {
-        int firstDelim = _val.indexOf('|');
-        int secondDelim = _val.lastIndexOf('|');
-        int theHour = _val.substring(0, firstDelim).toInt();
-        int theMinute = _val.substring(firstDelim+1, secondDelim).toInt();
-        int theSecond = _val.substring(secondDelim+1).toInt();
-        sprintf(buf, fmt, theHour, theMinute, theSecond);
+        String formattedTime = Output::formattedTime(now(), true, false);
+        strcpy(buf, formattedTime.c_str());
         break;
       }
       case FlexItem::Type::STATUS:
