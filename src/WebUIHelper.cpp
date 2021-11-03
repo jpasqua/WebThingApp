@@ -32,7 +32,7 @@ namespace WebUIHelper {
   namespace Internal {
     const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
-      "<i class='fa fa-desktop'></i>Configure Display</a>"
+      "<i class='fa fa-desktop'></i> Configure Display</a>"
       "<a class='w3-bar-item w3-button' href='/presentWeatherConfig'>"
       "<i class='fa fa-thermometer-three-quarters'></i> Configure Weather</a>"
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
