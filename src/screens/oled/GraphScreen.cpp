@@ -27,8 +27,6 @@ static const char* fmts[] {
 };
 static constexpr size_t nFmts = countof(fmts);
 
-#pragma message("nFmts =" nFmts)
-
 static String fourDigits(float val) {
   char buf[6];  // Space for -123M[NULL]
   bool negative = (val < 0);
