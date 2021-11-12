@@ -188,7 +188,7 @@ static constexpr struct  {
     {"D72",   &DSEG7_Classic_Bold_72},
     {"D100",  &DSEG7_Classic_Bold_100}
   };
-static constexpr uint8_t nGFXFonts = ARRAY_SIZE(GFXFonts);
+static constexpr uint8_t nGFXFonts = countof(GFXFonts);
 
 void Touch_Display::setFont(uint8_t fontID)  { tft.setFreeFont(GFXFonts[fontID].font); }
 void Touch_Display::setSpriteFont(uint8_t fontID) const { sprite->setFreeFont(GFXFonts[fontID].font); }

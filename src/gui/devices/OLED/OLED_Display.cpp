@@ -206,7 +206,7 @@ static constexpr struct  {
     {"W21",   Meteocons_Plain_21},
     {"W36",   Meteocons_Plain_36}
   };
-static constexpr uint8_t nFronts = ARRAY_SIZE(FontList);
+static constexpr uint8_t nFronts = countof(FontList);
 
 void OLED_Display::setFont(uint8_t fontID)  { oled->setFont(FontList[fontID].font); }
 
