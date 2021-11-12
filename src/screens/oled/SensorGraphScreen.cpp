@@ -1,6 +1,7 @@
 #include <gui/devices/DeviceSelect.h>
 #if DEVICE_TYPE == DEVICE_TYPE_OLED
 
+#include <Output.h>
 #include "SensorGraphScreen.h"
 
 AQIGraphScreen::AQIGraphScreen(const AQIMgr& mgr)
@@ -22,7 +23,7 @@ WeatherGraphScreen::WeatherGraphScreen(const WeatherMgr& mgr)
 }
 
 float WeatherGraphScreen::getVal(uint16_t index) const {
-  return _mgr.buffers[_range].peekAt(index).temp;
+  return Output::temp(_mgr.buffers[_range].peekAt(index).temp);
 }
 
 #endif
