@@ -96,9 +96,9 @@ namespace WebUIHelper {
     void updatePluginConfig() {
       auto action = []() {
         String responseType = "text/plain";
-        if (!WebUI::hasArg(F("pID"))) {
+        if (WebUI::hasArg(F("pID"))) {
           uint8_t pID = WebUI::arg(F("pID")).toInt()-1;
-          Plugin *p = wtAppImpl->pluginMgr.getPlugin(pID);
+          Plugin *p = wtAppImpl->pluginMgr.getUnifiedPlugin(pID);
 
           if (p) {
             if (WebUI::hasArg(F("plain"))) {
@@ -265,15 +265,12 @@ namespace WebUIHelper {
 
 
     void presentPluginConfig() {
-      uint8_t count = wtAppImpl->pluginMgr.getPluginCount();
-      Plugin** plugins = wtAppImpl->pluginMgr.getPlugins();
-
-      auto mapper =[count, plugins](const String& key, String& val) -> void {
+      auto mapper = [](const String& key, String& val) -> void {
         if (key.startsWith("_P")) {
           int pluginIndex = (key.charAt(2) - '0') - 1;
-          if (pluginIndex < count) {
-            Plugin* p = plugins[pluginIndex];
+          Plugin* p = wtAppImpl->pluginMgr.getUnifiedPlugin(pluginIndex);
 
+          if (p != nullptr) {
             const char* subkey = &(key.c_str()[4]);
             if (strcmp(subkey, "IDX") == 0) val.concat(pluginIndex+1);
             if (strcmp(subkey, "NAME") == 0) val = p->getName();
