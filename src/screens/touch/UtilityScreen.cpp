@@ -48,8 +48,8 @@ static constexpr uint16_t ThirdWidth = (Display.Width-(2*LabelInset))/3;
 static constexpr uint16_t PI_YOrigin = 60;
 
 static constexpr uint8_t FirstPluginLabel = 0;
-static constexpr uint8_t MaxPlugins = 4;
-static constexpr uint8_t DimLabel = FirstPluginLabel + MaxPlugins;
+static constexpr uint8_t NPluginSlots = 4;
+static constexpr uint8_t DimLabel = FirstPluginLabel + NPluginSlots;
 static constexpr uint8_t MediumLabel = 5;
 static constexpr uint8_t BrightLabel = 6;
 static constexpr uint8_t RefreshLabel = 7;
@@ -65,7 +65,7 @@ UtilityScreen::UtilityScreen() {
   buttonHandler =[&](int id, PressType type) -> void {
     Log.verbose(F("In UtilityScreen Label Handler, id = %d, type = %d"), id, type);
 
-    if (id < MaxPlugins) {
+    if (id < NPluginSlots) {
       wtAppImpl->pluginMgr.displayPlugin(id);
       return;
     }
@@ -82,7 +82,7 @@ UtilityScreen::UtilityScreen() {
 
 
   labels = new Label[(nLabels = N_Labels)];
-  for (int i = 0; i < MaxPlugins; i++) {
+  for (int i = 0; i < NPluginSlots; i++) {
     labels[i].init(
       LabelInset + ((i%2) * HalfWidth), PI_YOrigin + (i/2) * LabelHeight, HalfWidth, LabelHeight, i);        
   }
@@ -129,7 +129,7 @@ void UtilityScreen::display(bool activating) {
 
   String name;
   uint16_t textColor = Theme::Color_NormalText;
-  uint8_t nPlugins = min(wtAppImpl->pluginMgr.getPluginCount(), MaxPlugins);
+  uint8_t nPlugins = min(wtAppImpl->pluginMgr.getPluginCount(), NPluginSlots);
 
   for (int i = 0; i < N_Labels; i++) {
     if (i < nPlugins) {
@@ -137,12 +137,12 @@ void UtilityScreen::display(bool activating) {
       if (!p->enabled()) textColor = Theme::Color_Inactive;
       name = p->getName();
       textColor = Theme::Color_WiFiBlue;
-    } else if (i < MaxPlugins) {
+    } else if (i < NPluginSlots) {
       name = "Unused";
       textColor = Theme::Color_Inactive;
     } else {
-      name = pis_label[i-MaxPlugins];
-      textColor = pis_colors[i-MaxPlugins];
+      name = pis_label[i-NPluginSlots];
+      textColor = pis_colors[i-NPluginSlots];
     }
     drawLabel(name, i, textColor, activating);
   }

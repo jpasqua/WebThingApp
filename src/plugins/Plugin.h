@@ -41,7 +41,8 @@ public:
   String getName() { return _name; }
     // Return the UI name of the plugin
   FlexScreen* getFlexScreen() { return _flexScreen; }
-    // Return the associated screen
+    // Return the associated screen. If there is no associated screen then this is a
+    // data-only plugin and nullptr will be returned.
   String getNamespace() { return _namespace; }
     // Return the namespace for the associated data provider (if any)
   bool enabled() { return _enabled; }
@@ -56,7 +57,7 @@ protected:
     // Is this plugin enabled. This may always be true, may be a setting, or may be
     // set based on some operational parameters
   FlexScreen* _flexScreen;
-    // The associated FlexScreen for the plugin
+    // The associated FlexScreen for the plugin. nullptr if this is a data-only plugin
   String _namespace;
     // If this is a custom plugin with an associated data source, the data can be made available
     // through the DataBroker mechanism. This is the namespace that will be used to access the data

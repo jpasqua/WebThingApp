@@ -43,34 +43,39 @@ bool Plugin::init(const String& name, const String& piNamespace, const String& p
     else typeSpecificMapper(key, value);
   };
 
-  // Create the FlexScreen UI
+  String screenDescFileName = _pluginDir + "/screen.json";
+  if (ESP_FS::exists(screenDescFileName)) {
+    // Create the FlexScreen UI
 
-  // The following call to malloc is actually there to *reduce* fragmentation! What happens normally
-  // is we allocate a huge chunk for the the JSON document, read it in, and then allocate the various
-  // FlexScreen objects. They are allocated "later" on the heap than the JSON document, so when we free
-  // it, there is a big hole left over (hence the fragmentation). By allocating the placeholder first,
-  // then allocating the JSON doc, then freeing the placeholder, we leave space "before" the JSON doc
-  // for the FlexScreen items to consume. Then when the JSON doc is freed, it doesnt leave a hole since
-  // it is freed from the end of the heap.
-  constexpr uint16_t PluginReserveSize = 2000;
-  constexpr uint16_t PlaceHolderSize = 2000;
-  char *placeHolder = nullptr;
+    // The following call to malloc is actually there to *reduce* fragmentation! What happens normally
+    // is we allocate a huge chunk for the the JSON document, read it in, and then allocate the various
+    // FlexScreen objects. They are allocated "later" on the heap than the JSON document, so when we free
+    // it, there is a big hole left over (hence the fragmentation). By allocating the placeholder first,
+    // then allocating the JSON doc, then freeing the placeholder, we leave space "before" the JSON doc
+    // for the FlexScreen items to consume. Then when the JSON doc is freed, it doesnt leave a hole since
+    // it is freed from the end of the heap.
+    constexpr uint16_t PluginReserveSize = 2000;
+    constexpr uint16_t PlaceHolderSize = 2000;
+    char *placeHolder = nullptr;
 
-  if (GenericESP::getMaxFreeBlockSize() > PlaceHolderSize + PluginReserveSize) {
-    placeHolder = (char*)malloc(PluginReserveSize);
-    placeHolder[1] = 'C';   // Touch the memory or the compiler may optimize away the malloc
+    if (GenericESP::getMaxFreeBlockSize() > PlaceHolderSize + PluginReserveSize) {
+      placeHolder = (char*)malloc(PluginReserveSize);
+      placeHolder[1] = 'C';   // Touch the memory or the compiler may optimize away the malloc
 
+    }
+
+    DynamicJsonDocument* doc = PluginMgr::getDoc(_pluginDir + "/screen.json", MaxScreenDescriptorSize);
+
+    if (placeHolder) free(placeHolder);  // Free up the space for reuse by FlexScreen
+
+    if (doc == nullptr) return false;
+    _flexScreen = ScreenMgr.createFlexScreen(*doc, getUIRefreshInterval(), _mapper);
+    delete doc;
+    return (_flexScreen != nullptr);
+  } else {
+    _flexScreen = nullptr;
+    return true;
   }
-
-  DynamicJsonDocument* doc = PluginMgr::getDoc(_pluginDir + "/screen.json", MaxScreenDescriptorSize);
-
-  if (placeHolder) free(placeHolder);  // Free up the space for reuse by FlexScreen
-
-  if (doc == NULL) return false;
-  _flexScreen = ScreenMgr.createFlexScreen(*doc, getUIRefreshInterval(), _mapper);
-  delete doc;
-  
-  return !(_flexScreen == NULL);
 }
 
 void Plugin::getForm(String& form) {

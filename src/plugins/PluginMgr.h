@@ -37,9 +37,10 @@ public:
   // ----- Member Functions
   void      loadAll(String pluginRoot);
   void      refreshAll(bool force = false);
-  uint8_t   getPluginCount();
+  uint8_t   getUnifiedCount() { return _nPlugins + _nDataProviders; }
+  uint8_t   getPluginCount() { return _nPlugins; }
+  Plugin*   getUnifiedPlugin(uint8_t index);
   Plugin*   getPlugin(uint8_t index);
-  Plugin**  getPlugins();
   void      map(const String& key, String& value);
   void      displayPlugin(uint8_t pluginIndex);
   void      displayNextPlugin();
@@ -50,6 +51,8 @@ private:
   
   uint8_t _nPlugins;
   Plugin* _plugins[MaxPlugins];
+  uint8_t _nDataProviders;
+  Plugin* _dataProviders[MaxPlugins];
 
   int curPlugin = -1; // Used to iterate plugins for displayNextPlugin()
 
