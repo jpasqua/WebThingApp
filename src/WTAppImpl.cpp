@@ -174,10 +174,11 @@ void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
 
 // ----- WebThing Functions
 void WTAppImpl::setTitle() {
-  if (WebThing::settings.hostname.isEmpty() || WebThing::settings.hostname.startsWith(appPrefix))
+  if (WebThing::settings.hostname.isEmpty()) {
+    WebUI::setTitle(appName);
+  } else {
     WebUI::setTitle(appName + " (" + WebThing::settings.hostname + ")");
-  else
-    WebUI::setTitle(WebThing::settings.hostname);
+  }
 }
 
 void WTAppImpl::baseConfigChange() {
