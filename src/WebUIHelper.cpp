@@ -10,6 +10,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <BPABasics.h>
+#include <Output.h>
 //                                  WebThing Includes
 #include <DataBroker.h>
 #include <WebThing.h>
@@ -30,24 +31,14 @@ namespace WebUIHelper {
   // ----- BEGIN: WebUIHelper::Internal
   namespace Internal {
     const __FlashStringHelper* CORE_MENU_ITEMS = FPSTR(
-      "<a class='w3-bar-item w3-button' href='/updateStatus'>"
-      "<i class='fa fa-recycle'></i> Update Status</a>"
       "<a class='w3-bar-item w3-button' href='/presentDisplayConfig'>"
       "<i class='fa fa-desktop'></i> Configure Display</a>"
       "<a class='w3-bar-item w3-button' href='/presentWeatherConfig'>"
       "<i class='fa fa-thermometer-three-quarters'></i> Configure Weather</a>"
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
-      "<i class='fa fa-plug'></i> Configure Plugins</a>");
-
-    constexpr WebUI::Dev::Action ExtraDevButtons[] {
-      {"Take a screen shot", "/dev/screenShot", nullptr, nullptr}
-    };
-    constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
-
-    void showBusyStatus(bool busy) {
-      if (busy) ScreenMgr::showUpdatingIcon(Theme::Color_WebRequest, UpdatingSymbol);
-      else ScreenMgr::hideUpdatingIcon();
-    }
+      "<i class='fa fa-plug'></i> Configure Plugins</a>"
+      "<a class='w3-bar-item w3-button' href='/updateStatus'>"
+      "<i class='fa fa-recycle'></i> Update Status</a>");
   }
 
   // ----- END: WebUIHelper::Internal
@@ -62,7 +53,7 @@ namespace WebUIHelper {
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
           WebUI::closeConnection(400, "Invalid Brightness: " + WebUI::arg(F("brightness")));
         } else {
-          Display::setBrightness(b);
+          Display.setBrightness(b);
           WebUI::closeConnection(200, F("Brightness Set"));
         }
       };
@@ -97,14 +88,17 @@ namespace WebUIHelper {
       };
 
       WebUI::wrapWebAction("/updateWeatherConfig", action);
+      Output::setOptions(
+        &wtApp->settings->uiOptions.useMetric,
+        &wtApp->settings->uiOptions.use24Hour);
     }
 
     void updatePluginConfig() {
       auto action = []() {
         String responseType = "text/plain";
-        if (!WebUI::hasArg(F("pID"))) {
+        if (WebUI::hasArg(F("pID"))) {
           uint8_t pID = WebUI::arg(F("pID")).toInt()-1;
-          Plugin *p = wtAppImpl->pluginMgr.getPlugin(pID);
+          Plugin *p = wtAppImpl->pluginMgr.getUnifiedPlugin(pID);
 
           if (p) {
             if (WebUI::hasArg(F("plain"))) {
@@ -154,6 +148,32 @@ namespace WebUIHelper {
       };
       
       WebUI::wrapWebAction("/updateDisplayConfig", action);
+      Output::setOptions(
+        &wtApp->settings->uiOptions.useMetric,
+        &wtApp->settings->uiOptions.use24Hour);
+    }
+
+    void updateScreenSelection() {
+      auto action = []() {
+        // We are handling an HTTP POST with a JSON payload. There isn't a specific function
+        // to get the payload from the request, instead ask for the arg named "plain"
+        String newSequence = WebUI::arg("plain");
+        if (newSequence.isEmpty()) {
+         WebUI::sendStringContent("text/plain", "No screens were selected", "400 Bad Request");
+          return;
+        }
+        wtAppImpl->settings->screenSettings.fromJSON(newSequence);
+        ScreenMgr.reconcileScreenSequence(wtAppImpl->settings->screenSettings);
+        wtApp->settings->write();
+        WebUI::sendStringContent("text/plain", "New screen sequence was saved");
+      };
+      
+      WebUI::wrapWebAction("/updateScreenSelection", action);
+      ScreenMgr.beginSequence();
+        // Necessary to ensure we're in a sensible state after setting a new 
+        // sequence when we may be in the middle of the previous sequence
+        // Do this after wrapWebAction so the newly displayed screen doesn't end
+        // up having the ActivityIcon restored from the previous screen.
     }
   }   // ----- END: WebUIHelper::Endpoints
 
@@ -173,8 +193,8 @@ namespace WebUIHelper {
         String screen = WebUI::arg(F("screen"));
         Log.trace(F("/dev/forceScreen?screen=%s"), screen.c_str());
         if (!screen.isEmpty()) {
-          if (screen.equalsIgnoreCase("home")) ScreenMgr::displayHomeScreen();
-          else ScreenMgr::display(screen);
+          if (screen.equalsIgnoreCase("home")) ScreenMgr.displayHomeScreen();
+          else ScreenMgr.display(screen);
         }
         WebUI::redirectHome();
       };
@@ -185,9 +205,8 @@ namespace WebUIHelper {
     void yieldScreenShot() {
       auto action = []() {
         WebUI::sendArbitraryContent(
-            "image/bmp",
-            Display::getSizeOfScreenShotAsBMP(),
-            Display::streamScreenShotAsBMP);
+            "image/bmp", Display.ScreenShotSize, 
+            [](Stream& s) { Display.streamScreenShotAsBMP(s); });
       };
       WebUI::wrapWebAction("/dev/screenShot", action, false);
     }
@@ -214,7 +233,7 @@ namespace WebUIHelper {
         }
         else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
         else if (key.equals(F("UNITS"))) val.concat(wtApp->settings->uiOptions.useMetric ? "metric" : "imperial");
-        else if (key.equals(F("BRIGHT"))) val.concat(Display::getBrightness());
+        else if (key.equals(F("BRIGHT"))) val.concat(Display.getBrightness());
       };
 
       WebUI::wrapWebPage("/", "/wta/HomePage.html", mapper);
@@ -242,15 +261,12 @@ namespace WebUIHelper {
 
 
     void presentPluginConfig() {
-      uint8_t count = wtAppImpl->pluginMgr.getPluginCount();
-      Plugin** plugins = wtAppImpl->pluginMgr.getPlugins();
-
-      auto mapper =[count, plugins](const String& key, String& val) -> void {
+      auto mapper = [](const String& key, String& val) -> void {
         if (key.startsWith("_P")) {
           int pluginIndex = (key.charAt(2) - '0') - 1;
-          if (pluginIndex < count) {
-            Plugin* p = plugins[pluginIndex];
+          Plugin* p = wtAppImpl->pluginMgr.getUnifiedPlugin(pluginIndex);
 
+          if (p != nullptr) {
             const char* subkey = &(key.c_str()[4]);
             if (strcmp(subkey, "IDX") == 0) val.concat(pluginIndex+1);
             if (strcmp(subkey, "NAME") == 0) val = p->getName();
@@ -282,25 +298,42 @@ namespace WebUIHelper {
 
       WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
     }
+
+    void presentScreenConfig() {
+      UIOptions* uiOptions = &(wtApp->settings->uiOptions);
+
+      auto mapper =[uiOptions](const String& key, String& val) -> void {
+        if (key.equals(F("ORIG_SEQ"))) wtAppImpl->settings->screenSettings.toJSON(val);
+      };
+
+      WebUI::wrapWebPage("/presentScreenConfig", "/wta/ConfigScreens.html", mapper);
+    }
   }   // ----- END: WebUIHelper::Pages
 
+  void showBusyStatus(bool busy) {
+    if (busy) ScreenMgr.showActivityIcon(Theme::Color_WebRequest, UpdatingSymbol);
+    else ScreenMgr.hideActivityIcon();
+  }
 
   void init(const __FlashStringHelper* appMenuItems) {
-    WebUI::registerBusyCallback(Internal::showBusyStatus);
+    WebUI::registerBusyCallback(showBusyStatus);
 
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
     WebUI::Dev::init(&wtApp->settings->uiOptions.showDevMenu, wtApp->settings);
-    WebUI::Dev::addButtons(Internal::ExtraDevButtons, Internal::NumExtraDevButtons);
+
+    WebUI::Dev::addButton({"Take a screen shot", "/dev/screenShot", nullptr, nullptr});
 
     WebUI::registerHandler("/presentWeatherConfig",   Pages::presentWeatherConfig);
     WebUI::registerHandler("/presentDisplayConfig",   Pages::presentDisplayConfig);
     WebUI::registerHandler("/presentPluginConfig",    Pages::presentPluginConfig);
+    WebUI::registerHandler("/presentScreenConfig",    Pages::presentScreenConfig);
 
     WebUI::registerHandler("/updateStatus",           Endpoints::updateStatus);
     WebUI::registerHandler("/updateWeatherConfig",    Endpoints::updateWeatherConfig);
     WebUI::registerHandler("/updateDisplayConfig",    Endpoints::updateDisplayConfig);
     WebUI::registerHandler("/updatePluginConfig",     Endpoints::updatePluginConfig);
+    WebUI::registerHandler("/updateScreenSelection",  Endpoints::updateScreenSelection);
     WebUI::registerHandler("/setBrightness",          Endpoints::setBrightness);
 
     WebUI::registerHandler("/dev/reboot",             Dev::reboot); // Override the default from WebUI

@@ -144,10 +144,10 @@ void CryptoPlugin::typeSpecificMapper(const String& key, String& value) {
 
 void CryptoPlugin::refresh(bool force) {
   if (!force && (_nextRefresh > millis())) return;
-  ScreenMgr::showUpdatingIcon(Theme::Color_UpdatingPlugins);
+  ScreenMgr.showActivityIcon(Theme::Color_UpdatingPlugins);
   for (int i = 0; i < settings.nCoins; i++) {
     CoinbaseClient::getPrice(settings.coinIDs[i], _currencies[i], _coinVals[i]);
   }
   _nextRefresh = millis() + (settings.refreshInterval * settings.riScale);
-  ScreenMgr::hideUpdatingIcon();
+  ScreenMgr.hideActivityIcon();
 }

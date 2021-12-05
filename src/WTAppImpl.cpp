@@ -9,6 +9,7 @@
 //                                  Third Party Libraries
 //                                  WebThing Includes
 #include <GenericESP.h>
+#include <Output.h>
 #include <WebThing.h>
 #include <WebUI.h>
 #include <DataBroker.h>
@@ -31,7 +32,7 @@ constexpr const char* SettingsFileName = "/settings.json";
 // ----- Utility functions for the rest of the app
 
 void WTAppImpl::askToReboot() {
-  ScreenMgr::display(rebootScreen);
+  ScreenMgr.display(screens.rebootScreen);
 }
 
 void WTAppImpl::saveSettings() {
@@ -68,27 +69,31 @@ void WTAppImpl::begin() {
   settings->init(SettingsFileName);
   settings->read();
   settings->logSettings();
+  Output::setOptions(&(settings->uiOptions.useMetric), &(settings->uiOptions.use24Hour));
 
+  app_configureHW();
+
+  pluginMgr.loadAll("/plugins");
   DataBroker::registerMapper( ([this](const String& key, String& value){ weatherDataSupplier(key, value); }), 'W' );
   app_registerDataSuppliers();
 
-  ScreenMgr::setup(&settings->uiOptions, &settings->displayOptions, &pbMgr);
-  registerScreens();
-  ScreenMgr::display(wifiScreen);
+  ScreenMgr.setup(&settings->uiOptions, &settings->displayOptions);
+  screens.registerScreens();
+  screens.splashScreen = app_registerScreens();
+
+  ScreenMgr.display(screens.wifiScreen);
 
   prepWebThing();
   app_initWebUI();
 
-  if (splashScreen) ScreenMgr::display(splashScreen);
+  if (screens.splashScreen) ScreenMgr.display(screens.splashScreen);
 
   app_initClients();
   prepWeather();
 
-  pluginMgr.loadAll("/plugins");
-
   conditionalUpdate(true);
 
-  ScreenMgr::displayHomeScreen();
+  ScreenMgr.displayHomeScreen();
 
   WebThing::postSetup();                // Must be last
 
@@ -100,7 +105,7 @@ void WTAppImpl::loop() {
   conditionalUpdate(false);
 
   WebThing::loop();
-  ScreenMgr::loop();
+  ScreenMgr.loop();
 
   static uint32_t nextStats = 0;
   if (millis() > nextStats) {
@@ -128,33 +133,33 @@ void WTAppImpl::refreshWeatherData(bool force) {
   uint32_t threshold = (WebThing::settings.processingInterval * 60 * 1000L);
 
   if (force || ((curMillis - lastWeatherUpdate) > threshold)) {
-    ScreenMgr::showUpdatingIcon(Theme::Color_UpdatingWeather);
+    ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->update();
     lastWeatherUpdate = curMillis;
   }
   if (force || ((curMillis - lastForecastUpdate) > ForecastInterval)) {
-    ScreenMgr::showUpdatingIcon(Theme::Color_UpdatingWeather);
+    ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->updateForecast(WebThing::getGMTOffset());
     lastForecastUpdate = curMillis;
   }
-  ScreenMgr::hideUpdatingIcon();
+  ScreenMgr.hideActivityIcon();
 }
 
 void WTAppImpl::prepWeather() {
   if (settings->owmOptions.enabled) {
     if (settings->owmOptions.key.isEmpty()) { settings->owmOptions.enabled = false; }
     else {
-      if (owmClient != NULL) { /* TO DO: Do any necessary cleanup */ }
+      if (owmClient != nullptr) { /* TO DO: Do any necessary cleanup */ }
       owmClient = new OWMClient(
         settings->owmOptions.key, settings->owmOptions.cityID, settings->uiOptions.useMetric, settings->owmOptions.language);
     }
   } else {
-    owmClient = NULL;
+    owmClient = nullptr;
   }
 }
 
 void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
-  if (owmClient == NULL) return;
+  if (owmClient == nullptr) return;
   if (key.equalsIgnoreCase("temp")) value +=  owmClient->weather.readings.temp;
   else if (key.equalsIgnoreCase("desc")) value += owmClient->weather.description.basic;
   else if (key.equalsIgnoreCase("ldesc")) value += owmClient->weather.description.longer;
@@ -169,20 +174,20 @@ void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
 
 // ----- WebThing Functions
 void WTAppImpl::setTitle() {
-  if (WebThing::settings.hostname.isEmpty() || WebThing::settings.hostname.startsWith(appPrefix))
-    WebUI::setTitle("MultiMon (" + WebThing::settings.hostname + ")");
-  else
-    WebUI::setTitle(WebThing::settings.hostname);
+  if (WebThing::settings.hostname.isEmpty()) {
+    WebUI::setTitle(appName);
+  } else {
+    WebUI::setTitle(appName + " (" + WebThing::settings.hostname + ")");
+  }
 }
 
 void WTAppImpl::baseConfigChange() {
   setTitle();
 }
 
-void WTAppImpl::configModeCallback(const String &ssid, const String &ip) {
-  (void)ip; // We don't use this parameter - avoid a warning
-  configScreen->setSSID(ssid);
-  ScreenMgr::display(configScreen);
+void WTAppImpl::configModeCallback(const String &ssid, const String&) {
+  screens.configScreen->setSSID(ssid);
+  ScreenMgr.display(screens.configScreen);
 }
 
 void WTAppImpl::prepWebThing() {
@@ -203,36 +208,3 @@ void WTAppImpl::prepWebThing() {
   setTitle();
 }
 
-
-/*------------------------------------------------------------------------------
- *
- * Private Functions
- *
- *----------------------------------------------------------------------------*/
-
-void WTAppImpl::registerScreens() {
-  // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
-
-  calibrationScreen = new CalibrationScreen();
-  ScreenMgr::registerScreen("Calibration", calibrationScreen);
-
-  configScreen = new ConfigScreen();
-  ScreenMgr::registerScreen("Config", configScreen);
-
-  forecastScreen = new ForecastScreen();
-  ScreenMgr::registerScreen("Forecast", forecastScreen);
-
-  rebootScreen = new RebootScreen();
-  ScreenMgr::registerScreen("Reboot", rebootScreen);
-
-  weatherScreen = new WeatherScreen();
-  ScreenMgr::registerScreen("Weather", weatherScreen);
-
-  wifiScreen = new WiFiScreen();
-  ScreenMgr::registerScreen("WiFi", wifiScreen);
-
-  utilityScreen = new UtilityScreen();
-  ScreenMgr::registerScreen("Utility", utilityScreen);
-
-  splashScreen = app_registerScreens();
-}

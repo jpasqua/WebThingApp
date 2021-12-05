@@ -19,237 +19,268 @@
 #include "ScreenMgr.h"
 #include "Theme.h"
 #include "FlexScreen.h"
+#include "ScreenSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
-using Display::tft;
 
-namespace ScreenMgr {
-  namespace State {
-    std::map<String, Screen*> screenFromName;
+/*------------------------------------------------------------------------------
+ *
+ * BlankScreen Implementation
+ *
+ *----------------------------------------------------------------------------*/
 
-    Screen* curScreen;
-    Screen* homeScreen;
+class BlankScreen : public Screen {
+public:
+  uint8_t lastBrightness = 100;
+  bool blanking = false;
 
-    UIOptions* uiOptions;
-    DisplayOptions* displayOptions;
-    PhysicalButtonMgr* pbMgr;
+  BlankScreen() {
+    buttonHandler =[this](int /*id*/, PressType /*type*/) -> void {
+      Log.verbose("Waking up with millis() = %d, restoring brightness to %d", millis(), lastBrightness);
+      ScreenMgr.unsuspend();  // Let the screen redisplay while the brightness is off...
+      Display.setBrightness(lastBrightness);  // ...then let there be light
+      blanking = false;       // Remember we are no longer blanking
+    };
 
-    uint32_t lastInteraction = 0;
-    Screen* suspendedScreen = nullptr;
+    labels = new Label[(nLabels = 1)];
+    labels[0].init(0, 0, Display.Width, Display.Height, 0);
+
+    nButtonMappings = PassAllRawButtons;
+
+    blanking = false;
+  }
+
+  void display(bool) override {
+    if (!blanking) {
+      blanking = true;
+      lastBrightness = Display.getBrightness();
+      Display.setBrightness(0);
+    }
+  }
+
+  void processPeriodicActivity() override { }
+
+  void updateSavedBrightness(uint8_t b) { lastBrightness = b; }
+
+} blankScreen;
+
+
+/*------------------------------------------------------------------------------
+ *
+ * BaseScreenMgr Implementation
+ *
+ *----------------------------------------------------------------------------*/
+
+void BaseScreenMgr::setup(UIOptions* uiOptions, DisplayOptions* displayOptions) {
+  _uiOptions = uiOptions;
+  _displayOptions = displayOptions;
+
+  auto dispatcher = [this](uint8_t pin, PressType pt) {
+    Log.verbose("Physical button %d was pressed. PressType: %d", pin, pt);
+    _lastInteraction = millis();
+
+    if (_curScreen->physicalButtonPress(pin, pt))  return;  // We consumed the press
+      // Note that a screen can choose to consume the forward or backward buttons
+      // so the lines below may never be reached, even if they were pressed.
+    if (pin == _forwardButton) moveThroughSequence(true);
+    else if (pin == _backwardButton) moveThroughSequence(false);
   };
 
-  namespace Internal {
+  WebThing::buttonMgr.setDispatcher(dispatcher);
+  _lastInteraction = millis();
+  device_setup();
+}
 
-    void unsuspend() {
-      if (State::suspendedScreen) {
-        display(State::suspendedScreen);
-        State::suspendedScreen = nullptr;
-      }
-    }
+void BaseScreenMgr::loop() {
+  if (_curScreen == NULL) return;
+  processSchedules();
+  device_processInput();
 
-    class BlankScreen : public Screen {
-    public:
-      uint8_t lastBrightness;
+  // Test whether we should blank the screen
+  if (_uiOptions->screenBlankMinutes && !isSuspended()) {
+    if (millis() > _lastInteraction + minutesToMS(_uiOptions->screenBlankMinutes)) suspend();
+  }
 
-      BlankScreen() {
-        auto buttonHandler =[this](int id, Button::PressType type) -> void {
-          (void)id;   // We don't use this parameter - avoid a warning...
-          (void)type; // We don't use this parameter - avoid a warning...
-          Log.verbose("Waking up with millis() = %d", millis());
-          // Let the screen redisplay while the brightness is off...
-          ScreenMgr::Internal::unsuspend();
-          // ...then let there be light
-          Display::setBrightness(lastBrightness);
-        };
+  _curScreen->processPeriodicActivity();
+}
 
-        buttons = new Button[(nButtons = 1)];
-        buttons[0].init(0, 0, Display::Width, Display::Height, buttonHandler, 0);
-      }
+Screen* BaseScreenMgr::screenFromName(String& name) {
+  auto namesMatch = [name](Screen* screen) { return name == screen->name; };
+  auto pos = std::find_if(allScreens.begin(), allScreens.end(), namesMatch);
+  return (pos == allScreens.end()) ? nullptr : *pos;
+}
 
-      void display(bool activating = false) {
-        (void)activating; // Not used, avoid warning
-        lastBrightness = Display::getBrightness();
-        Display::setBrightness(0);
-      }
+bool BaseScreenMgr::registerScreen(String screenName, Screen* theScreen, bool special) {
+  if (screenFromName(screenName) != nullptr) {
+    Log.warning("Trying to register a screen with a name that is in use: %s", screenName.c_str());
+    return false;
+  }
+  theScreen->name = screenName;
+  theScreen->special = special;
+  allScreens.push_back(theScreen);
 
-      void processPeriodicActivity() { }
-    } blankScreen;
+  return true;
+}
+
+void BaseScreenMgr::setAsHomeScreen(Screen* screen) {
+  _homeScreen = screen;
+}
+
+void BaseScreenMgr::display(String name) {
+  Screen* screen = screenFromName(name);
+  if (screen == NULL) {
+    Log.warning("Trying to display screen %s, but none is registered", name.c_str());
+    return;
+  }
+  display(screen);
+}
+
+void BaseScreenMgr::display(Screen* screen) {
+  _curScreen = screen;
+  screen->activate();
+}
+
+void BaseScreenMgr::displayHomeScreen() {
+  if (_homeScreen == NULL) {
+    Log.warning("Trying to display a home screen when none has been set");
+    return;
+  }
+  display(_homeScreen);
+}
+
+void BaseScreenMgr::refresh() {
+  if (_curScreen) _curScreen->display(true);
+}
+
+FlexScreen*  BaseScreenMgr::createFlexScreen(
+  const JsonDocument &doc,
+  uint32_t refreshInterval,
+  const Basics::ReferenceMapper &mapper)
+{
+  FlexScreen* flexScreen = new FlexScreen();
+  JsonObjectConst descriptor = doc.as<JsonObjectConst>();
+  if (!flexScreen->init(descriptor, refreshInterval, mapper)) {
+    delete flexScreen;
+    return NULL;
+  }
+
+  registerScreen(flexScreen->getScreenID(), flexScreen);
+  return (flexScreen);
+}
 
 
-    void processSchedules() {
-      static uint32_t eveningExecutedOnDay = UINT32_MAX;
-      static uint32_t morningExecutedOnDay = UINT32_MAX;
-      static uint32_t nextScheduleCheck = 0;
+void BaseScreenMgr::unsuspend() {
+  if (_suspendedScreen) {
+    display(_suspendedScreen);
+    _suspendedScreen = nullptr;
+  }
+}
 
-      if (State::uiOptions->schedule.active) {
-        uint16_t morning = State::uiOptions->schedule.morning.hr * 100 + State::uiOptions->schedule.morning.min;
-        uint16_t evening = State::uiOptions->schedule.evening.hr * 100 + State::uiOptions->schedule.evening.min;
-        uint32_t curMillis = millis();
-        uint32_t today = day();
-        if (curMillis > nextScheduleCheck) {
-          nextScheduleCheck = curMillis + (60-second()) * 1000L;
-          uint16_t curTime = hour() * 100 + minute();
-          if (curTime >= evening || curTime < morning) {
-            if (eveningExecutedOnDay != today) {
-              Display::setBrightness(State::uiOptions->schedule.evening.brightness);
-              eveningExecutedOnDay = today;
-            }
-          } else if (morningExecutedOnDay != today) {
-            Display::setBrightness(State::uiOptions->schedule.morning.brightness);
-            morningExecutedOnDay = today;
-          }
+void BaseScreenMgr::suspend() {
+  _suspendedScreen = _curScreen;
+  display(&blankScreen);
+}
+
+void BaseScreenMgr::processSchedules() {
+  static uint32_t eveningExecutedOnDay = UINT32_MAX;
+  static uint32_t morningExecutedOnDay = UINT32_MAX;
+  static uint32_t nextScheduleCheck = 0;
+
+  if (_uiOptions->schedule.active) {
+    uint16_t morning = _uiOptions->schedule.morning.hr * 100 + _uiOptions->schedule.morning.min;
+    uint16_t evening = _uiOptions->schedule.evening.hr * 100 + _uiOptions->schedule.evening.min;
+    uint32_t curMillis = millis();
+    uint32_t today = day();
+    if (curMillis > nextScheduleCheck) {
+      nextScheduleCheck = curMillis + (60-second()) * 1000L;
+      uint16_t curTime = hour() * 100 + minute();
+      if (curTime >= evening || curTime < morning) {
+        if (eveningExecutedOnDay != today) {
+          if (isSuspended()) blankScreen.updateSavedBrightness(_uiOptions->schedule.evening.brightness);
+          else Display.setBrightness(_uiOptions->schedule.evening.brightness);
+          eveningExecutedOnDay = today;
         }
+      } else if (morningExecutedOnDay != today) {
+        if (isSuspended()) blankScreen.updateSavedBrightness(_uiOptions->schedule.morning.brightness);
+        else Display.setBrightness(_uiOptions->schedule.morning.brightness);
+        morningExecutedOnDay = today;
       }
     }
+  }
+}
 
-    void processInput() {
-      uint32_t curMillis = millis();
-      uint16_t tx = 0, ty = 0;
-      bool pressed = Display::tft.getTouch(&tx, &ty);
-      if (pressed) State::lastInteraction = curMillis;
-      State::curScreen->processInput(pressed, tx, ty);
-      State::pbMgr->processInput();
+void BaseScreenMgr::setSequenceButtons(uint8_t forward, uint8_t backward) {
+  _forwardButton = forward;
+  _backwardButton = backward;
+}
 
-      // Test whether we should blank the screen
-      if (State::uiOptions->screenBlankMinutes && !State::suspendedScreen) {
-        uint32_t timeToBlankScreen = State::lastInteraction +
-            State::uiOptions->screenBlankMinutes * Basics::MillisPerMinute;
-        if (curMillis > timeToBlankScreen) {
-          Log.verbose("Going to sleep with millis() = %d", curMillis);
-          State::suspendedScreen = State::curScreen;
-          display(&Internal::blankScreen);
-        }
+void BaseScreenMgr::beginSequence() {
+  if (sequence.empty()) { displayHomeScreen(); return; }
+  _curSequenceIndex = 0;
+  display(sequence.at(_curSequenceIndex));
+}
+
+void BaseScreenMgr::moveThroughSequence(bool forward) {
+  if (sequence.empty()) { displayHomeScreen(); return; }
+  if (forward) {
+    _curSequenceIndex++;
+    if (_curSequenceIndex == sequence.size()) _curSequenceIndex = 0;
+  } else {
+    if (_curSequenceIndex == 0) _curSequenceIndex = sequence.size()-1;
+    else _curSequenceIndex--;
+  }
+  display(sequence.at(_curSequenceIndex));
+}
+
+void dumpScreenInfo(const char* title, ScreenSettings& screenSettings) {
+  Log.verbose("%s", title);
+  for (auto& s : screenSettings.screenInfo) {
+    Log.verbose("%s is %s", s.id.c_str(), s.enabled ? "on" : "off");
+  }
+}
+
+void BaseScreenMgr::reconcileScreenSequence(ScreenSettings& screenSettings) {
+  auto& screenInfo = screenSettings.screenInfo;
+
+  // dumpScreenInfo("Before phase 1 reconcilation:", screenSettings);
+
+  // Step 1: Ensure that every screen in the settings
+  // is a real screen, and not special. If we find one
+  // that's not, remove it from the list
+  for (int i = screenInfo.size()-1; i >= 0 ; i--) {
+    Screen* s = screenFromName(screenInfo[i].id);
+    if (s == nullptr || s->special) {
+      screenInfo.erase(screenInfo.begin()+i);
+    }
+  }
+  // dumpScreenInfo("After phase 1 reconcilation:", screenSettings);
+
+  // Step 2: Ensure that every non-special screen shows up in the
+  // settings even if it is disabled. If we find one that's not,
+  // add it and make it disabled. The user can enable it if desired.
+  for (Screen* s : allScreens) {
+    bool matched = false;
+    for (int j = screenInfo.size()-1; j >= 0; j--) {
+      if (screenInfo[j].id == s->name) {
+        matched = true;
+        break;
       }
     }
-
-    void dispatchPhysicalButtonPress(uint8_t id, BaseButton::PressType pt) {
-      Log.verbose("Physical button %d was pressed. PressType: %d", id, pt);
-      State::lastInteraction = millis();
-      if (!State::curScreen->physicalButtonHandler) return;
-
-      auto mapping = State::curScreen->screenButtonFromPhysicalButton.find(id);
-      if (mapping != State::curScreen->screenButtonFromPhysicalButton.end()) {
-        State::curScreen->physicalButtonHandler(mapping->second, pt);
-      }
+    if (!matched && !(s->special)) {
+      // Log.verbose("Adding screen named %s to settings.screenInfo", s->name.c_str());
+      screenInfo.emplace_back(ScreenSettings::ScreenInfo(s->name, true));
     }
-
-  };  // ----- END: ScreenMgr::Internal
-
-  namespace InfoIcon {
-    constexpr uint16_t Size = 32;
-    constexpr uint16_t BorderSize = 5;
-    constexpr uint16_t X = (320 - Size);
-    constexpr uint16_t Y = 0;
-    uint16_t *savedPixels = NULL;
-    bool isDisplayed = false;
-
-    void draw(
-        uint16_t borderColor, char symbol, uint16_t fillColor, uint16_t textColor)
-    {
-      tft.readRect(X, Y, Size, Size, savedPixels);
-      uint16_t centerX = X+(Size/2);
-      uint16_t centerY = Y+(Size/2);
-      tft.fillCircle(centerX, centerY, Size/2-1, borderColor);
-      tft.fillCircle(centerX, centerY, (Size/2-1)-BorderSize, fillColor);
-      tft.setTextDatum(MC_DATUM);
-      // tft.setFreeFont(&FreeSerifBoldItalic9pt7b);
-      tft.setFreeFont(&FreeSansBold9pt7b);
-      tft.setTextColor(textColor);
-      tft.drawString(String(symbol), centerX, centerY);
-    }
-
-
-    void init() {
-      // In theory it would be better to allocate/deallocate this as needed, but it causes
-      // a lot more fragmentation and potentially a crash.
-      savedPixels = (uint16_t *)malloc(Size*Size*sizeof(uint16_t));  // This is BIG!
-    }
-  } // END: ScreenMgr::InfoIcon namespace
-
-  void setup(UIOptions* uiOptions, DisplayOptions* displayOptions, PhysicalButtonMgr* pbMgr) {
-    State::uiOptions = uiOptions;
-    State::displayOptions = displayOptions;
-    State::pbMgr = pbMgr;
-
-    State::pbMgr->setDispatcher(Internal::dispatchPhysicalButtonPress);
-    Display::begin(displayOptions);
-    State::lastInteraction = millis();
-    InfoIcon::init();
   }
+  // dumpScreenInfo("After phase 2 reconcilation:", screenSettings);
 
-  void loop() {
-    if (State::curScreen == NULL) return;
-    Internal::processSchedules();
-    Internal::processInput();
-    State::curScreen->processPeriodicActivity();
-  }
-
-
-  bool registerScreen(String screenName, Screen* theScreen) {
-    if (State::screenFromName[screenName] != NULL) {
-      Log.warning("Trying to register a screen with a name that is in use: %s", screenName.c_str());
-      return false;
+  // Step 3: OK, we've reconciled the lists, now rebuild the sequence in the
+  // order specified by the settings. Leave out any item that is disabled
+  sequence.clear();
+  for (auto& si : screenInfo) {
+    if (si.enabled) {
+      Screen* screen = screenFromName(si.id);  // Guaranteed to be present
+      sequence.push_back(screen);
+      // Log.verbose("Adding %s to the screenSequence", screen->name.c_str());
     }
-    State::screenFromName[screenName] = theScreen;
-    return true;
   }
-
-  void setAsHomeScreen(Screen* screen) {
-    State::homeScreen = screen;
-  }
-
-  void display(String name) {
-    Screen* screen = State::screenFromName[name];
-    if (screen == NULL) {
-      Log.warning("Trying to display screen %s, but none is registered", name.c_str());
-      return;
-    }
-    display(screen);
-  }
-
-  void display(Screen* screen) {
-    State::curScreen = screen;
-    screen->activate();
-  }
-
-  void displayHomeScreen() {
-    if (State::homeScreen == NULL) {
-      Log.warning("Trying to display a home screen when none has been set");
-      return;
-    }
-    display(State::homeScreen);
-  }
-
-  FlexScreen* createFlexScreen(
-      const JsonDocument &doc,
-      uint32_t refreshInterval,
-      const Basics::ReferenceMapper &mapper)
-  {
-    FlexScreen* flexScreen = new FlexScreen();
-    JsonObjectConst descriptor = doc.as<JsonObjectConst>();
-    if (!flexScreen->init(descriptor, refreshInterval, mapper)) {
-      delete flexScreen;
-      return NULL;
-    }
-
-    registerScreen(flexScreen->getScreenID(), flexScreen);
-    return (flexScreen);
-  }
-
-    void showUpdatingIcon(uint16_t accentColor, char symbol) {
-      if (InfoIcon::isDisplayed) return;
-      InfoIcon::draw(
-        accentColor, symbol, Theme::Color_UpdatingFill, Theme::Color_UpdatingText);
-      InfoIcon::isDisplayed = true;
-    }
-
-    void hideUpdatingIcon() {
-      if (!InfoIcon::isDisplayed) return;
-      tft.pushRect(
-        InfoIcon::X, InfoIcon::Y, InfoIcon::Size,
-        InfoIcon::Size, InfoIcon::savedPixels);
-      InfoIcon::isDisplayed = false;
-    }
-
-
-};
+}

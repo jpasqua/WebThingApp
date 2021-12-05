@@ -1,74 +1,64 @@
 #ifndef Screen_h
 #define Screen_h
 
-#include <map>
 #include "Display.h"
-#include "Button.h"
+#include "Label.h"
+#include <WTButton.h>
 
-
-class Screen {
+class BaseScreen {
 public:
-  // ----- Constructors
-  Screen() = default;
+  // ----- Types
+  using ButtonHandler = std::function<void(uint8_t, PressType)>;
 
-  // ----- Member Functions that must be implemented by subclasses
+  // ----- Constants
+  static constexpr uint8_t MaxLabels = 254;
+  static constexpr uint8_t MaxButtonMappings = 254;
+  static constexpr uint8_t PassAllRawButtons = 255;
+
+  // ----- Constructors
+  BaseScreen() = default;
+  ~BaseScreen() = default;
+
+  // ----- The following must be implemented by subclasses
   virtual void display(bool force = false) = 0;
   virtual void processPeriodicActivity() = 0;
 
-  // ----- Member Functions that may be overriden by subclasses
-  virtual void activate() {
-    startOfPress = endOfPress = 0;
-    display(true);
-  }
+  // ---- The following may be implemented by subclasses
+  virtual void activate();
 
-  // ----- Member Functions
-  void processInput(bool pressed, uint16_t tx, uint16_t ty) {
-    if (pressed) {
-      if (startOfPress == 0) {
-        startOfPress = millis();
-        endOfPress = 0;
-      }
-      lastX = tx; lastY = ty;
-    } else {
-      if (startOfPress != 0) {
-        if (endOfPress == 0) {
-          endOfPress = millis();
-        } else if (millis() - endOfPress > DebounceTime) {
-          // Process the press
-          // Ok, we got a press/release, see which button (if any) is associated
-          Button::PressType pt;
-          uint32_t pressDuration = (millis() - startOfPress);
-          if (pressDuration >= Button::VeryLongPressInterval) pt = Button::PressType::VeryLongPress;
-          else if (pressDuration >= Button::LongPressInterval) pt = Button::PressType::LongPress;
-          else pt = Button::PressType::NormalPress;
+  // ----- ScreenMgr calls this to pass along a button press
+  bool physicalButtonPress(uint8_t pin, PressType pt);
 
-          for (int i = 0; i < nButtons; i++) {
-            if (buttons[i].processTouch(lastX, lastY, pt)) break;
-          }
-          endOfPress = 0;
-          startOfPress = 0;
-        }
-      }
-    }
-  }
+  String name;
+  bool special; // Is this a "one-off" screen like the splash screen, or
+                // will it be used in the normal course of operation
+                // e.g. in a sequence
 
-
+protected:
   // ----- Data Members
-  BaseButton::ButtonCallback physicalButtonHandler = nullptr;
-  std::map<uint8_t/*physical*/, uint8_t/*screen*/> screenButtonFromPhysicalButton;
+  // These must all be set be concrete subclasses
 
-  Button* buttons;
-  uint8_t nButtons;
+  ButtonHandler buttonHandler;
+    // The function to call when a button press of any type occurs
+    // It might be a physical button or a virtual touch button
 
+  Label* labels = nullptr;
+  uint8_t nLabels = 0;
+    // The label areas in use by this screen. This is only relevant
+    // to the Screen class if any of the labels correspond to touch
+    // targets on a touch screen display.
 
-private:
-  // ----- Constants
-  static constexpr uint32_t DebounceTime = 100;
+  WTButton::Mapping* buttonMappings = nullptr;
+  uint8_t nButtonMappings = 0;
+    // The physical buttons that this screen cares about. If
+    // nButtonMappings is set to PassAllRawButtons, then the
+    // array of mappings is ignored and all button presses are
+    // passed to the buttonHandler with an ID that corresponds
+    // to the button's associated pin.
 
-  // ----- Data Members
-  uint32_t startOfPress = 0;
-  uint32_t endOfPress = 0;
-  uint16_t lastX, lastY;
 };
+
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(Screen)
 
 #endif // Screen_h

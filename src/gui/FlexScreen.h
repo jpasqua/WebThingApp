@@ -27,7 +27,7 @@
 //                                  WebThing Includes
 //                                  Local Includes
 #include "Screen.h"
-#include "Button.h"
+#include "Label.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -61,7 +61,7 @@ public:
 
 class FlexScreen : public Screen {
 public:
-  static void setButtonDelegate(Button::ButtonCallback delegate) { _buttonDelegate = delegate; }
+  static void setButtonDelegate(Screen::ButtonHandler delegate) { _buttonDelegate = delegate; }
 
   // ----- Functions that are specific to FlexScreen
   virtual ~FlexScreen();
@@ -78,7 +78,7 @@ public:
 
 
 private:
-  static   Button::ButtonCallback _buttonDelegate;
+  static   Screen::ButtonHandler _buttonDelegate;
 
   FlexItem* _items;             // An array of items on the screen
   uint8_t   _nItems;            // Number of items

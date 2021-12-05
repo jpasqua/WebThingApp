@@ -466,7 +466,9 @@ Each plugin requires four JSON descriptor files. All descriptors for a plugin ar
 	* How often to refresh the UI
 	* A representation of the units of the refresh interval (i.e. is it seconds, minutes, etc.)
 * **form.json**: A [jsonform](https://github.com/jsonform/jsonform) descriptor that is used by the Web UI to allow the user to display and edit the settings. Using this mechanism, a plugin can augment a `WebThingApp`'s Web UI without creating a new HTML template or writing custom code. The Web UI for all plugins are displayed by the [Configure Plugins](../Readme.md#configure-plugins) page 
-* **screen.json**: A description of the layout and content of the screen. The FlexScreen class is responsible for parsing this description and displaying information - no custom code is required. FlexScreen can display things like floats, ints, and string using a format you specify. It can also display more complex things like a progress/status bar. At the moment, that's the only complex thing.
+* **screen.json**: A description of the layout and content of the screen.
+	* The FlexScreen class is responsible for parsing this description and displaying information - no custom code is required. FlexScreen can display things like floats, ints, and string using a format you specify. It can also display more complex things like a progress/status bar. At the moment, that's the only complex thing.
+	* The `screen.json` descriptor is optional. If it is omitted, the plugin will not create a new screen. A plugin without a screen is known as a data provider. It is accomanied by C++ code to provide data from some source (e.g. a sensor or REST API) and make that data available to other plugins via the [DataBroker](#datavalues).
 
 ### Custom Code
 
@@ -479,7 +481,9 @@ You can create a plugin that goes beyond what is possible via a generic plugin. 
 
 Plugin code should be placed in the `src/plugins` directory and the data sources should be placed  in the `src/clients` directory.
 
-To make a new type of plugin available, you must add it to the `PluginFactory` which is typically defined in your main app. A `PluginFactory` simply takes a plugin name, as defined in a plugin.json file, and returns an instance of that plugin. See the sample code for details. 
+To make a new type of plugin available, you must add it to the `PluginFactory` which is typically defined in your main app. A `PluginFactory` simply takes a plugin name, as defined in a plugin.json file, and returns an instance of that plugin. See the sample code for details. A plugin with or without a screen definition may act as a data source.
+
+***Side Note***: One might wonder why plugins act as data sources providing data to the DataBroker rather than clients themselves. To be concrete, why have a BlynkPlugin data provider when the BlynkClient could theoretically interace with the DataBroker directly? There are a couple of reasons, but the most important is that plugins have settings. Multiple plugins of the same type could be configured with different configurations (e.g. different API keys). The client code is lower level and not bound to any specific configuration.
 
 ## Describing the GUI Layout
 
@@ -497,7 +501,9 @@ The bulk of the content is in the `items` array, each element of which describes
 * `bkg`: Provide the background color of the screen as a 24bit hex color code
 * `name`: The name that will be used to identify the plugin in the GUI and Web UI. This should be a fairly short name as space is limited in the GUI.
 
-The `items` have a number of elements, some of which are optional:
+The `items` have a number of fields, some of which are optional. The physical display you have attached to your device has an impact on the allowable value of the item fields. At the moment, there are two general types of displays supported: a small monochrome OLED and a larger color touch screen. When there are differences based on display type, they will be pointed out below.
+
+The available fields are:
 
 ````
 {
@@ -514,9 +520,11 @@ The `items` have a number of elements, some of which are optional:
 }
 ````
 
-The elements are as follows:
+The fields are as follows:
 
-* `x, y, w, h`: *Required*. These provide the size and location of the field on the display. The location (0, 0) represents the upper left corner of the display. Note that displayed values are not clipped to the bounding box defined by `w, h`. 
+* `x, y, w, h`: *Required*. These provide the size and location of the field on the display. The location (0, 0) represents the upper left corner of the display.
+	* Displayed values are not clipped to the bounding box defined by `w, h`.
+	* Values beyond the edges of the physcial display will be clipped.
 * `xOff, yOff	`: *Optional*. Gives the offset within the bounding box where the content will be rendered. If not specified, it will default to (0, 0).
 * `justify`: *Optional*. Defines the alignment of the displayed content within the field. For example, if you would like the content to be centered horizontally and vertical within the field's bounding box, then set `(xOff, yOff)` to `(width/2, height/2)` and use `MC` as the `justify` value.
   
@@ -533,15 +541,21 @@ The elements are as follows:
 
   If not specified, it will default to `TL`. 
 * `font`: *Optional*. The font to be used. The structure of the names are: `Family` `Style` `Size`. The families are Mono (M), SansSerif (S), Digital (D). The styles are Regular (default), Bold (B), Oblique (O), and Bold-Oblique (BO). The allowed values are:
-  * M9, MB9, MO9, MBO9: 9 point Mono fonts in all styles
-  * S9, SB9, SO9, SBO9: point Sans fonts in all styles
-  * S12, SB12, SO12, SBO12: 12 point Sans fonts in all styles
-  * S18, SB18, SO18, SBO18: 18 point Sans fonts in all styles
-  * S24, SB24, SO24, SBO24: 24 point Sans fonts in all styles
-  * D20, D72, D100: 7-Segment Digital Font in large sizes
-  
-  `font` may also be a number corresponding to a built-in font in the [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI). If this item is omitted, it defaults to built-in font 2.
-* `color`: *Required*. The color of the content of the field. This is a 24-bit (888) hex color specifier (not a name) which begins with `0x`.
+	* Color Touch Screen:
+	  * M9, MB9, MO9, MBO9: 9 point Mono fonts in all styles
+	  * S9, SB9, SO9, SBO9: point Sans fonts in all styles
+	  * S12, SB12, SO12, SBO12: 12 point Sans fonts in all styles
+	  * S18, SB18, SO18, SBO18: 18 point Sans fonts in all styles
+	  * S24, SB24, SO24, SBO24: 24 point Sans fonts in all styles
+	  * D20, D72, D100: 7-Segment Digital Font in large sizes
+	  * `font` may also be a number corresponding to a built-in font in the [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI). If this item is omitted, it defaults to built-in font 2.
+  * OLED
+  	* M5
+  	* S10, SB12, S16, S24
+  	* D16, D32
+  	* W21, W36 (weather icons)
+
+* `color`: *Required*. The color of the content of the field. This is a 24-bit (888) hex color specifier (not a name) which begins with `0x`. For monochrome OELD displays all non-zero values convert to 1.
 * `format`: *Required*. The format is used to display the content of the field. It is a `printf` style format. For example if the field is meant to display a temperature, then the format might be: `"Temp: %0.1fF"`. If the field is just a static label, then the format specifies the label. Note: while optional, if this is not supplied, then no content will be displayed other than a border if specified.   The `format` must correspond to the `type`. For example, if the `type` is `FLOAT`, then the `format` must include some variation of `%f`. 
   
   There are special values of the format string that begin with '#'. These format strings indicate that a a custom display element should be used rather than displaying the result textually. The current set of custom display elements are:
@@ -563,11 +577,10 @@ Any plugin (generic or custom) may access values made available by an app-wide d
 Values have names that are composed of multiple parts. All keys begin with a '$' followed by a single letter:
 
 * `$S`: Corresponds to the system namespace which contains keys for things like the current time and heap statistics
-* `$G`: Corresponds to the Grill namespace which contains keys related to the grill being monitored such as the status of the grill and the requested grill temperature.
 * `$W`: Corresponds to the weather namespace which contains keys such as the temperature in the selected city.
 * `$E`: Corresponds to the ***extension*** namespace which is where plugins can publish their own data values.
 
-The list of available values for `$S`, `$P`, and `$W` are given in the table below.
+The list of available values for `$S` and `$W` are given in the table below.
 
 
 | Full name | Type 	  | Description	|
@@ -580,19 +593,6 @@ The list of available values for `$S`, `$P`, and `$W` are given in the table bel
 | `$W.temp`   | FLOAT   | Current temperature |
 | `$W.desc`   | STRING  | Short description of weather conditions  |
 | `$W.ldesc`  | STRING  | Longer description of weather conditions |
-| **Grill**   |   | Note that if *GrillMon* is not connected to a grill, the values below will not be meaningful. |
-| `$G.connected`  | BOOL | Indicates whether GrillMon is connected to a grill |
-| `$G.id`  | STRING | The ID of the connected grill. |
-| `$G.fv`  | STRING | The firmware version of the connected grill. |
-| `$G.state`  | STRING | The state of the connected grill: On, Off, or Fan. |
-| `$G.fireState`  | STRING | The state of the flame of the connected grill. For example `Starting` or `Running` |
-| `$G.warning`  | STRING | A representation of the current warning. If there is no warning (which is normal), it will be "None" |
-| `$G.dft`  | INT | The desired food temperature. |
-| `$G.cft`  | INT | The current food temperature. |
-| `$G.dgt`  | INT | The desired grill temperature. |
-| `$G.cgt`  | INT | The current grill temperature. |
-| `$G.foodTemps`  | STRING | A formatted version of the food temperatures in the form `Current / Desired` |
-| `$G.grillTemps`  | STRING | A formatted version of the grill temperatures in the form `Current / Desired` |
 
 Any plugin that publishes data should provide a similar list of available data. See the [Blynk Weather Plugin](#bwp) for an example.
 

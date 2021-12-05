@@ -100,8 +100,13 @@ void PluginMgr::newPlugin(String pluginPath) {
     return;
   }
 
-  _plugins[_nPlugins++] = p;
-  Log.verbose("completed setting up %s", name.c_str());
+  if (p->getFlexScreen()) {
+    _plugins[_nPlugins++] = p;
+    Log.verbose("completed setting up Plugin %s", name.c_str());
+  } else {
+    _dataProviders[_nDataProviders++] = p;
+    Log.verbose("completed setting up DataProvider %s", name.c_str());
+  }
 } 
 
 bool PluginMgr::validatePluginFiles(String pluginPath) {
@@ -109,10 +114,14 @@ bool PluginMgr::validatePluginFiles(String pluginPath) {
   // Make sure all the required files exist, or don't bother going any further
   if (ESP_FS::exists(pluginPath + "/plugin.json") &&
       ESP_FS::exists(pluginPath + "/form.json") &&
-      ESP_FS::exists(pluginPath + "/settings.json") &&
-      ESP_FS::exists(pluginPath + "/screen.json")) return true;
+      ESP_FS::exists(pluginPath + "/settings.json")) return true;
+      // Note that pluginPath/screen.json is optional
 
   Log.warning(F("For plugin %s, not all json files are present"), pluginPath.c_str());
+  Log.warning(F("  plugin.json: %T"), ESP_FS::exists(pluginPath + "/plugin.json"));
+  Log.warning(F("  form.json: %T"), ESP_FS::exists(pluginPath + "/form.json"));
+  Log.warning(F("  settings.json: %T"), ESP_FS::exists(pluginPath + "/settings.json"));
+  Log.warning(F("  screen.json: %T"), ESP_FS::exists(pluginPath + "/screen.json"));
   return false;
 }
 
@@ -158,13 +167,14 @@ void PluginMgr::setFactory(Factory theFactory) {
 
 void PluginMgr::loadAll(String pluginRoot) {
 
-  auto buttonHandler =[this](int id, Button::PressType type) -> void {
+  auto buttonHandler =[this](int id, PressType type) -> void {
     Log.verbose(F("FlexScreen button delegate: id = %d, type = %d"), id, type);
     displayNextPlugin();
   };
   FlexScreen::setButtonDelegate(buttonHandler);
 
   _nPlugins = 0;
+  _nDataProviders = 0;
   String  pluginDirNames[MaxPlugins];
   uint8_t nPluginsFound = enumPlugins(pluginRoot, &pluginDirNames[0]);
 
@@ -188,15 +198,20 @@ void PluginMgr::refreshAll(bool force) {
   for (int i = 0; i < _nPlugins; i++) {
     _plugins[i]->refresh(force);
   }
+  for (int i = 0; i < _nDataProviders; i++) {
+    _dataProviders[i]->refresh(force);
+  }
 }
 
-uint8_t PluginMgr::getPluginCount() { return _nPlugins; }
-
-Plugin** PluginMgr::getPlugins() { return &(_plugins[0]); }
-
 Plugin* PluginMgr::getPlugin(uint8_t index) {
-  if (index >= _nPlugins) return NULL;
+  if (index >= _nPlugins) return nullptr;
   return _plugins[index];
+}
+
+Plugin* PluginMgr::getUnifiedPlugin(uint8_t index) {
+  if (index < _nPlugins) return _plugins[index];
+  if (index < _nPlugins + _nDataProviders) return _dataProviders[index - _nPlugins];
+  return nullptr;
 }
 
 void PluginMgr::map(const String& key, String& value) {
@@ -209,16 +224,23 @@ void PluginMgr::map(const String& key, String& value) {
       return;
     }
   }
+  for (int i = 0; i < _nDataProviders; i++) {
+    Plugin *p = _dataProviders[i];
+    if (p->getNamespace() == piNamespace) {
+      if (p->enabled()) { p->typeSpecificMapper(key.substring(indexOfSeparator+1), value); }
+      return;
+    }
+  }
 }
 
 void PluginMgr::displayPlugin(uint8_t pluginIndex) {
   if (pluginIndex >= _nPlugins) {
     curPlugin = -1;
-    ScreenMgr::displayHomeScreen();
+    ScreenMgr.displayHomeScreen();
     return;
   }
   Plugin *p = _plugins[(curPlugin = pluginIndex) ];
-  if (p && p->enabled()) { ScreenMgr::display(p->getFlexScreen()); }
+  if (p && p->enabled()) { ScreenMgr.display(p->getFlexScreen()); }
 }
 
 void PluginMgr::displayNextPlugin() {

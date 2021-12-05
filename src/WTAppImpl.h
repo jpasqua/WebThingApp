@@ -14,14 +14,8 @@
 //                                  Local Includes
 #include "WTApp.h"
 #include "plugins/PluginMgr.h"
-#include "gui/PhysicalButtonMgr.h"
-#include "screens/CalibrationScreen.h"
-#include "screens/ConfigScreen.h"
-#include "screens/ForecastScreen.h"
-#include "screens/RebootScreen.h"
-#include "screens/WeatherScreen.h"
-#include "screens/WiFiScreen.h"
-#include "screens/UtilityScreen.h"
+#include "gui/devices/DeviceSelect.h"
+#include "WTScreenConfig.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -30,16 +24,7 @@
 class WTAppImpl : public WTApp {
 public:
   PluginMgr pluginMgr;
-  PhysicalButtonMgr pbMgr;
-
-  CalibrationScreen*  calibrationScreen;
-  ConfigScreen*       configScreen;
-  ForecastScreen*     forecastScreen;
-  RebootScreen*       rebootScreen;
-  WeatherScreen*      weatherScreen;
-  WiFiScreen*         wifiScreen;
-  UtilityScreen*      utilityScreen;
-  Screen*             splashScreen;       // Optional. Supplied by the app.
+  AppScreens screens;
 
   WTAppImpl(const String& name, const String& prefix, const String& version, WTAppSettings* appSettings);
   
@@ -64,7 +49,7 @@ public:
   virtual void app_loop() = 0;
 
   // ----- Functions that *may* be provided by subclasses
-  virtual void app_registerButtons() {  };
+  virtual void app_configureHW() {  };
 
 protected:
   // ----- Weather Functions
@@ -75,11 +60,8 @@ protected:
   // ----- WebThing Functions
   void setTitle();
   void baseConfigChange();
-  void configModeCallback(const String &ssid, const String &ip);
   void prepWebThing();
-
-private:
-  void registerScreens();
+  virtual void configModeCallback(const String &ssid, const String &ip);
 };
 
 #endif  // WTAppImpl_h

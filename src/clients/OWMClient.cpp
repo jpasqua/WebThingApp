@@ -190,6 +190,14 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
     forecast[forecastIndex].icon = curIcon;
   }
 
+  // If the actual current temperature is higher than the predicted
+  // high for today, then update the prediction!
+  if (day(weather.dt) == day(forecast[0].dt)) {
+    if (weather.readings.temp > forecast[0].hiTemp) {
+      forecast[0].hiTemp = weather.readings.temp;
+    }
+  }
+
   dumpForecast();
   delete root;
 }

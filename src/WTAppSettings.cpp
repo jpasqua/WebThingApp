@@ -23,18 +23,21 @@ void WTAppSettings::fromJSON(const JsonDocument &doc) {
   uiOptions.fromJSON(doc);
   displayOptions.fromJSON(doc);
   owmOptions.fromJSON(doc);
+  screenSettings.fromJSON(doc);
 }
 
 void WTAppSettings::toJSON(JsonDocument &doc) {
   uiOptions.toJSON(doc);
   displayOptions.toJSON(doc);
   owmOptions.toJSON(doc);
+  screenSettings.toJSON(doc);
 }
 
 void WTAppSettings::logSettings() {
   uiOptions.logSettings();
   displayOptions.logSettings();
   owmOptions.logSettings();
+  screenSettings.logSettings();
 }
 
 

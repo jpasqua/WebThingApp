@@ -12,15 +12,13 @@
 #include <ArduinoLog.h>
 //                                  WebThing Includes
 #include <BPABasics.h>
+#include <Output.h>
 #include <DataBroker.h>
 //                                  Local Includes
 #include "Display.h"
 #include "Theme.h"
 #include "FlexScreen.h"
 //--------------- End:    Includes ---------------------------------------------
-
-using Display::tft;
-using Display::sprite;
 
 
 /*------------------------------------------------------------------------------
@@ -30,8 +28,13 @@ using Display::sprite;
  *----------------------------------------------------------------------------*/
 
 inline uint16_t mapColor(String colorSpecifier) {
-  uint32_t hexVal = strtol(colorSpecifier.c_str(), NULL, 16);
-  return tft.color24to16(hexVal);
+  uint32_t hexVal = strtol(colorSpecifier.c_str(), nullptr, 16);
+
+  uint16_t r = (hexVal >> 8) & 0xF800;
+  uint16_t g = (hexVal >> 5) & 0x07E0;
+  uint16_t b = (hexVal >> 3) & 0x001F;
+
+  return (r | g | b);
 }
 
 FlexItem::Type mapType(String t) {
@@ -58,6 +61,7 @@ uint8_t mapDatum(String justify) {
   return TL_DATUM;
 }
 
+// Requires device-specific code
 void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
   // Use a default if no matching font is found
   font = 2;
@@ -68,7 +72,7 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
     return;
   } 
 
-  gfxFont = Display::Font::idFromName(fontName);
+  gfxFont = Display.fontIDFromName(fontName);
 } 
 
 /*------------------------------------------------------------------------------
@@ -77,7 +81,7 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
  *
  *----------------------------------------------------------------------------*/
 
-Button::ButtonCallback FlexScreen::_buttonDelegate;
+Screen::ButtonHandler FlexScreen::_buttonDelegate;
 
 FlexScreen::~FlexScreen() {
   // TO DO: Cleanup!
@@ -93,25 +97,28 @@ bool FlexScreen::init(
   _mapper = mapper;
   _refreshInterval = refreshInterval;
 
-  buttons = new Button[(nButtons = 1)];
-  buttons[0].init(0, 0, Display::Width, Display::Height, _buttonDelegate, 0);
+  labels = new Label[(nLabels = 1)];
+  labels[0].init(0, 0, Display.Width, Display.Height, 0);
+  buttonHandler = _buttonDelegate;
 
-  _clock = NULL;
+  _clock = nullptr;
   return fromJSON(screen);
 }
 
 void FlexScreen::display(bool activating) {
-  if (activating) { tft.fillScreen(_bkg); }
+  // Requires device-specific code
+  if (activating) { Display.fillRect(0, 0, Display.Width, Display.Height, _bkg); }
   for (int i = 0; i < _nItems; i++) {
     _items[i].display(_bkg, _mapper);
   }
+  Display.flush();
   lastDisplayTime = lastClockTime = millis();
 }
 
 void FlexScreen:: processPeriodicActivity() {
   uint32_t curMillis = millis();
   if (curMillis - lastDisplayTime > _refreshInterval) display(false);
-  else if (_clock != NULL  && (curMillis - lastClockTime > 1000L)) {
+  else if (_clock != nullptr  && (curMillis - lastClockTime > 1000L)) {
     _clock->display(_bkg, _mapper);
     lastClockTime = curMillis;
   }
@@ -174,17 +181,11 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
-    // Reuse the same value buffer across all FlexItems, so clear it out
-    Basics::resetString(_val);
+    Basics::resetString(_val);    // Reuse the same value buffer across all FlexItems, so clear it out
     
     mapper(_key, _val);
-
-    sprite->setColorDepth(1);
-    sprite->createSprite(_w, _h);
-    sprite->fillSprite(Theme::Mono_Background);
-
     // TO DO: Use snprintf to determine the correct buffer size
-    int bufSize = Display::Width/6 + 1; // Assume 6 pixel spacing is smallest font
+    int bufSize = Display.Width/6 + 1; // Assume 6 pixel spacing is smallest font
     char buf[bufSize];
 
     switch (_dataType) {
@@ -198,12 +199,8 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         break;
       }
       case FlexItem::Type::CLOCK: {
-        int firstDelim = _val.indexOf('|');
-        int secondDelim = _val.lastIndexOf('|');
-        int theHour = _val.substring(0, firstDelim).toInt();
-        int theMinute = _val.substring(firstDelim+1, secondDelim).toInt();
-        int theSecond = _val.substring(secondDelim+1).toInt();
-        sprintf(buf, fmt, theHour, theMinute, theSecond);
+        String formattedTime = Output::formattedTime(now(), true, false);
+        strcpy(buf, formattedTime.c_str());
         break;
       }
       case FlexItem::Type::STATUS:
@@ -216,8 +213,8 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
           if (strncasecmp(fmt, "#progress", 9) == 0) {
             String showPct = Basics::EmptyString;
             if (fmt[9] == '|' && fmt[10] != 0) showPct = String(&fmt[10]);
-            Button b(_x, _y, _w, _h, NULL, 0);
-            b.drawProgress(
+            Label progressLabel(_x, _y, _w, _h, 0);
+            progressLabel.drawProgress(
               ((float)code)/100.0, msg, _font, _strokeWidth,
               Theme::Color_Border, Theme::Color_NormalText, 
               _color, bkg, showPct, true);
@@ -228,19 +225,15 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         }
         break;
     }
-    if (_gfxFont >= 0) { Display::Font::setUsingID(_gfxFont, sprite); }
-    else { sprite->setTextFont(_font);}
-    sprite->setTextColor(Theme::Mono_Foreground);
-    sprite->setTextDatum(_datum);
-    sprite->drawString(buf, _xOff, _yOff);
 
-    sprite->setBitmapColor(_color, bkg);
-    sprite->pushSprite(_x, _y);
-    sprite->deleteSprite();
+    Display.drawStringInRegion(
+      buf, ((_gfxFont >= 0) ? _gfxFont : -_font), _datum,
+      _x, _y, _w, _h, _xOff, _yOff, _color, bkg);
   }
 
   for (int i = 0; i < _strokeWidth; i++) {
-    tft.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
+    // Requires device-specific code
+    Display.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
   }
 }
 
