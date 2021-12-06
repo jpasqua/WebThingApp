@@ -64,8 +64,8 @@ void GraphScreen::display(bool activating) {
   float yAxisMin = displayParams.suggestedYAxisMin;
   float yAxisMax = displayParams.suggestedYAxisMax;
   if (displayParams.autoScale) {
-    yAxisMin = loVal * 0.95;
-    yAxisMax = hiVal * 1.05;
+    yAxisMin = loVal * 0.98;
+    yAxisMax = hiVal * 1.02;
   } else {
     if (hiVal > yAxisMax) yAxisMax = hiVal;
     if (loVal < yAxisMin) yAxisMin = loVal;
@@ -74,8 +74,8 @@ void GraphScreen::display(bool activating) {
 
   Display.setFont(Display.FontID::M5);
   oled->setTextAlignment(TEXT_ALIGN_RIGHT);
-  oled->drawString(GraphRegion.x-2, GraphRegion.bottom()-7, fourDigits(yAxisMin));
-  oled->drawString(GraphRegion.x-2, GraphRegion.y, fourDigits(yAxisMax));
+  oled->drawString(GraphRegion.x-2, GraphRegion.bottom()-7, fourDigits(/*yAxisMin*/loVal));
+  oled->drawString(GraphRegion.x-2, GraphRegion.y, fourDigits(/*yAxisMax*/hiVal));
 
   String legend = dataProvider->getYLegend();
   if (legend.length() > 5) legend.remove(5);
