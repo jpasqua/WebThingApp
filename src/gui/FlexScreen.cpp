@@ -199,8 +199,8 @@ void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
         break;
       }
       case FlexItem::Type::CLOCK: {
-        String formattedTime = Output::formattedTime(now(), true, false);
-        strcpy(buf, formattedTime.c_str());
+        time_t curTime = now();
+        sprintf(buf, fmt, Output::adjustedHour(hour(curTime)), minute(curTime), second(curTime));
         break;
       }
       case FlexItem::Type::STATUS:
