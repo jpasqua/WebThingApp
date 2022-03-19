@@ -181,8 +181,10 @@ namespace WebUIHelper {
   namespace Dev {
     void reboot() {
       auto action = []() {
-        wtAppImpl->askToReboot();
         WebUI::redirectHome();
+          // Make sure this gets done first or the reboot request
+          // may be repeated over and over!
+        wtAppImpl->askToReboot();
       };
 
       WebUI::wrapWebAction("/dev/reboot", action, false);
