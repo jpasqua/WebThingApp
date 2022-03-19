@@ -37,8 +37,10 @@ RebootScreen::RebootScreen() {
 }
 
 void RebootScreen::display(bool) {
-  auto& oled = Display.oled;
+  // Log.verbose("RebootScreen::display, Display.deviceOptions.deviceType = %d", Display.deviceOptions->deviceType);
+  if (Display.deviceOptions->deviceType == DisplayDeviceOptions::NONE) { ESP.restart(); }
 
+  auto& oled = Display.oled;
   oled->clear();
 
   // Draw the top line...
