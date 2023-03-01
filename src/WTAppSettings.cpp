@@ -53,10 +53,10 @@ OWMOptions::OWMOptions() {
 void OWMOptions::fromJSON(const JsonDocument &doc) {
   JsonObjectConst owm = doc["owm"].as<JsonObjectConst>();
   enabled = owm[F("enabled")];
-  cityID = owm[F("cityID")];
   key = owm["key"].as<const char*>();
-  language = owm["language"].as<const char*>();
+  cityID = owm[F("cityID")] | 5372223;
   nickname = owm["nickname"].as<const char*>();
+  language = owm["language"]|"en";
 }
 
 void OWMOptions::toJSON(JsonDocument &doc) {

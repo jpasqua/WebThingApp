@@ -48,17 +48,17 @@ FlexItem::Type mapType(String t) {
 }
 
 uint8_t mapDatum(String justify) {
-  if (justify.equalsIgnoreCase(F("TL"))) { return TL_DATUM;}
-  if (justify.equalsIgnoreCase(F("TC"))) { return TC_DATUM;}
-  if (justify.equalsIgnoreCase(F("TR"))) { return TR_DATUM;}
-  if (justify.equalsIgnoreCase(F("ML"))) { return ML_DATUM;}
-  if (justify.equalsIgnoreCase(F("MC"))) { return MC_DATUM;}
-  if (justify.equalsIgnoreCase(F("MR"))) { return MR_DATUM;}
-  if (justify.equalsIgnoreCase(F("BL"))) { return BL_DATUM;}
-  if (justify.equalsIgnoreCase(F("BC"))) { return BC_DATUM;}
-  if (justify.equalsIgnoreCase(F("BR"))) { return BR_DATUM;}
+  if (justify.equalsIgnoreCase(F("TL"))) { return BaseDisplay::TL_Align;}
+  if (justify.equalsIgnoreCase(F("TC"))) { return BaseDisplay::TC_Align;}
+  if (justify.equalsIgnoreCase(F("TR"))) { return BaseDisplay::TR_Align;}
+  if (justify.equalsIgnoreCase(F("ML"))) { return BaseDisplay::ML_Align;}
+  if (justify.equalsIgnoreCase(F("MC"))) { return BaseDisplay::MC_Align;}
+  if (justify.equalsIgnoreCase(F("MR"))) { return BaseDisplay::MR_Align;}
+  if (justify.equalsIgnoreCase(F("BL"))) { return BaseDisplay::BL_Align;}
+  if (justify.equalsIgnoreCase(F("BC"))) { return BaseDisplay::BC_Align;}
+  if (justify.equalsIgnoreCase(F("BR"))) { return BaseDisplay::BR_Align;}
 
-  return TL_DATUM;
+  return BaseDisplay::TL_Align;
 }
 
 // Requires device-specific code

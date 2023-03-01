@@ -9,12 +9,12 @@ BrightnessSchedule::BrightnessSchedule() {
 
 void BrightnessSchedule::fromJSON(const JsonDocument &doc) {
   active = doc[F("scheduleActive")];
-  morning.hr = doc[F("morning")][F("hr")];
-  morning.min = doc[F("morning")][F("min")];
-  morning.brightness = doc[F("morning")][F("brightness")];
-  evening.hr = doc[F("evening")][F("hr")];
-  evening.min = doc[F("evening")][F("min")];
-  evening.brightness = doc[F("evening")][F("brightness")];
+  morning.hr = doc[F("morning")][F("hr")]|8;
+  morning.min = doc[F("morning")][F("min")]|0;
+  morning.brightness = doc[F("morning")][F("brightness")]|100;
+  evening.hr = doc[F("evening")][F("hr")]|20;
+  evening.min = doc[F("evening")][F("min")]|0;
+  evening.brightness = doc[F("evening")][F("brightness")]|20;
 }
 
 void BrightnessSchedule::toJSON(JsonDocument &doc) {

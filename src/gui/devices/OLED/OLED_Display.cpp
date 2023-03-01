@@ -141,44 +141,44 @@ void OLED_Display::drawStringInRegion(
   Display.oled->fillRect(x, y, w, h);
 
   switch (alignment) {
-    case TL_DATUM:
-    case TC_DATUM:
-    case TR_DATUM:
-    case MC_DATUM:
+    case TL_Align:
+    case TC_Align:
+    case TR_Align:
+    case MC_Align:
       break;
-    case ML_DATUM:
-      alignment = TL_DATUM;
+    case ML_Align:
+      alignment = TL_Align;
       yOff += h/2;
       break;
-    case MR_DATUM:
-      alignment = TR_DATUM;
+    case MR_Align:
+      alignment = TR_Align;
       yOff += h/2;
       break;
-    case BL_DATUM:
-      alignment = TL_DATUM;
+    case BL_Align:
+      alignment = TL_Align;
       yOff += h;
       break;
-    case BC_DATUM:
-      alignment = TC_DATUM;
+    case BC_Align:
+      alignment = TC_Align;
       yOff += w/2;
       break;
-    case BR_DATUM:
-      alignment = TR_DATUM;
+    case BR_Align:
+      alignment = TR_Align;
       yOff += h;
       break;
   }
 
   switch (alignment) {
-    case TL_DATUM:
+    case TL_Align:
       Display.oled->setTextAlignment(TEXT_ALIGN_LEFT);
       break;
-    case TC_DATUM:
+    case TC_Align:
       Display.oled->setTextAlignment(TEXT_ALIGN_CENTER);
       break;
-    case TR_DATUM:
+    case TR_Align:
       Display.oled->setTextAlignment(TEXT_ALIGN_RIGHT);
       break;
-    case MC_DATUM:
+    case MC_Align:
       Display.oled->setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
       break;
   }

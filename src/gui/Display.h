@@ -12,7 +12,6 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoJson.h>
-#include <TFT_eSPI.h>
 //                                  Local Includes
 #include "DisplayOptions.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -21,6 +20,19 @@ class DisplayDeviceOptions;
 
 class BaseDisplay {
 public:
+  // ----- Constants
+  // For convenience, these correspond to the "DATUM" definitions
+  // in the TFT_eSPI library
+  static constexpr uint8_t TL_Align = 0;
+  static constexpr uint8_t TC_Align = 1;
+  static constexpr uint8_t TR_Align = 2;
+  static constexpr uint8_t ML_Align = 3;
+  static constexpr uint8_t MC_Align = 4;
+  static constexpr uint8_t MR_Align = 5;
+  static constexpr uint8_t BL_Align = 6;
+  static constexpr uint8_t BC_Align = 7;
+  static constexpr uint8_t BR_Align = 8;
+
   // ----- Constructors
   BaseDisplay() = default;
   ~BaseDisplay() = default;
