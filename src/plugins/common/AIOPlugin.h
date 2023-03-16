@@ -12,7 +12,6 @@
 //                                  Core Libraries
 #include <Arduino.h>
 //                                  Third Party Libraries
-#include <AdafruitIO_Group.h>
 //                                  WebThing Libraries
 #include <BaseSettings.h>
 //                                  Local Includes
