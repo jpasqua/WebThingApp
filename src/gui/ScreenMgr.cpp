@@ -98,7 +98,7 @@ void BaseScreenMgr::loop() {
 
   // Test whether we should blank the screen
   if (_uiOptions->screenBlankMinutes && !isSuspended()) {
-    if (millis() > _lastInteraction + minutesToMS(_uiOptions->screenBlankMinutes)) suspend();
+    if (millis() > _lastInteraction + Basics::minutesToMS(_uiOptions->screenBlankMinutes)) suspend();
   }
 
   _curScreen->processPeriodicActivity();
