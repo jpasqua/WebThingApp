@@ -37,7 +37,7 @@ public:
   void updateAllData();
 
   // ----- Functions that aren't provided by subclasses
-  void begin();
+  void begin(bool respectPowerSettings = false);
   void loop();
 
   // ----- Functions that *must* be provided by subclasses
@@ -60,7 +60,7 @@ protected:
   // ----- WebThing Functions
   void setTitle();
   void baseConfigChange();
-  void prepWebThing();
+  void prepWebThing(bool respectPowerSettings = false);
   virtual void configModeCallback(const String &ssid, const String &ip);
 };
 
