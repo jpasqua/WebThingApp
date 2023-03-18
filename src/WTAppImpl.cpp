@@ -63,7 +63,7 @@ WTAppImpl::WTAppImpl(const String& name, const String& prefix, const String& ver
   // Nothing to do here...
 }
 
-void WTAppImpl::begin() {
+void WTAppImpl::begin(bool respectPowerSettings) {
   WebThing::preSetup();                 // Must be first
 
   settings->init(SettingsFileName);
@@ -83,7 +83,7 @@ void WTAppImpl::begin() {
 
   ScreenMgr.display(screens.wifiScreen);
 
-  prepWebThing();
+  prepWebThing(respectPowerSettings);
   app_initWebUI();
 
   if (screens.splashScreen) ScreenMgr.display(screens.splashScreen);
@@ -190,20 +190,17 @@ void WTAppImpl::configModeCallback(const String &ssid, const String&) {
   ScreenMgr.display(screens.configScreen);
 }
 
-void WTAppImpl::prepWebThing() {
-  // Some of the MultiMonitor hardware configuration is fixed, so the corresponding settings
-  // should have specific values. Rather than make the user configure them, set them to the
-  // right values here.
-  WebThing::settings.hasVoltageSensing = false;
-  WebThing::settings.sleepOverridePin = WebThingSettings::NoPinAssigned;
-  WebThing::displayPowerOptions(false);               // Don't let the user fool with this.
-  WebThing::replaceEmptyHostname(appPrefix.c_str());
+void WTAppImpl::prepWebThing(bool respectPowerSettings) {
+  if (!respectPowerSettings) {
+    WebThing::settings.hasVoltageSensing = false;
+    WebThing::settings.sleepOverridePin = WebThingSettings::NoPinAssigned;
+    WebThing::displayPowerOptions(false);               // Don't let the user fool with this.    
+  }
 
+  WebThing::replaceEmptyHostname(appPrefix.c_str());
   WebThing::notifyOnConfigMode([this](const String &ssid, const String &ip) { configModeCallback(ssid, ip); });
   WebThing::notifyConfigChange([this]() { baseConfigChange(); } );
-
   WebThing::setup();
-
   WebThing::setDisplayedVersion(appPrefix + appVersion);
   setTitle();
 }
