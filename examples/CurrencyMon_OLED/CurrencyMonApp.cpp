@@ -23,7 +23,7 @@
 #include <gui/ScreenMgr.h>
 #include <plugins/PluginMgr.h>
 #include <plugins/common/GenericPlugin.h>
-#include <plugins/common/BlynkPlugin.h>
+#include <plugins/common/AIOPlugin.h>
 #include <plugins/common/CryptoPlugin.h>
 //                                  Local Includes
 #include "src/hardware/HWConfig.h"
@@ -42,7 +42,7 @@
  *----------------------------------------------------------------------------*/
 
 // CUSTOM: Update these strings for your app:
-static const char* VersionString = "0.0.5";
+static const char* VersionString = "0.0.6";
 static const char* AppName = "CurrencyMon";
 static const char* AppPrefix = "CM-";
 
@@ -59,6 +59,7 @@ Plugin* pluginFactory(const String& type) {
   // CUSTOM: Choose which plugins you'd like to load
   if      (type.equalsIgnoreCase("generic")) { p = new GenericPlugin(); }
   else if (type.equalsIgnoreCase("crypto"))  { p = new CryptoPlugin();  }
+  else if (type.equalsIgnoreCase("aio"))  { p = new AIOPlugin();  }
   
 
   if (p == NULL) {
