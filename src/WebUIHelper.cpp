@@ -137,8 +137,9 @@ namespace WebUIHelper {
         wtApp->settings->uiOptions.schedule.evening.min = t.substring(separator+1).toInt();
         wtApp->settings->uiOptions.schedule.evening.brightness = WebUI::arg(F("eBright")).toInt();
 
-        wtApp->settings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
         wtApp->settings->uiOptions.screenBlankMinutes = WebUI::arg(F("blank")).toInt();
+
+        wtApp->settings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
         wtApp->settings->displayOptions.invertDisplay = WebUI::hasArg(F("invDisp"));
 
         wtApp->settings->write();
@@ -283,8 +284,10 @@ namespace WebUIHelper {
 
     void presentDisplayConfig() {
       UIOptions* uiOptions = &(wtApp->settings->uiOptions);
+      String blankingTarget("SL");
+      blankingTarget += uiOptions->screenBlankMinutes;
 
-      auto mapper =[uiOptions](const String& key, String& val) -> void {
+      auto mapper =[uiOptions, &blankingTarget](const String& key, String& val) -> void {
         if (key.equals(F("SCHED_ENABLED"))) val = checkedOrNot[uiOptions->schedule.active];
         else if (key.equals(F("MORN"))) val = WebThing::formattedInterval(
           uiOptions->schedule.morning.hr, uiOptions->schedule.morning.min, 0, true, false);
@@ -293,8 +296,10 @@ namespace WebUIHelper {
         else if (key.equals(F("M_BRIGHT"))) val.concat(uiOptions->schedule.morning.brightness);
         else if (key.equals(F("E_BRIGHT"))) val.concat(uiOptions->schedule.evening.brightness);
 
+        else if (key.equals(F("BRIGHT"))) val.concat(Display.getBrightness());
+
         else if (key.equals(F("USE_24HOUR"))) val = checkedOrNot[uiOptions->use24Hour];
-        else if (key.equals(F("BLANK")))  val.concat(uiOptions->screenBlankMinutes);
+        else if (key == blankingTarget) val = "selected";
         else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };
 
