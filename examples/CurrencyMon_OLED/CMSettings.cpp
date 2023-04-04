@@ -1,6 +1,6 @@
 /*
  * CMSettings
- *    Setting for the OTCurrencyApp.
+ *    Setting for the CMCurrencyApp.
  *
  */
 
