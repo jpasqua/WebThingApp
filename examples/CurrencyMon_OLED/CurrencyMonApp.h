@@ -29,7 +29,6 @@
 //                                  Third Party Libraries
 //                                  WebThing Includes
 #include <WTAppImpl.h>
-#include <screens/touch/EnterNumberScreen.h>
 //                                  Local Includes
 #include "CMSettings.h"
 #include "src/screens/SplashScreen.h"
