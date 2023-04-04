@@ -27,7 +27,6 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
-#include <GrillClient.h>
 //                                  WebThing Includes
 #include <WTAppImpl.h>
 #include <screens/touch/EnterNumberScreen.h>
