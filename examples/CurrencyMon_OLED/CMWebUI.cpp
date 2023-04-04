@@ -26,7 +26,9 @@ namespace CMWebUI {
   namespace Internal {
     const __FlashStringHelper* APP_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/presentCurrencyConfig'>"
-      "<i class='fa fa-cog'></i> Set Currencies</a>");
+      "<i class='fa fa-cog'></i> Set Currencies</a>"
+      "<a class='w3-bar-item w3-button' href='/presentScreenConfig'>"
+      "<i class='fa fa-window-restore'></i> Configure Screens</a>");
   } // ----- END: CMWebUI::Internal
 
   // ----- BEGIN: CMWebUI::Pages
