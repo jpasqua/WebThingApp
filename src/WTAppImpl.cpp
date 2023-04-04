@@ -63,8 +63,8 @@ WTAppImpl::WTAppImpl(const String& name, const String& prefix, const String& ver
   // Nothing to do here...
 }
 
-void WTAppImpl::begin(bool respectPowerSettings) {
-  WebThing::preSetup();                 // Must be first
+void WTAppImpl::begin(bool respectPowerSettings, Basics::Pin SDA, Basics::Pin SCL) {
+  WebThing::preSetup(SDA, SCL);                 // Must be first
 
   settings->init(SettingsFileName);
   settings->read();
@@ -193,7 +193,7 @@ void WTAppImpl::configModeCallback(const String &ssid, const String&) {
 void WTAppImpl::prepWebThing(bool respectPowerSettings) {
   if (!respectPowerSettings) {
     WebThing::settings.hasVoltageSensing = false;
-    WebThing::settings.sleepOverridePin = WebThingSettings::NoPinAssigned;
+    WebThing::settings.sleepOverridePin = Basics::UnusedPin;
     WebThing::displayPowerOptions(false);               // Don't let the user fool with this.    
   }
 

@@ -19,9 +19,6 @@
 // HWConfig files with other types of display, or no display
 //
 
-// SECTION 0: Generic definitions
-#define UNUSED_PIN 255
-
 // SECTION 1: Select the general class of Display Device we're using.
 // The available types are defined in DeviceTypes.h
 // This config provides options based on DEVICE_TYPE_OLED.
@@ -53,7 +50,7 @@
    *----------------------------------------------------------------------------*/
 
   // ----- I2C Settings
-  constexpr uint8_t SDA_PIN = D3;
+  constexpr uint8_t SDA_PIN = D2; //D3;
   constexpr uint8_t SCL_PIN = D5;
 
   // ----- Display Type
@@ -81,7 +78,7 @@
 
   // ----- Buttons
   constexpr uint8_t physicalButtons[] = { 13 };
-  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
+  constexpr uint8_t syntheticGrounds[] = { Basics::UnusedPin };
 
 #elif (SelectedConfig == Config_ESP32WithOLED)
   /*------------------------------------------------------------------------------
@@ -100,7 +97,7 @@
   
   // ----- Buttons
   constexpr uint8_t physicalButtons[] = { 13 };
-  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
+  constexpr uint8_t syntheticGrounds[] = { Basics::UnusedPin };
 
 #elif (SelectedConfig == Config_EmbeddedOLED)
   /*------------------------------------------------------------------------------
@@ -119,7 +116,7 @@
 
   // ----- Buttons
   constexpr uint8_t physicalButtons[] = { D3 };
-  constexpr uint8_t syntheticGrounds[] = { UNUSED_PIN };
+  constexpr uint8_t syntheticGrounds[] = { Basics::UnusedPin };
 
 #elif (SelectedConfig ==  Config_Custom)
   /*------------------------------------------------------------------------------
@@ -139,7 +136,7 @@
 
   // ----- Buttons
   constexpr int8_t physicalButtons[] = { D3 };
-  constexpr int8_t syntheticGrounds[] = { UNUSED_PIN };
+  constexpr int8_t syntheticGrounds[] = { Basics::UnusedPin };
 #else
     #error "Please set SelectedConfig"
 #endif
@@ -168,7 +165,7 @@ constexpr HWConfig hwConfig {
   { DISPLAY_DRIVER, SCL_PIN, SDA_PIN, DISPLAY_I2C_ADDRESS },
   physicalButtons, ARRAY_SIZE(physicalButtons),  
   syntheticGrounds, ARRAY_SIZE(syntheticGrounds),
-  physicalButtons[0], UNUSED_PIN
+  physicalButtons[0], Basics::UnusedPin
 };
 
 #endif  // HWConfig_h

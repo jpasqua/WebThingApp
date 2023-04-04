@@ -37,7 +37,7 @@ public:
   void updateAllData();
 
   // ----- Functions that aren't provided by subclasses
-  void begin(bool respectPowerSettings = false);
+  void begin(bool respectPowerSettings = false, int SDA = -1, int SCL = -1);
   void loop();
 
   // ----- Functions that *must* be provided by subclasses

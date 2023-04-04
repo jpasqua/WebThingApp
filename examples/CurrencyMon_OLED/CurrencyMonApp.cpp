@@ -83,20 +83,11 @@ void CurrencyMonApp::create() {
   // Set the display options before we fire up the display!
   Display.setDeviceOptions(&hwConfig.displayDeviceOptions);
 
-  // Initialize the synthetic grounds
-  for (int i = 0; i < hwConfig.nSyntheticGrounds; i++) {
-    uint8_t pin = hwConfig.syntheticGrounds[i];
-    if (pin != UNUSED_PIN) {
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, LOW);      
-    }
-  }
-
   // BOILERPLATE
   PluginMgr::setFactory(pluginFactory);
   CurrencyMonApp* app = new CurrencyMonApp(&theSettings);
 
-  app->begin();
+  app->begin(false, hwConfig.corePins.sda, hwConfig.corePins.scl);
 }
 
 
@@ -208,9 +199,20 @@ Screen* CurrencyMonApp::app_registerScreens() {
 
 void CurrencyMonApp::app_configureHW() {
   // CUSTOM: Register any physical buttons that are connected
+
+  // Initialize the synthetic grounds
+  for (int i = 0; i < hwConfig.nSyntheticGrounds; i++) {
+    uint8_t pin = hwConfig.syntheticGrounds[i];
+    if (pin != Basics::UnusedPin) {
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);      
+    }
+  }
+
+  // Initialize the buttons
   for (int i = 0; i < hwConfig.nPhysicalButtons; i++) {
     uint8_t pin = hwConfig.physicalButtons[i];
-    if (pin != UNUSED_PIN) {
+    if (pin != Basics::UnusedPin) {
       WebThing::buttonMgr.addButton(pin);
     }
   }
