@@ -158,7 +158,6 @@ void CurrencyMonApp::app_conditionalUpdate(bool force) {
 Screen* CurrencyMonApp::app_registerScreens() {
   // CUSTOM: Register any app-specific Screen objects
 
-	numpad = new EnterNumberScreen();
   splashScreen = new SplashScreen();
   homeScreen = new HomeScreen();
 
