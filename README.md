@@ -22,15 +22,15 @@ This document is divided into three major parts:
 
 To illustrate the process of building a WebThingApp we will focus on an example: *CurrencyMon*. This example demonstrates of all of the elements of a `WebThingApp` (hardware and software).
 
-`WebThingApp` has been built and tested with Arduino IDE 1.8.10 and ESP8266 cores 2.6.1 and 2.7.1. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). `WebThingApp` also supports the ESP32, though it has less testing to date. It requires v1.0.5rc2 or later of the ESP32 Arduino core.
+`WebThingApp` has been built and tested with Arduino IDE 1.8.19 and ESP8266 core 2.7.4. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). `WebThingApp` also supports the [ESP32](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html).
 
 The general build process is:
 
 1. [Prepare your hardware](#hardware): You only need to do this once.
 2. [Download required libraries](#libs): You only need to do this once unless you later want to get a newer version of one of the libraries.
-3. [Configure the graphics library](#tft_espi): You only need to do this once unless you change your display or the way it is connected.
+3. [Configure the graphics library](#graphics): You only need to do this once unless you change your display or the way it is connected.
 4. [Upload the data files](#upload): Do this every time your supporting files change. If you are using an existing app, you should only need to do this once. If you are developing your own app you may need to do this multiple times as you refine and debug your application.
-5. [Build and upload the application](#upload): Do this every time your supporting files change. If you are using an existing app, you should only need to do this once. If you are developing your own app you may need to do this multiple times as you refine and debug your application.
+5. [Build and upload the application](#upload): Do this every time your code changes. If you are using an existing app, you should only need to do this once. If you are developing your own app you may need to do this multiple times as you refine and debug your application.
 
 
 
@@ -73,18 +73,23 @@ I have also upload [another model](https://www.thingiverse.com/thing:4460344) fo
 
 <a name="libs"></a>
 #### Libraries
-The following third party libraries are used by WebThingApp. You'll need to download them and place them in your Arduino `library` folder before you build the project.
+The following third party libraries are used by WebThingApp. You'll need to download them and place them in your Arduino `library` folder before you build the project. Each library is listed along with the version which has been tested.
 
-* [Arduino-Log](https://github.com/thijse/Arduino-Log)
-* [ArduinoJson](https://github.com/bblanchon/ArduinoJson): Minimum version: 6.15
-* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.5 or later]
-* [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI): Minimum version 2.2.7
-* [TimeLib](https://github.com/PaulStoffregen/Time.git)
-* [JSONService](https://github.com/jpasqua/JSONService) [v0.0.5 or later]
-* [WebThing](https://github.com/jpasqua/WebThing) [0.5.0 or later]
-* [WiFiManager](https://github.com/tzapu/WiFiManager)
+**Note**: Be sure to download any dependencies that these libraries have, if any, particularly `WebThing`.
+
+* [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel): 1.7.0
+* [Arduino-Log](https://github.com/thijse/Arduino-Log): 1.1.1
+* [ArduinoJson](https://github.com/bblanchon/ArduinoJson): 6.15
+* [BPAUtils](https://github.com/jpasqua/BPAUtils): 0.1.3
+* [esp8266-oled-ssd1306-2023-03-26](https://github.com/ThingPulse/esp8266-oled-ssd1306) 4.4.0
+* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) 0.0.5
+* [TFT\_eSPI](https://github.com/Bodmer/TFT_eSPI): 2.5.0
+* [TimeLib](https://github.com/PaulStoffregen/Time.git): 1.6.1
+* [JSONService](https://github.com/jpasqua/JSONService) 0.0.3
+* [WebThing](https://github.com/jpasqua/WebThing) 0.5.6
+* [WiFiManager](https://github.com/tzapu/WiFiManager) master as of 2023-03-08
 * ESP32 Only
-	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite)
+	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite): 0.1.0
 
 The following libraries are used in the browser - you do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
 
@@ -98,10 +103,20 @@ The following services are used by `WebThingApp`. You will need to obtain a free
 	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient. *Note* that this functionality is only used by the client code - not code running on the device.
 	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data.
 
-<a name="tft_espi"></a>
-#### Configuring the graphics library: `TFT_eSPI`
+<a name="graphics"></a>
+#### Configuring the graphics library
 
-All of the graphics, text, and images displayed by `WebThingApp` are drawn using the `TFT_eSPI` library. In order to function properly, it needs to know how your display is physically connected to your ESP8266/ESP32. You specify this by providing a  file (a `.h` file). `WebThingApp` provides the following predefined *user setups* which you can use:
+`WebThingApp` currently supports two styles of display: a 320x240 color touch screen and a small monochrome OLED. The very first thing you must do is choose which of these you will be using. To do so, open the file: `WebThingApp/src/gui/devices/DeviceSelect.h` and look for the code:
+
+```
+	#define DEVICE_TYPE DEVICE_TYPE_TOUCH
+	// #define DEVICE_TYPE DEVICE_TYPE_OLED
+```
+Uncomment one of these and comment out the other to select the class of display you want to use. Depending on your choice you will need to configure more options for your particular display.
+
+#####Configuring for a Color Touch Display using the `TFT_eSPI` Library
+
+When using a color touch display, `WebThingApp` uses the `TFT_eSPI` library under the covers. In order to function properly, it needs to know how your display is physically connected to your ESP8266/ESP32. You specify this with a *user setup* file (a `.h`). You can create one of your own, or use one of the files supplied with `WebThingApp`:
 
 | Microcontroller | Display                                   | File                     |
 |-----------------|-------------------------------------------|--------------------------|
@@ -120,25 +135,31 @@ To use one of these, just copy the files listed below into the `TFT_eSPI` direct
 * `WebThingApp/resources/TFT_eSPI/User_Setups/D1_DB_Mini_ILI9341.h`  &rarr; <br> &nbsp;&nbsp;`library/TFT_eSPI/User_Setups/D1_DB_Mini_ILI9341.h`
 * `WebThingApp/resources/TFT_eSPI/User_Setups/ESP32D1Mini_DB_ILI9341.h`  &rarr;<br> &nbsp;&nbsp; `library/TFT_eSPI/User_Setups/ESP32D1Mini_DB_ILI9341.h`
 
+#####Configuring for a Monochrome OLED using the `esp8266-oled-ssd1306` Library
+
+When using a monochrome OLED display, `WebThingApp` uses the `esp8266-oled-ssd1306` library under the covers. In order to function properly, it needs to know how your display is physically connected to your ESP8266/ESP32 and which specific chip is being used to drive the display. You specify this at runtime by calling `Display.setDeviceOptions()`.
+
+It accepts a `DeviceOptions` object which indicates the type of driver chip (`SH1106` or `SSD1306`), the SCL and SDA pins to which the device is connected, and the I2C address of the display.
+
 ### The build process
 
-Building the software for a `WebThingApp` like *CurrencyMon* is a bit more complex than a typical application. You build an upload your app as usual, but you also need to upload support files (such as HTML templates) to your ESP8266/ESP32 using a plugin to the Arduino IDE. The support files need to be in a subfolder of your app named `data` which has this structure:
+Building the software for a `WebThingApp` like *CurrencyMon* is a bit more complex than a typical Arduino sketch. You build an upload your app as usual, but you also need to upload support files (such as HTML templates) to your ESP8266/ESP32 using a plugin to the Arduino IDE. The support files need to be in a subfolder of your app named `data` which has this structure:
 
-````
+```
 data
 ├── <HTML files that are specific to your app>
 ├── plugins <Optional plugin descriptor files>
 ├── wt <These files come with the WebThing library>
 └── wta <These files come with the WebThingApp library>
-````
+```
 <a name="upload"></a>
 Follow these steps to upload the data to your device:
 
-1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plugin. For ESP32, use the [ESP32 Sketch Data Upload plugin](https://github.com/me-no-dev/arduino-esp32fs-plugin) plugin. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions [here](https://github.com/esp8266/arduino-esp8266fs-plugin#installation). If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
+1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plugin. For ESP32, use the [ESP32 Sketch Data Upload plugin](https://github.com/me-no-dev/arduino-esp32fs-plugin) plugin. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions given at the links above. If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
 2. Prepare the data directory
 	* Copy or link the `WebThing/data/wt` directory to the `CurrencyMon/data` directory.
 	* Copy or link the `WebThingApp/data/wta` directory to the `CurrencyMon/data` directory.
-	* When you're done you'll have a `data` directory that has the structure shown below.
+	* When you're done you'll have a `data` directory that has the structure shown above.
 3. You need to reserve some flash memory space for the file system.
 	* ESP8266: In the Tools menu of the Arduino IDE you will see a `Flash Size` submenu. Choose `FS: 1MB`.
 	* ESP32: For the moment this project is too big to fit in the default program space on the ESP32. Future optimization may change that. For now you must use the `Tools -> Partition Scheme` menu item to select a choice that provides more program space. I use `No OTA (Large APP)`
