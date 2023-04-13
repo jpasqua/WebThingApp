@@ -146,13 +146,11 @@ void WTAppImpl::refreshWeatherData(bool force) {
 }
 
 void WTAppImpl::prepWeather() {
+  if (settings->owmOptions.key.isEmpty()) { settings->owmOptions.enabled = false; }
   if (settings->owmOptions.enabled) {
-    if (settings->owmOptions.key.isEmpty()) { settings->owmOptions.enabled = false; }
-    else {
-      if (owmClient != nullptr) { /* TO DO: Do any necessary cleanup */ }
-      owmClient = new OWMClient(
-        settings->owmOptions.key, settings->owmOptions.cityID, settings->uiOptions.useMetric, settings->owmOptions.language);
-    }
+    if (owmClient != nullptr) { /* TO DO: Do any necessary cleanup */ }
+    owmClient = new OWMClient(
+      settings->owmOptions.key, settings->owmOptions.cityID, settings->uiOptions.useMetric, settings->owmOptions.language);
   } else {
     owmClient = nullptr;
   }
