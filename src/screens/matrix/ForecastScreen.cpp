@@ -48,16 +48,14 @@ void ForecastScreen::innerActivation() {
     if (wtApp->owmClient->timeOfLastForecastUpdate() == _timeOfLastForecast) return;
   }
 
-  _forecastText = "5 Day Forecast for ";
   String& city = wtApp->settings->owmOptions.nickname;
   if (city.isEmpty()) { city = wtApp->owmClient->weather.location.city; }
-  _forecastText += city;
-Log.verbose("Initial forecast text: %s", _forecastText.c_str());
+  _forecastText = city;
+  _forecastText += " Forecast: ";
 
   for (int i = 0; i < wtApp->owmClient->ForecastElements; i++) {
-    _forecastText += "   ";
+    if (i) _forecastText += ", ";
     appendForecastForDay(&forecast[i], _forecastText);
-Log.verbose("Updated forecast: %s", _forecastText.c_str());
   }
 
   setText(_forecastText, Display.BuiltInFont_ID);

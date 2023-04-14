@@ -43,7 +43,6 @@ void ScrollScreen::setText(String text, uint8_t fontID) {
   _nextTimeToDisplay = 0;
   int16_t unused;
   _textWidth = Display.getTextWidth(_text, _fontID);
-Log.verbose("Calculated text width = %d for %s", _textWidth, _text.c_str());
   uint16_t verticalPadding = (Display.mtx->height() - Display.getFontHeight(_fontID))/2;
   if (_fontID == 0) { // Built-in font
     _baseline = verticalPadding;
