@@ -19,29 +19,37 @@ void MTX_ScreenMgr::device_processInput() {
  *
  *----------------------------------------------------------------------------*/
 
+#include <Ticker.h>
+Ticker aiAnimationTicker;
+
+void animateAI(AnimationState* state) {
+  Display.mtx->drawPixel(state->x, state->y - state->pos, state->inc < 0 ? 0 : 1);
+  Display.mtx->write();
+  state->pos += state->inc;
+  if (state->pos == 8) { state->inc = -1; state->pos = 7; }
+  else if (state->pos == -1) { state->inc = 1; state->pos = 0; }
+}
 
 void MTX_ScreenMgr::showActivityIcon(uint16_t accentColor, char symbol) {
-  if (aiDisplayed) return;
-
+  if (animationState.aiDisplayed) return;
   saveBits();
-
-  auto mtx = Display.mtx;
   Display.setFont(Display.BuiltInFont_ID);
 
-  uint16_t AI_X = Display.mtx->width() - Display.BuiltInFont_CharWidth;
-  uint16_t AI_Y = 0;
-
-  mtx->drawChar(AI_X, AI_Y, symbol, Theme::Color_BLACK, Theme::Color_WHITE, 1);
-
-  mtx->write();
-  aiDisplayed = true;
+  animationState.symbol = symbol;
+  animationState.x = Display.mtx->width() - 1;  // Could be done at init time
+  animationState.y = 7;                         // Could be done at init time
+  animationState.pos = 0;
+  animationState.inc = 1;
+  animationState.aiDisplayed = true;
+  Display.mtx->fillRect(animationState.x, 0, 1, 8, 0);  // Clear the area, but don't write it yet
+  aiAnimationTicker.attach_ms(AI_AnimationInterval, animateAI, &(this->animationState));
 }
 
 void MTX_ScreenMgr::hideActivityIcon() {
-  if (!aiDisplayed) return;
+  if (!animationState.aiDisplayed) return;
+  aiAnimationTicker.detach();
   restoreBits();
-  // refresh();
-  aiDisplayed = false;
+  animationState.aiDisplayed = false;
 }
 
 /*------------------------------------------------------------------------------
@@ -60,8 +68,8 @@ void MTX_ScreenMgr::saveBits() {
     uint8_t curByte = 0;
     for (int yOff = 0; yOff < AI_Size; yOff++) {
       uint8_t pix = (Display.mtx->readPixel(x+xOff, y+yOff) != 0);
-      curByte |= pix;
       curByte = curByte << 1;
+      curByte |= pix;
     }
     savedPixels[savedBytesIndex++] = curByte;
   }
