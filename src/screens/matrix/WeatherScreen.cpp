@@ -64,7 +64,7 @@ void WeatherScreen::innerActivation() {
   if (city.isEmpty()) { city = weather.location.city; }
 
   weatherText += city;
-  weatherText += ": ";
+  weatherText += " ";
   weatherText += String(weather.readings.temp, 0);
   weatherText += (wtApp->settings->uiOptions.useMetric ? "C" : "F");
   weatherText += ' ';
