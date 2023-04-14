@@ -19,7 +19,7 @@ public:
     Display.setFont(Display.BuiltInFont_ID);
     mtx->setCursor(0, 0);
     if (mtx->width() >= 64) {
-      mtx->print("Marquis");
+      mtx->print("Marquee");
     } else {
       mtx->print("Ready");
     }
