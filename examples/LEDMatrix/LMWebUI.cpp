@@ -25,54 +25,69 @@ namespace LMWebUI {
 
   namespace Internal {
     const __FlashStringHelper* APP_MENU_ITEMS = FPSTR(
-      "<a class='w3-bar-item w3-button' href='/presentCurrencyConfig'>"
-      "<i class='fa fa-cog'></i> Set Currencies</a>"
+      "<a class='w3-bar-item w3-button' href='/presentLMConfig'>"
+      "<i class='fa fa-cog'></i> Configure LEDMatrix</a>"
       "<a class='w3-bar-item w3-button' href='/presentScreenConfig'>"
       "<i class='fa fa-window-restore'></i> Configure Screens</a>");
   } // ----- END: LMWebUI::Internal
 
   // ----- BEGIN: LMWebUI::Pages
   namespace Pages {
-    void currencyPage() {
-      auto mapper =[](const String& key, String& val) -> void {
-        if (key.startsWith("_C")) {
-          // "key" is of the form: _CN_subkey, where N is a digit
-          int i = (key.charAt(2) - '0');
-          const char* subkey = &(key.c_str()[4]);
-          if (strcmp(subkey, "ID") == 0) val = lmSettings->currencies[i].id;
-          else if (strcmp(subkey, "NICK") == 0) val = lmSettings->currencies[i].nickname;
+    void presentLMconfig() {
+      auto mapper =[&](const String &key, String& val) -> void {
+        if (key == "SCROLL_DELAY")    val = lmSettings->scrollDelay;
+        else if (key == "AIO_KEY")    val = lmSettings->aio.key;
+        else if (key == "AIO_USER")   val = lmSettings->aio.username;
+        else if (key == "AIO_GROUP")  val = lmSettings->aio.groupName;
+        else if (key == "USE_METRIC") val = WebUI::checkedOrNot[lmSettings->uiOptions.useMetric];
+        else if (key == "USE_24HOUR") val = WebUI::checkedOrNot[lmSettings->uiOptions.use24Hour];
+        else if (key == "LAT")        val = WebThing::settings.latAsString();
+        else if (key == "LNG")        val = WebThing::settings.lngAsString();
+        else if (key == "GMAPS_KEY")  val = WebThing::settings.googleMapsKey;
+        else if (key.equals(F("CITYID"))) {
+          if (wtApp->settings->owmOptions.enabled) val = wtApp->settings->owmOptions.cityID;
+          else val.concat("5380748");  // Palo Alto, CA, USA
         }
-        else if (key.equals(F("RFRSH"))) val.concat(lmSettings->refreshInterval);
-        else if (key.equals(F("ER_KEY"))) val = lmSettings->rateApiKey;
+        else if (key.equals(F("WEATHER_KEY"))) val = wtApp->settings->owmOptions.key;
+        else if (key.equals(F("UNITS"))) val = wtApp->settings->uiOptions.useMetric ? "metric" : "imperial";
+        else if (key == "VLTG") {
+          float voltage = WebThing::measureVoltage();
+          if (voltage == -1) val = "N/A";
+          else val = (String(voltage, 2) + "V");
+        }
       };
 
-      WebUI::wrapWebPage("/presentCurrencyConfig", "/ConfigCurrency.html", mapper);
+      WebUI::wrapWebPage("/presentLMconfig", "/ConfigForm.html", mapper);
     }
   } // ----- END: LMWebUI::Pages
 
 
   // ----- BEGIN: LMWebUI::Endpoints
   namespace Endpoints {
-    void updateCurrencyConfig() {
+    // Handler for the "/updatePHConfig" endpoint. This is invoked as the target
+    // of the form presented by "/displayLMConfig". It updates the values of the
+    // corresponding settings and writes the settings to EEPROM.
+    //
+    // TO DO: Call a function to let the main app know that settings may have changed
+    //        so that it can take any appropriate actions
+    //
+    // Form:
+    //    GET /updatePHConfig?description=DESC&iBright=INT&...
+    //
+    void updateLMConfig() {
       auto action = []() {
-        for (int i = 0; i < LMSettings::MaxCurrencies; i++) {
-          String prefix = "_c" + String(i) + "_";
-          lmSettings->currencies[i].id = WebUI::arg(prefix + "id");
-          lmSettings->currencies[i].nickname = WebUI::arg(prefix + "nick");
-        }
+        lmSettings->aio.key = WebUI::arg("aioKey");
+        lmSettings->aio.username = WebUI::arg("aioUsername");
+        lmSettings->aio.groupName = WebUI::arg("aioGroup");
+        lmSettings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
+        lmSettings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
+        lmSettings->scrollDelay = WebUI::arg("scrollDelay").toInt();
+        lmSettings->write();
 
-        uint32_t refreshInHours = WebUI::arg(F("refreshInterval")).toInt();
-        lmSettings->refreshInterval = max<uint32_t>(refreshInHours, LMSettings::MinRefreshInterval);
-        lmSettings->rateApiKey = WebUI::arg("erKey");
-
-        wtApp->settings->write();
-
-        // Act on changed settings...
-        wtAppImpl->configMayHaveChanged();
         WebUI::redirectHome();
       };
 
-      WebUI::wrapWebAction("/updateCurrencyConfig", action);
+      WebUI::wrapWebAction("/updateLMConfig", action, false);
     }
   }   // ----- END: LMWebUI::Endpoints
 
@@ -81,8 +96,10 @@ namespace LMWebUI {
     WebUIHelper::init(Internal::APP_MENU_ITEMS);
 
     WebUI::registerHandler("/",                       WebUIHelper::Default::homePage);
-    WebUI::registerHandler("/presentCurrencyConfig",  Pages::currencyPage);
-    WebUI::registerHandler("/updateCurrencyConfig",   Endpoints::updateCurrencyConfig);
+    WebUI::registerHandler("/presentLMConfig",        Pages::presentLMconfig);
+
+    WebUI::registerHandler("/updateLMConfig",         Endpoints::updateLMConfig);
+
   }
 
 }

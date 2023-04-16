@@ -130,33 +130,18 @@ void LEDMatrixApp::app_loop() {
 
 void LEDMatrixApp::app_initClients() {
   // CUSTOM: If your app has any app-specific clients, initilize them now
-  // In this example, we have one: RateClient
 
-  ScreenMgr.showActivityIcon(Theme::Color_WHITE);
-
-  for (int i = 0; i < LMSettings::MaxCurrencies; i++) {
-    currencies[i].id = lmSettings->currencies[i].id;
-    currencies[i].exchangeRate = 1.0;
-  }
-
-  rateClient = new RateClient(
-      lmSettings->rateApiKey, &(currencies[0]), LMSettings::MaxCurrencies);
-
-  ScreenMgr.hideActivityIcon();
+  // ScreenMgr.showActivityIcon(Theme::Color_WHITE);
+  // Perform potentially long running actions here...
+  // ScreenMgr.hideActivityIcon();
 }
 
 void LEDMatrixApp::app_conditionalUpdate(bool force) {
   // CUSTOM: Update any app-specific clients
 
-  static uint32_t nextTimeForStatus = 0;
-  if (millis() > nextTimeForStatus || force) {
-    ScreenMgr.showActivityIcon(Theme::Color_WHITE);
-
-    rateClient->updateRates();
-
-    ScreenMgr.hideActivityIcon();
-    nextTimeForStatus = millis() + lmSettings->refreshInterval * 60 * 60 * 1000L;
-  }      
+  // ScreenMgr.showActivityIcon(Theme::Color_WHITE);
+  // Update any relevant clients here...
+  // ScreenMgr.hideActivityIcon();
 }
 
 Screen* LEDMatrixApp::app_registerScreens() {

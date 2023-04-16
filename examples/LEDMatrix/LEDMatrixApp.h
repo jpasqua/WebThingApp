@@ -53,8 +53,6 @@ public:
   HomeScreen*     homeScreen;
 
   // CUSTOM: Data defined by this app which is available to the whole app
-  RateClient* rateClient;
-  Currency currencies[LMSettings::MaxCurrencies];
 
   // ----- Functions that *must* be provided by subclasses
   virtual void app_registerDataSuppliers() override;

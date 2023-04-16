@@ -20,52 +20,33 @@
 LMSettings::LMSettings() {
   maxFileSize = 4096;
   version = LMSettings::CurrentVersion;
-  rateApiKey = "";
-  for (uint8_t i = 0; i < LMSettings::MaxCurrencies; i++) {
-    currencies[i].id = "";
-    currencies[i].nickname = "";
-  }
 }
 
 void LMSettings::fromJSON(const JsonDocument &doc) {
-  refreshInterval = doc[F("refreshInterval")];
-  refreshInterval = max<uint32_t>(refreshInterval, MinRefreshInterval);
+  aio.username = String(doc["aioUsername"]|"");
+  aio.key = String(doc["aioKey"]|"");
+  aio.groupName = String(doc["aioGroup"]|"");
 
-  rateApiKey = doc["rateApiKey"].as<const char*>();
-
-  JsonArrayConst osArray = doc[F("currencies")];
-  int i = 0;
-  for (JsonObjectConst os : osArray) {
-    currencies[i].id = os["id"].as<const char*>();
-    currencies[i].nickname = os["nickname"].as<const char*>();
-    if (++i == LMSettings::MaxCurrencies) break;
-  }
+  scrollDelay = doc["scrollDelay"] | 20;
 
   WTAppSettings::fromJSON(doc);
   logSettings();
 }
 
 void LMSettings::toJSON(JsonDocument &doc) {
-  doc[F("refreshInterval")] = refreshInterval;
-  doc["rateApiKey"] = rateApiKey;
-
-  JsonArray jsonCurrencies = doc.createNestedArray(F("currencies"));
-  for (int i = 0; i < LMSettings::MaxCurrencies; i++) {
-    JsonObject jsonCurrency = jsonCurrencies.createNestedObject();
-    jsonCurrency["id"] = currencies[i].id;
-    jsonCurrency["nickname"] = currencies[i].nickname;
-  }
-
+  doc["aioUsername"] = aio.username;
+  doc["aioKey"] = aio.key;
+  doc["aioGroup"] = aio.groupName;
+  doc[F("scrollDelay")] = scrollDelay;
   WTAppSettings::toJSON(doc);
 }
 
 void LMSettings::logSettings() {
-  Log.verbose(F("refreshInterval: %d"), refreshInterval);
-  Log.verbose(F("Exchange Rate API Key: %s"), rateApiKey.c_str());
-  Log.verbose(F("Currencies"));
-  for (int i = 0; i < LMSettings::MaxCurrencies; i++) {
-    Log.verbose("  %s(%s)", currencies[i].id.c_str(), currencies[i].nickname.c_str());
-  }
+  Log.verbose(F("LEDMatrix Settings"));
+  Log.verbose(F("  aio.username = %s"), aio.username.c_str());
+  Log.verbose(F("  aio.key = %s"), aio.key.c_str());
+  Log.verbose(F("  aio.groupName = %s"), aio.groupName.c_str());
+  Log.verbose(F("  scrollDelay = %d"), scrollDelay);
 
   WTAppSettings::logSettings();
 }

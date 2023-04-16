@@ -21,22 +21,19 @@
 
 class LMSettings: public WTAppSettings {
 public:
-  static constexpr uint8_t MaxCurrencies = 3;
-  static constexpr uint8_t MinRefreshInterval = 4;
-
   // ----- Constructors and methods
   LMSettings();
   void fromJSON(const JsonDocument &doc) override;
   void toJSON(JsonDocument &doc);
   void logSettings();
 
-  uint16_t refreshInterval = 4;   // Time in hours between refreshing exchange rates
   struct {
-    String id;
-    String nickname;
-  } currencies[MaxCurrencies];
-  
-  String rateApiKey;              // api key for exchange rate service
+    String username;
+    String key;
+    String groupName;
+  } aio;
+
+  uint16_t scrollDelay;
 
 private:
   // ----- Constants -----
