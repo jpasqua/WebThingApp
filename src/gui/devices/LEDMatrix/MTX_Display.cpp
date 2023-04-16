@@ -28,7 +28,6 @@ void MTX_Display::setDeviceOptions(const DisplayDeviceOptions* options) {
 }
 
 void MTX_Display::device_begin() {
-  Log.verbose("csPin: %d, h: %d, v: %d", deviceOptions->csPin, deviceOptions->hDisplays, deviceOptions->vDisplays);
   mtx = new Max72xxPanel(
       deviceOptions->csPin, deviceOptions->hDisplays, deviceOptions->vDisplays);
   mtx->setIntensity(1); // Don't blast the intensity right out of the gate
@@ -129,13 +128,9 @@ void MTX_Display::drawStringInRegion(
     uint16_t xOff, uint16_t yOff, 
     uint16_t fg, uint16_t bg)
 {
-// Log.verbose("drawStringInRegion(%s, fID=%d, align=%d, (x, y, w, h) = (%d, %d, %d, %d), xo=%d, yo=%d, fc=%d, bg=%d",
-//   text, fontID, alignment, x, y, w, h, xOff, yOff, fg, bg);
-
   int16_t bb_x, bb_y;
   uint16_t bb_w, bb_h;
   mtx->getTextBounds(text, 0, 0, &bb_x, &bb_y, &bb_w, &bb_h);
-// Log.verbose("bb_x = %d, bb_y = %d, bb_w = %d, bb_h = %d", bb_x, bb_y, bb_w, bb_h);
 
   // Adjust X coordinate
   switch (alignment) {
@@ -174,7 +169,6 @@ void MTX_Display::drawStringInRegion(
       yOff -= bb_h;
       break;
   }
-// Log.verbose("xOff = %d, yOff = %d", xOff, yOff);
 
   mtx->fillRect(x, y, w, h, bg);
   if (fontID == BuiltInFont_ID) yOff -= getFontHeight(fontID);  // Adjust baseline
@@ -244,6 +238,10 @@ uint16_t MTX_Display::getTextWidth(const char* text, uint8_t fontID) {
   }
   return width;
 }
+
+uint16_t MTX_Display::width() const  { return mtx->width(); }
+uint16_t MTX_Display::height() const { return mtx->height(); }
+
 
 // ----- GLOBAL STATE
 MTX_Display Display;
