@@ -303,7 +303,7 @@ namespace WebUIHelper {
         else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };
 
-      WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
+      WebUI::wrapWebPage("/presentDisplayConfig", "/wta/ConfigDisplay.html", mapper);
     }
 
     void presentScreenConfig() {
