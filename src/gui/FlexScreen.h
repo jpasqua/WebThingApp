@@ -1,22 +1,22 @@
 /*
- * FlexScreen:
+ * BaseFlexScreen:
  *    Display values driven by a screen layout definition 
  *
  * NOTES:
- * o FlexScreen is central to the Plugin system for WebThing applications
+ * o BaseFlexScreen is central to the Plugin system for WebThing applications
  * o It creates a Screen driven by a definition given in a JSON document
  * o That document specifies the layout of the elements on the screen
  *   and the data that should be used to fill those elements
  * o The data is accessed via the WebThing DataBroker. The JSON document
- *   provides the keys to be used and FlexScreen uses the DataBroker to
+ *   provides the keys to be used and BaseFlexScreen uses the DataBroker to
  *   get values associated with the keys at runtime.
- * o There is only one user interaction defined for a FlexScreen. Touching
+ * o There is only one user interaction defined for a BaseFlexScreen. Touching
  *   anywhere on the screen invoked the ButtonDelegate supplied when the
- *   FlexScreen is instantiated.
+ *   BaseFlexScreen is instantiated.
  */
 
-#ifndef FlexScreen_h
-#define FlexScreen_h
+#ifndef BaseFlexScreen_h
+#define BaseFlexScreen_h
 
 
 //--------------- Begin:  Includes ---------------------------------------------
@@ -55,16 +55,16 @@ public:
   String _key;        // The key that will be used to get the value
   Type _dataType;
 
-  void display(uint16_t bkg, Basics::ReferenceMapper mapper);
+  void generateText(char* buf, Basics::ReferenceMapper mapper);
 };
 
 
-class FlexScreen : public Screen {
+class BaseFlexScreen : public Screen {
 public:
   static void setButtonDelegate(Screen::ButtonHandler delegate) { _buttonDelegate = delegate; }
 
-  // ----- Functions that are specific to FlexScreen
-  virtual ~FlexScreen();
+  // ----- Functions that are specific to BaseFlexScreen
+  virtual ~BaseFlexScreen();
 
   bool init(
       JsonObjectConst& screen,
@@ -73,11 +73,12 @@ public:
   String getScreenID() { return _screenID; }
 
   // ----- Functions defined in Screen class
-  void display(bool activating = false);
+  virtual void display(bool activating = false);
   virtual void processPeriodicActivity();
 
+  virtual void displayItem(FlexItem& item);
 
-private:
+protected:
   static   Screen::ButtonHandler _buttonDelegate;
 
   FlexItem* _items;             // An array of items on the screen
@@ -94,4 +95,7 @@ private:
   bool fromJSON(JsonObjectConst& screen);
 };
 
-#endif  // FlexScreen_h
+#include "devices/DeviceSelect.h"
+#include DeviceImplFor(FlexScreen)
+
+#endif  // BaseFlexScreen_h
