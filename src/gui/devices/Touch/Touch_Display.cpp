@@ -202,6 +202,9 @@ int8_t Touch_Display::fontIDFromName(String fontName) const {
 
 uint8_t Touch_Display::getFontHeight(uint8_t fontID) const { return GFXFonts[fontID].font->yAdvance; }
 
+uint16_t Touch_Display::width() const { return tft->width(); }
+uint16_t Touch_Display::height() const { return tft->height(); }
+
 // ----- GLOBAL STATE
 Touch_Display Display;
 #endif

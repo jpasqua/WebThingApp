@@ -64,7 +64,9 @@ public:
   virtual int8_t fontIDFromName(String fontName) const = 0;
   virtual uint8_t getFontHeight(uint8_t fontID) const = 0;
   virtual void flush() { };
-
+  virtual uint16_t width() const = 0;
+  virtual uint16_t height() const = 0;
+  
   // ----- Screenshot functionality
   virtual void streamScreenShotAsBMP(Stream &s) = 0;
 

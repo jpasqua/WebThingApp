@@ -221,6 +221,9 @@ uint8_t OLED_Display::getFontHeight(uint8_t fontID) const {
   return pgm_read_byte(FontList[fontID].font + HEIGHT_POS);
 }
 
+uint16_t OLED_Display::width() const { return oled->width(); }
+uint16_t OLED_Display::height() const { return oled->height(); }
+
 // ----- GLOBAL STATE
 OLED_Display Display;
 
