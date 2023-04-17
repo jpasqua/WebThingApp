@@ -65,6 +65,7 @@ void ScrollScreen::display(bool activating) {
     innerActivation();
     _offset = 0;
     _nextTimeToDisplay = 0;
+    Display.setFont(_fontID);
   }
 
   innerDisplay();

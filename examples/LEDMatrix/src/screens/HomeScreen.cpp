@@ -21,6 +21,7 @@ HomeScreen::HomeScreen() { }
 void HomeScreen::display(bool activating) {
   auto mtx = Display.mtx;
 
+  if (activating) { Display.setFont(Display.BuiltInFont_ID); }
   _colonVisible = false;
   mtx->fillScreen(Theme::Color_BLACK);
 
@@ -76,11 +77,11 @@ void HomeScreen::processPeriodicActivity() {
     return;
   }
   if (_compositeTime != compose(hour(), minute())) {
-    display(true);
+    display(false);
     _colonLastToggledAt = curMillis;
     return;
   }
-  if (curMillis >= _colonLastToggledAt + 1000L) {
+  if (curMillis >= _colonLastToggledAt + 500L) {
     toggleColon();
     Display.mtx->write();
     _colonLastToggledAt = curMillis;
