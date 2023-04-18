@@ -30,7 +30,7 @@ void animateAI(AnimationState* state) {
   else if (state->pos == -1) { state->inc = 1; state->pos = 0; }
 }
 
-void MTX_ScreenMgr::showActivityIcon(uint16_t accentColor, char symbol) {
+void MTX_ScreenMgr::showActivityIcon(uint16_t, char symbol) {
   if (animationState.aiDisplayed) return;
   saveBits();
   Display.setFont(Display.BuiltInFont_ID);

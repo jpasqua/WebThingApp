@@ -136,7 +136,7 @@ void LEDMatrixApp::app_initClients() {
   // ScreenMgr.hideActivityIcon();
 }
 
-void LEDMatrixApp::app_conditionalUpdate(bool force) {
+void LEDMatrixApp::app_conditionalUpdate(bool) {
   // CUSTOM: Update any app-specific clients
 
   // ScreenMgr.showActivityIcon(Theme::Color_WHITE);

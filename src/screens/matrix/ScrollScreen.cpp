@@ -41,7 +41,6 @@ void ScrollScreen::setText(String text, uint8_t fontID) {
   _fontID = fontID;
   _offset = 0;
   _nextTimeToDisplay = 0;
-  int16_t unused;
   _textWidth = Display.getTextWidth(_text, _fontID);
   uint16_t verticalPadding = (Display.mtx->height() - Display.getFontHeight(_fontID))/2;
   if (_fontID == 0) { // Built-in font

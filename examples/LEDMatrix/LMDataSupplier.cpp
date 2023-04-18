@@ -19,7 +19,7 @@ namespace LMDataSupplier {
   // CUSTOM: If your app has a custom data source, publish that data to
   // plugins by implementing a data supplier that maps keys to values.
   // In this case we publish the data from the RateClient
-  void dataSupplier(const String& key, String& value) {
+  void dataSupplier(const String&, String&) {
 
   }
 

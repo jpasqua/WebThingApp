@@ -126,7 +126,7 @@ void MTX_Display::drawStringInRegion(
     const char *text, int8_t fontID, uint8_t alignment,
     uint16_t x, uint16_t y, uint16_t w, uint16_t h,
     uint16_t xOff, uint16_t yOff, 
-    uint16_t fg, uint16_t bg)
+    uint16_t, uint16_t bg)
 {
   int16_t bb_x, bb_y;
   uint16_t bb_w, bb_h;
