@@ -25,29 +25,23 @@ void HomeScreen::display(bool activating) {
   _colonVisible = false;
   mtx->fillScreen(Theme::Color_BLACK);
 
-  bool am = true;
   int  m = minute();
-  int  h = hour();
-  _compositeTime = compose(h, m);
+  int  h = lmSettings->uiOptions.use24Hour ? hour() : hourFormat12();
+  _compositeTime = compose(hour(), m);
 
   char timeBuf[4];
   timeBuf[0] = (h/10) + '0';
   timeBuf[1] = (h%10) + '0';
+  if (timeBuf[0] == '0') timeBuf[0] = ' ';
   timeBuf[2] = (m/10) + '0';
   timeBuf[3] = (m%10) + '0';
-  if (!lmSettings->uiOptions.use24Hour) {
-    if (h > 12) { h -= 12; am = false; }
-    else if (h == 0) { h = 12;}
-    else if (h == 12) { am = false; }
-    timeBuf[0] = h < 10 ? ' ' : '1';
-  }
 
   mtx->drawChar( 0, 0, timeBuf[0], Theme::Color_WHITE, Theme::Color_BLACK, 1);
   mtx->drawChar( 6, 0, timeBuf[1], Theme::Color_WHITE, Theme::Color_BLACK, 1);
   mtx->drawChar(14, 0, timeBuf[2], Theme::Color_WHITE, Theme::Color_BLACK, 1);
   mtx->drawChar(20, 0, timeBuf[3], Theme::Color_WHITE, Theme::Color_BLACK, 1);
   if (!lmSettings->uiOptions.use24Hour) {
-    mtx->drawChar(26, 0, am ? 'a' : 'p', Theme::Color_WHITE, Theme::Color_BLACK, 1);
+    mtx->drawChar(26, 0, isAM() ? 'a' : 'p', Theme::Color_WHITE, Theme::Color_BLACK, 1);
     mtx->drawChar(32, 0, 'm', Theme::Color_WHITE, Theme::Color_BLACK, 1);    
   }
 
