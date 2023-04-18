@@ -26,7 +26,7 @@
 #define Config_ESP32Mini     2
 
 // SECTION 4: [CUSTOMIZE] Choose a specific configuration
-#define SelectedConfig Config_ESP32Mini
+#define SelectedConfig Config_D1Mini
 
 // SECTION 5: The definitions of the available configurations
 // Add new configs below if you add an option
@@ -40,13 +40,13 @@
   // ----- Matrix Settings
   constexpr Basics::Pin Wiring_MOSI = D7;  // DIN
   constexpr Basics::Pin Wiring_CLK  = D5;
-  constexpr Basics::Pin Wiring_CS   = D4;
+  constexpr Basics::Pin Wiring_CS   = D6;
   constexpr uint8_t hDisplays = 8;
   constexpr uint8_t vDisplays = 1;
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { D6 };
-  constexpr Basics::Pin syntheticGrounds[] = { D8 };
+  constexpr Basics::Pin physicalButtons[] = { D3 }; // This is the "Flash" button
+  constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
 
 #elif (SelectedConfig == Config_ESP32Mini)
   /*------------------------------------------------------------------------------
