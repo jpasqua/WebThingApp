@@ -62,13 +62,12 @@ public:
   // @param borderColor The color to be used to draw the border
   // @param barColor    The color to be used to draw the progress bar
   // @param bgColor     The color to be used for the unfilled part of the progress bar
-  // @param showPct     If the label is textually equal to this parameter, then the percentage
-  //                    value will be shown rather than the label text.
+  // @param showPct     If true, then the percentage value will be shown rather than the label text.
   // @param buffer      Should this be buffered offscreen then copied to the display
   virtual void drawProgress(
       float pct, const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor,
-      uint16_t barColor, uint16_t bgColor, const String& showPct,
+      uint16_t barColor, uint16_t bgColor, const bool showPct,
       bool buffer = false) = 0;
 
 

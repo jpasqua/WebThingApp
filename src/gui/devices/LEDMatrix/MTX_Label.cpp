@@ -22,12 +22,13 @@ void Label::clear(uint16_t color) {
 }
 
 void Label::drawSimple(
-  const String& label, uint8_t, uint8_t borderSize,
+  const String& label, uint8_t font, uint8_t borderSize,
   uint16_t labelColor, uint16_t borderColor, uint16_t bgColor,
   bool)
 {
   auto& mtx = Display.mtx;
 
+  Display.setFont(font);
   // Clear the background
   mtx->fillRect(
     region.x+borderSize, region.y+borderSize,
@@ -48,11 +49,11 @@ void Label::drawSimple(
 void Label::drawProgress(
   float pct, const String& label, uint8_t font, uint8_t borderSize,
   uint16_t labelColor, uint16_t borderColor,
-  uint16_t barColor, uint16_t bgColor, const String& showPct,
+  uint16_t barColor, uint16_t bgColor, bool showPct,
   bool)
 {
   auto mtx = Display.mtx;
-  String note = (label == showPct) ? String((int)(pct*100)) + "%" : label;
+  String note = showPct ? String((int)(pct*100)) + "%" : label;
 
   // Clear the background
   mtx->fillRect(
@@ -71,7 +72,7 @@ void Label::drawProgress(
 
   // Draw the overlay text
   Display.drawStringInRegion(
-    note.c_str(), 0, Display.MC_Align,
+    note.c_str(), font, Display.MC_Align,
     region.x, region.y, region.w, region.h, (region.w/2), (region.h/2),
     labelColor, bgColor);
 }

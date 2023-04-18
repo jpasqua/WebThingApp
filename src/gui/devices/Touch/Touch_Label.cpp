@@ -98,11 +98,11 @@ void Label::drawSimple(
 void Label::drawProgress(
       float pct, const String& label, uint8_t font, uint8_t borderSize,
       uint16_t labelColor, uint16_t borderColor,
-      uint16_t barColor, uint16_t bgColor, const String& showPct,
+      uint16_t barColor, uint16_t bgColor, bool showPct,
       bool buffer)
 {
   auto& tft = Display.tft;
-  String note = (label == showPct) ? String((int)(pct*100)) + "%" : label;
+  String note = showPct ? String((int)(pct*100)) + "%" : label;
 
   if (buffer) {
     auto& sprite = Display.sprite;

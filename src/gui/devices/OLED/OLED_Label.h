@@ -17,7 +17,7 @@ public:
   virtual void drawProgress(
     float pct, const String& label, uint8_t font, uint8_t borderSize,
     uint16_t labelColor, uint16_t borderColor,
-    uint16_t barColor, uint16_t bgColor, const String& showPct,
+    uint16_t barColor, uint16_t bgColor, bool showPct,
     bool buffer = false) override;
 
 };

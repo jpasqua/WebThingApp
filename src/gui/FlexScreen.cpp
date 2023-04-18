@@ -105,34 +105,46 @@ bool BaseFlexScreen::init(
   return fromJSON(screen);
 }
 
+void BaseFlexScreen::renderProgressBar(FlexItem& item, const char* buf) {
+  // buf is of the form:
+  // message|percent     OR     message
+  // If no perent is given, then the message is displayed within a full
+  // progress bar. Otherwise a progress bar will be shown 'percent' full
+  // with the percentage displayed within (eg 47%)
+  int pct = 100;
+  char* delimiter = strchr(buf, '|');
+  if (delimiter) {
+    pct = atoi(delimiter+1);
+    *delimiter = '\0';
+  }
+Log.verbose("BaseFlexScreen::renderProgressBar: buf = %s, delimiter==null: %T",
+  buf, (delimiter == nullptr));
+  Label progressLabel(item._x, item._y, item._w, item._h, 0);
+  progressLabel.drawProgress(
+    ((float)pct)/100.0, buf, item._font, item._strokeWidth,
+    Theme::Color_Border, Theme::Color_NormalText, 
+    item._color, _bkg, (delimiter!=nullptr), true);
+}
+
 void BaseFlexScreen::displayItem(FlexItem& item) {
-  char buf[Display.width()/6 + 1];  // Assume 6 pixel spacing is smallest font
+  int bufSize = Display.width()/6 + 1; // Assume 6 pixel spacing is smallest font
+  char buf[bufSize];  
 
-  item.generateText(buf, _mapper);
+  item.generateText(buf, bufSize, _mapper);
 
-  if (item._format.indexOf("#progress|") != -1) {
-    String val(buf);
-    int firstDelimiter = val.indexOf('|');
-    int lastDelimiter = val.lastIndexOf('|');
-    String msg = val.substring(0, firstDelimiter);
-    int code = val.substring(firstDelimiter+1, lastDelimiter).toInt();
-    String showPct = val.substring(lastDelimiter+1);
+  if (item._format.equalsIgnoreCase("#progress")) {
+    renderProgressBar(item, buf);
+    return;
+  }
 
-    Label progressLabel(item._x, item._y, item._w, item._h, 0);
-    progressLabel.drawProgress(
-      ((float)code)/100.0, msg, item._font, item._strokeWidth,
-      Theme::Color_Border, Theme::Color_NormalText, 
-      item._color, _bkg, showPct, true);
-  } else {
-    Display.drawStringInRegion(
-      buf, ((item._gfxFont >= 0) ? item._gfxFont : -item._font), item._datum,
-      item._x, item._y, item._w, item._h, item._xOff, item._yOff,
-      item._color, _bkg);
+  Display.drawStringInRegion(
+    buf, ((item._gfxFont >= 0) ? item._gfxFont : -item._font), item._datum,
+    item._x, item._y, item._w, item._h, item._xOff, item._yOff,
+    item._color, _bkg);
 
-    for (int i = 0; i < item._strokeWidth; i++) {
-      // Requires device-specific code
-      Display.drawRect(item._x+i, item._y+i, item._w-2*i, item._h-2*i, item._color);
-    }
+  for (int i = 0; i < item._strokeWidth; i++) {
+    // Requires device-specific code
+    Display.drawRect(item._x+i, item._y+i, item._w-2*i, item._h-2*i, item._color);
   }
 }
 void BaseFlexScreen::display(bool activating) {
@@ -208,7 +220,7 @@ void FlexItem::fromJSON(JsonObjectConst& item) {
   _strokeWidth = item[F("strokeWidth")];
 }
 
-void FlexItem::generateText(char* buf, Basics::ReferenceMapper mapper) {
+void FlexItem::generateText(char* buf, int bufSize, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
@@ -232,20 +244,12 @@ void FlexItem::generateText(char* buf, Basics::ReferenceMapper mapper) {
         break;
       }
       case FlexItem::Type::STATUS: {
-        if (strncasecmp(fmt, "#progress|", 10) == 0) {
-          sprintf(buf, "%s|%s", _val.c_str(), &fmt[10]);
-          // Result will be of the form: msg|code|showPctIndicator
-          // if msg == showPctIndicator, then the percentage will
-          // be shown rather than the message
-        } else {
-          // It's not a progress bar, so format according to the fmt string
-          int index = _val.indexOf('|');
-          String msg = _val.substring(0, index);
-          int code = _val.substring(index+1).toInt();
-          sprintf(buf, fmt, msg, code);
-        }
+Log.verbose("FlexItem::generateText: STATUS _val = %s", _val.c_str());
+        _val.toCharArray(buf, bufSize);
       }
     }
+  } else {
+    buf[0] = '\0';
   }
 }
 

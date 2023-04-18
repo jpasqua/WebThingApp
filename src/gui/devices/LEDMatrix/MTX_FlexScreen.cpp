@@ -19,11 +19,12 @@ void FlexScreen::prepForDisplay() {
   _nextTimeToDisplay = 0;
 
   // Build up the text
-  char buf[Display.mtx->width()/6 + 1];  // Assume 6 pixel spacing is smallest font
+  int bufSize = Display.mtx->width()/6 + 1;  // Assume 6 pixel spacing is smallest font
+  char buf[bufSize];
 
   _text.clear();
   for (int i = 0; i < _nItems; i++) {
-    _items[i].generateText(buf, _mapper);
+    _items[i].generateText(buf, bufSize, _mapper);
     _text += buf;
   }
   _textWidth = Display.getTextWidth(_text, _fontID);

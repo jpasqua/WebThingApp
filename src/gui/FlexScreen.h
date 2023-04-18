@@ -36,8 +36,9 @@ public:
   using Type = enum {INT, FLOAT, STRING, BOOL, CLOCK, STATUS};
 
   void fromJSON(JsonObjectConst& item);
+  void generateText(char* buf, int bufSize, Basics::ReferenceMapper mapper);
 
-  static String _val; // Temporary space shared by all FlexItems
+  static String _val; // Temporary mapping string shared by all FlexItems
   static void init() { _val.reserve(32); }
 
   uint16_t _x, _y;    // Location of the field
@@ -49,13 +50,10 @@ public:
   uint16_t _color;    // Color to use
   String   _format;   // Format string to use when displaying the value
   uint8_t  _datum;    // Justification of the output
-
   uint8_t _strokeWidth; 
 
   String _key;        // The key that will be used to get the value
   Type _dataType;
-
-  void generateText(char* buf, Basics::ReferenceMapper mapper);
 };
 
 
@@ -77,6 +75,7 @@ public:
   virtual void processPeriodicActivity();
 
   virtual void displayItem(FlexItem& item);
+  virtual void renderProgressBar(FlexItem& item, const char* buf);
 
 protected:
   static   Screen::ButtonHandler _buttonDelegate;
