@@ -139,6 +139,9 @@ void Label::drawProgress(
     sprite->pushSprite(region.x, region.y);
     sprite->deleteSprite();
   } else {
+    // Clear the region
+    tft.fillRect(region.x, region.y, region.w, region.h, bgColor);
+
     // Draw the frame
     for (int i = 0; i < borderSize; i++) {
       tft.drawRect(region.x+i, region.y+i, region.w-(2*i), region.h-(2*i), borderColor);
