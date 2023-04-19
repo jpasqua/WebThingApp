@@ -229,18 +229,18 @@ void FlexItem::generateText(char* buf, int bufSize, Basics::ReferenceMapper mapp
     mapper(_key, _val);
 
     switch (_dataType) {
-      case FlexItem::Type::INT: sprintf(buf, fmt, _val.toInt()); break;
-      case FlexItem::Type::FLOAT: sprintf(buf, fmt, _val.toFloat()); break;
-      case FlexItem::Type::STRING: sprintf(buf, fmt, _val.c_str()); break;
+      case FlexItem::Type::INT: snprintf(buf, bufSize, fmt, _val.toInt()); break;
+      case FlexItem::Type::FLOAT: snprintf(buf, bufSize, fmt, _val.toFloat()); break;
+      case FlexItem::Type::STRING: snprintf(buf, bufSize, fmt, _val.c_str()); break;
       case FlexItem::Type::BOOL: {
         char c = _val[0];
         bool bv = (c == 't' || c == 'T' || c == '1') ;
-        sprintf(buf, fmt, bv ? F("True") : F("False"));
+        snprintf(buf, bufSize, fmt, bv ? F("True") : F("False"));
         break;
       }
       case FlexItem::Type::CLOCK: {
         time_t curTime = now();
-        sprintf(buf, fmt, Output::adjustedHour(hour(curTime)), minute(curTime), second(curTime));
+        snprintf(buf, bufSize, fmt, Output::adjustedHour(hour(curTime)), minute(curTime), second(curTime));
         break;
       }
       case FlexItem::Type::STATUS: {
