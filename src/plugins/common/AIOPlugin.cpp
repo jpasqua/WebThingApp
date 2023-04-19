@@ -41,6 +41,8 @@ AIOSettings::AIOSettings() {
 }
 
 void AIOSettings::fromJSON(const JsonDocument &doc) {
+Log.verbose("AIOSettings::fromJSON");
+serializeJsonPretty(doc, Serial);
   JsonArrayConst groupNameArray = doc[F("groups")];
   JsonArrayConst nameArray = doc[F("nicknames")];
   nGroups = groupNameArray.size();  
@@ -50,6 +52,8 @@ void AIOSettings::fromJSON(const JsonDocument &doc) {
   for (int i = 0; i < nGroups; i++) {
     groupNames[i] = groupNameArray[i].as<String>();
     nicknames[i] = nameArray[i].as<String>();
+    if (nicknames[i].equalsIgnoreCase("null") ||
+        nicknames[i].isEmpty()) nicknames[i] = groupNames[i];
   }
 
   JsonArrayConst feedArray = doc[F("feeds")];
@@ -78,7 +82,7 @@ void AIOSettings::fromJSON(const String& settings) {
 }
 
 void AIOSettings::toJSON(JsonDocument &doc) {
-  JsonArray groupArray = doc.createNestedArray(F("groupNames"));
+  JsonArray groupArray = doc.createNestedArray(F("groups"));
   JsonArray nnArray = doc.createNestedArray(F("nicknames"));
   for (int i = 0; i < nGroups; i++) {
     groupArray.add(groupNames[i]);
