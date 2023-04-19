@@ -29,6 +29,13 @@
           $('#res_'+pID).css('color', 'red');
           $('#res_'+pID).text('Error: ' + xhr.responseText);
         }
+        setTimeout(function() {
+          $('#res_'+pID).fadeOut("slow", function() {
+            $('#res_'+pID).text('');
+            $('#res_'+pID).attr("style","font-size: small; display:block");
+          }
+        );
+        } ,3000);
       }
     };
     xhr.send(JSON.stringify(values));
