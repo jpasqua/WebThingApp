@@ -52,30 +52,6 @@
 <form class='w3-container' action='/updateDisplayConfig' method='get'>
   <h2>Display Options</h2>
 
-  <p><input name='scheduleEnabled' class='w3-check' type='checkbox' onclick='showHide("schedules")' %SCHED_ENABLED% checked> Enable schedules</p>
-    <div id="schedules" style='display:none'>
-      <p>
-        <label>Morning begins at: </label><input type='time' name='morning' value='%MORN%' pattern="(([01]?[0-9])|(2[0-3])):[0-5][0-9]" placeholder="08:00" size='6'>
-        <label> Brightness: </label><input type='text' name='mBright' value='%M_BRIGHT%' placeholder="100" size='6'>\%</p>
-      </p>
-      <p>
-        <label>Evening begins at: </label><input type='time' name='evening' value='%EVE%' pattern="(([01]?[0-9])|(2[0-3])):[0-5][0-9]" placeholder="22:15" size='6'>
-        <label> Brightness: </label><input type='text' name='eBright' value='%E_BRIGHT%' placeholder="100" size='6'>\%</p>
-      </p>
-  </div>
-
-  <p><label>Turn of display after:&nbsp;</label>
-    <select class='w3-option w3-padding' name='blank'>
-      <option value='1'  %SL1%>1 minute</option>
-      <option value='5'  %SL5%>5 minutes</option>
-      <option value='10' %SL10%>10 minutes</option>
-      <option value='15' %SL15%>15 minutes</option>
-      <option value='30' %SL30%>30 minutes</option>
-      <option value='60' %SL50%>1 hour</option>
-      <option value='0'  %SL0%>Never</option>
-    </select>
-  </p>
-
   <p>Adjust Current Brightness</p>
   <div class='w3-container'>
     <script>
@@ -92,6 +68,35 @@
     </div>
       <script>showVal(document.getElementById('bSlider').value)</script>
   </div>
+
+  <p><input name='scheduleEnabled' class='w3-check' type='checkbox' onclick='showHide("schedules")' %SCHED_ENABLED% checked> Enable schedules</p>
+  <div class='w3-card w3-round-large'>
+    <div class='w3-container'>
+    <div id="schedules" style='display:none'>
+      <p>
+        <label>Morning begins at: </label><input type='time' name='morning' value='%MORN%' pattern="(([01]?[0-9])|(2[0-3])):[0-5][0-9]" placeholder="08:00" size='6'>
+        <label> Brightness: </label><input type='text' name='mBright' value='%M_BRIGHT%' placeholder="100" size='6'>\%</p>
+      </p>
+      <p>
+        <label>Evening begins at: </label><input type='time' name='evening' value='%EVE%' pattern="(([01]?[0-9])|(2[0-3])):[0-5][0-9]" placeholder="22:15" size='6'>
+        <label> Brightness: </label><input type='text' name='eBright' value='%E_BRIGHT%' placeholder="100" size='6'>\%</p>
+      </p>
+  </div>
+</div>
+</div>
+
+  <p><label>Turn of display after:&nbsp;</label>
+    <select class='w3-option w3-padding' name='blank'>
+      <option value='1'  %SL1%>1 minute</option>
+      <option value='5'  %SL5%>5 minutes</option>
+      <option value='10' %SL10%>10 minutes</option>
+      <option value='15' %SL15%>15 minutes</option>
+      <option value='30' %SL30%>30 minutes</option>
+      <option value='60' %SL50%>1 hour</option>
+      <option value='0'  %SL0%>Never</option>
+    </select>
+  </p>
+
 
   <hr>
   <p><input name='is24hour' class='w3-check' type='checkbox' %USE_24HOUR%> Use 24 Hour Clock (13:30 vs 1:30)</p>
