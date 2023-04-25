@@ -117,8 +117,7 @@ void BaseFlexScreen::renderProgressBar(FlexItem& item, const char* buf) {
     pct = atoi(delimiter+1);
     *delimiter = '\0';
   }
-Log.verbose("BaseFlexScreen::renderProgressBar: buf = %s, delimiter==null: %T",
-  buf, (delimiter == nullptr));
+
   Label progressLabel(item._x, item._y, item._w, item._h, 0);
   progressLabel.drawProgress(
     ((float)pct)/100.0, buf, item._font, item._strokeWidth,
@@ -244,7 +243,6 @@ void FlexItem::generateText(char* buf, int bufSize, Basics::ReferenceMapper mapp
         break;
       }
       case FlexItem::Type::STATUS: {
-Log.verbose("FlexItem::generateText: STATUS _val = %s", _val.c_str());
         _val.toCharArray(buf, bufSize);
       }
     }
