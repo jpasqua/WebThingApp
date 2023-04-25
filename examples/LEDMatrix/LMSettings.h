@@ -11,6 +11,7 @@
 //                                  Core Libraries
 #include <Arduino.h>
 //                                  Third Party Libraries
+#include <BPA_PrinterSettings.h>
 //                                  WebThing Includes
 #include <WTAppSettings.h>
 //                                  Local Includes
@@ -34,6 +35,11 @@ public:
   } aio;
 
   uint16_t scrollDelay;
+
+
+  static constexpr uint8_t MaxPrinters = 4;
+  PrinterSettings printer[MaxPrinters];
+  uint32_t printerRefreshInterval = 10;
 
 private:
   // ----- Constants -----
