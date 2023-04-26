@@ -62,13 +62,6 @@ public:
   // Call this while initializing hardware and before begin()
   virtual void setDeviceOptions(const DisplayDeviceOptions* options) override;
 
-  // Must be called before the display is used
-  void begin(DisplayOptions* displayOptions) {
-    _options = displayOptions;
-    device_begin();
-    setBrightness(80);
-  }
-
   // ----- Brightness control -----
   virtual void setBrightness(uint8_t b) override;
 
