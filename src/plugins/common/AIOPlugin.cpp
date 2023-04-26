@@ -41,8 +41,6 @@ AIOSettings::AIOSettings() {
 }
 
 void AIOSettings::fromJSON(const JsonDocument &doc) {
-Log.verbose("AIOSettings::fromJSON");
-serializeJsonPretty(doc, Serial);
   JsonArrayConst groupNameArray = doc[F("groups")];
   JsonArrayConst nameArray = doc[F("nicknames")];
   nGroups = groupNameArray.size();  
