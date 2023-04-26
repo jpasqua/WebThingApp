@@ -4,6 +4,7 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#include <ArduinoLog.h>
 //                                  WebThing Includes
 //                                  Local Includes
 #include "../../FlexScreen.h"
@@ -12,6 +13,7 @@
 
 
 void FlexScreen::prepForDisplay() {
+  _mtxWidth = Display.width();
   _delayBetweenFrames = std::max(_items[0]._x, MinDelayBetweenFrames);
     // We overload the meaning of "_x" when used as part of a MTX_FlexScreen
   _fontID = _items[0]._gfxFont;
