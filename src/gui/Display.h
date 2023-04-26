@@ -45,7 +45,6 @@ public:
   void begin(DisplayOptions* displayOptions) {
     _options = displayOptions;
     device_begin();
-    setBrightness(80);
   }
 
   // ----- Brightness control -----
