@@ -62,6 +62,10 @@ void ScrollScreen::innerDisplay() {
 void ScrollScreen::display(bool activating) {
   if (activating) {
     innerActivation();
+    if (_text.isEmpty() && _autoAdvance) {
+      ScreenMgr.moveThroughSequence(true);  // Go to the next screen
+      return;
+    }
     _offset = 0;
     _nextTimeToDisplay = 0;
     Display.setFont(_fontID);
