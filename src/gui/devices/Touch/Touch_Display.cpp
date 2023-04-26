@@ -31,6 +31,7 @@
 void Touch_Display::device_begin() {
   if (TFT_LED != -1) pinMode(TFT_LED, OUTPUT);
   tft.begin();
+  setBrightness(50);
   tft.setSwapBytes(true);
   tft.setRotation(_options->invertDisplay ? 3 : 1);
   tft.fillScreen(TFT_BLACK);
