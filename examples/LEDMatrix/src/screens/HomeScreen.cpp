@@ -59,6 +59,9 @@ void HomeScreen::display(bool activating) {
     mtx->print(temp);
     mtx->print(lmApp->settings->uiOptions.useMetric ? 'C' : 'F');
   }
+
+  if (lmSettings->printMonitorEnabled) drawProgressBar();
+
   mtx->write();
   _displayStartedAt = millis();
 }
@@ -89,6 +92,30 @@ void HomeScreen::toggleColon() {
   _colonVisible = !_colonVisible;
   Display.mtx->writePixel(12, 2, _colonVisible);
   Display.mtx->writePixel(12, 4, _colonVisible);
+}
+
+void HomeScreen::drawProgressBar() {
+  if (lmSettings->homeScreenProgress == LMSettings::HSP_None) return;
+  bool isVert = lmSettings->homeScreenProgress == LMSettings::HSP_Vertical;
+
+  uint8_t whichPrinter;
+  String completionTime;
+  uint32_t timeRemaining;
+
+  String printerName;
+  String fileName;
+
+  if (lmApp->printerGroup->nextCompletion(whichPrinter, completionTime, timeRemaining)) {
+    PrintClient* p = lmApp->printerGroup->getPrinter(whichPrinter);
+    float pct = p->getPctComplete()/100.0;
+    uint8_t pctPixels = (isVert ? Display.height() : Display.width()) * pct;
+    if (pctPixels == 0) pctPixels = 1;
+    if (isVert) {
+      Display.mtx->drawFastVLine(0, Display.height()-pctPixels, pctPixels, Theme::Color_WHITE);
+    } else {
+      Display.mtx->drawFastHLine(0, Display.height()-1, pctPixels, Theme::Color_WHITE);
+    }
+  }
 }
 
 #endif

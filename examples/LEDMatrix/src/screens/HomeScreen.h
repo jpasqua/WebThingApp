@@ -27,6 +27,7 @@ private:
   uint32_t _homeScreenDisplayTime = 10*1000L; // Should be a setting
 
   void toggleColon();
+  void drawProgressBar();
 };
 
 #endif  // HomeScreen_h
