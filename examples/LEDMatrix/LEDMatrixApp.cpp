@@ -103,6 +103,13 @@ LEDMatrixApp::LEDMatrixApp(LMSettings* settings) :
   // In this case, nothing app-specific is required
 }
 
+void LEDMatrixApp::printerWasActivated(int index) {
+  if (lmSettings->printMonitorEnabled) {
+  // TO DO: May need to cache the IP!!!
+    printerGroup->activatePrinter(index);
+  }
+}
+
 
 /*------------------------------------------------------------------------------
  *
@@ -113,6 +120,11 @@ LEDMatrixApp::LEDMatrixApp(LMSettings* settings) :
 void LEDMatrixApp::app_registerDataSuppliers() {
   // BOILERPLATE
   DataBroker::registerMapper(LMDataSupplier::dataSupplier, LMDataSupplier::ERPrefix);
+  if (lmSettings->printMonitorEnabled) {
+    DataBroker::registerMapper(
+        [this](const String& key,String& val) { this->printerGroup->dataSupplier(key, val); },
+        PrinterGroup::DataProviderPrefix);
+  }
 }
 
 void LEDMatrixApp::app_initWebUI() {
@@ -131,26 +143,32 @@ void LEDMatrixApp::app_loop() {
 void LEDMatrixApp::app_initClients() {
   // CUSTOM: If your app has any app-specific clients, initilize them now
 
+  fireUpPrintMonitor();
+
   // ScreenMgr.showActivityIcon(Theme::Color_WHITE);
   // Perform potentially long running actions here...
   // ScreenMgr.hideActivityIcon();
 }
 
-void LEDMatrixApp::app_conditionalUpdate(bool) {
+void LEDMatrixApp::app_conditionalUpdate(bool force) {
   // CUSTOM: Update any app-specific clients
 
-  // ScreenMgr.showActivityIcon(Theme::Color_WHITE);
-  // Update any relevant clients here...
-  // ScreenMgr.hideActivityIcon();
+  if (lmSettings->printMonitorEnabled) {
+    printerGroup->refreshPrinterData(force);
+  }
 }
 
 Screen* LEDMatrixApp::app_registerScreens() {
   // CUSTOM: Register any app-specific Screen objects
   splashScreen = new SplashScreen();
   homeScreen = new HomeScreen();
-
+  nextPrinterScreen = new NextPrinterScreen();
+  allPrinterScreen = new AllPrinterScreen();
+  
   ScreenMgr.registerScreen("Splash", splashScreen, true);
   ScreenMgr.registerScreen("Home", homeScreen);
+  ScreenMgr.registerScreen("NextPrint", nextPrinterScreen);
+  ScreenMgr.registerScreen("AllPrints", allPrinterScreen);
   ScreenMgr.setAsHomeScreen(homeScreen);
 
   // CUSTOM: Associate a confirm/cancel buttons with the reboot screen
@@ -201,4 +219,27 @@ void LEDMatrixApp::app_configureHW() {
   }
 
   ScreenMgr.setSequenceButtons(hwConfig.advanceButton, hwConfig.previousButton);
+}
+
+/*------------------------------------------------------------------------------
+ *
+ * LEDMatrixApp Private Functions
+ *
+ *----------------------------------------------------------------------------*/
+
+void LEDMatrixApp::showPrinterActivity(bool busy) {
+ if (busy) ScreenMgr.showActivityIcon(Theme::Color_WHITE);
+ else ScreenMgr.hideActivityIcon();
+}
+
+void LEDMatrixApp::fireUpPrintMonitor() {
+  if (lmSettings->printMonitorEnabled) {
+    printerGroup = new PrinterGroup(
+      MaxPrinters, lmSettings->printer,
+      lmSettings->printerRefreshInterval,
+      [this](bool busy){this->showPrinterActivity(busy);});
+    for (int i = 0; i < MaxPrinters; i++) {
+      printerGroup->activatePrinter(i);
+    }
+  }
 }

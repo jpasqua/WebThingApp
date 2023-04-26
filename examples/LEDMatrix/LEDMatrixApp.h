@@ -27,12 +27,15 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#include <BPA_PrinterGroup.h>
 //                                  WebThing Includes
 #include <WTAppImpl.h>
 //                                  Local Includes
 #include "LMSettings.h"
 #include "src/screens/SplashScreen.h"
 #include "src/screens/HomeScreen.h"
+#include "src/screens/NextPrinterScreen.h"
+#include "src/screens/AllPrinterScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -45,14 +48,18 @@
 
 class LEDMatrixApp : public WTAppImpl {
 public:
+  static constexpr int MaxPrinters = 4;
 
   static void create();
 
   // CUSTOM: Screens implemented by this app
-  SplashScreen*   splashScreen;
-  HomeScreen*     homeScreen;
+  SplashScreen*       splashScreen;
+  HomeScreen*         homeScreen;
+  NextPrinterScreen*  nextPrinterScreen;
+  AllPrinterScreen*   allPrinterScreen;
 
   // CUSTOM: Data defined by this app which is available to the whole app
+  PrinterGroup*   printerGroup;
 
   // ----- Functions that *must* be provided by subclasses
   virtual void app_registerDataSuppliers() override;
@@ -67,6 +74,11 @@ public:
 
   // ----- Public functions
   LEDMatrixApp(LMSettings* settings);
+  void printerWasActivated(int index);
+  void fireUpPrintMonitor();
+
+private:
+  void showPrinterActivity(bool busy);
 
 };
 
