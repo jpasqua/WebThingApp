@@ -24,16 +24,20 @@
 //--------------- End:    Includes ---------------------------------------------
 
 void MTX_Display::setDeviceOptions(const DisplayDeviceOptions* options) {
+  // We setup the device during setDeviceOptions to keep it from potentially
+  // displaying garbage while the app and frameworks are initializing
   deviceOptions = options;
+  mtx = new Max72xxPanel(
+      deviceOptions->csPin, deviceOptions->hDisplays, deviceOptions->vDisplays);
+  setBrightness(7); // Don't blast the intensity right out of the gate
+  // mtx->fillScreen(0);  // The Max72XXPanel constructor does this
+  mtx->write();
 }
 
 void MTX_Display::device_begin() {
-  mtx = new Max72xxPanel(
-      deviceOptions->csPin, deviceOptions->hDisplays, deviceOptions->vDisplays);
-  mtx->setIntensity(1); // Don't blast the intensity right out of the gate
+  // We can't set the orientation until now because _options is read from
+  // a settings file and isn't ready at 'setDeviceOptions()' time
   setOrientation(_options->invertDisplay);
-  mtx->fillScreen(0);
-  mtx->write();
 }
 
 void MTX_Display::setBrightness(uint8_t b) {
