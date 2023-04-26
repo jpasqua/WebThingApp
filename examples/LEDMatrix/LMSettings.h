@@ -16,7 +16,6 @@
 #include <WTAppSettings.h>
 //                                  Local Includes
 #include "LEDMatrixApp.h"
-#include "src/clients/RateClient.h"
 //--------------- End:    Includes ---------------------------------------------
 
 struct PrinterFields {
@@ -46,7 +45,7 @@ public:
 
   PrinterFields singlePrinter, allPrinters;
   enum {HSP_Horizontal, HSP_Vertical, HSP_None} homeScreenProgress;
-  
+
   uint16_t scrollDelay;
 
   static constexpr uint8_t MaxPrinters = 4;
