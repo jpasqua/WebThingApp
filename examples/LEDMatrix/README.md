@@ -1,13 +1,7 @@
 
 # LEDMatrix: A WebThingApp Example
 
-![](doc/images/SplashScreen.png)
-![](doc/images/HomeScreen.png)
-
-*LEDMatrix* is a simple example application based on the [WebThingApp library](https://github.com/jpasqua/WebThingApp), which itself is based on the [WebThing library](https://github.com/jpasqua/WebThing) library. To understand how those libraries work in more detail, refer to their documentation.
-
-*LEDMatrix* uses the `exchangeratesapi.io` service to get currency exchange rates for up to 3 currencies. It allows the user to enter an amount of one currency and see the corresponding amounts in the other currencies.
- 
+*LEDMatrix* is an application that can display weather, 3D Printer status, messages, and other information on a monochrome LED Matrix panel. It is based on the [WebThingApp library](https://github.com/jpasqua/WebThingApp), which itself is based on the [WebThing library](https://github.com/jpasqua/WebThing) library. To understand how those libraries work in more detail, refer to their documentation. 
 
 This application demonstrates the following:
 
@@ -26,19 +20,17 @@ This application demonstrates the following:
 
 ### Libraries
 
-To build this application you will need to douwnload and install all of the libraries required by [WebThingApp library](https://github.com/jpasqua/WebThingApp) and [WebThing library](https://github.com/jpasqua/WebThing). No additional libraries are required.
+To build this application you will need to douwnload and install all of the libraries required by [WebThingApp library](https://github.com/jpasqua/WebThingApp) and [WebThing library](https://github.com/jpasqua/WebThing). In addition, you will need:
+
+* [BPA3DPrintClients](https://github.com/jpasqua/BPA3DPClients): master
+
 
 ### Services
 
-*LEDMatrix* depends on two services in addition to those used by [WebThingApp library](https://github.com/jpasqua/WebThingApp) and [WebThing library](https://github.com/jpasqua/WebThing):
+In addition to the services used by [WebThingApp library](https://github.com/jpasqua/WebThingApp) and [WebThing library](https://github.com/jpasqua/WebThing), *LEDMatrix* may require API keys to connect to your 3D Printers
 
-* **exchangeratesapi.io**:
-	* This service requires a free API key. You can get one [here](https://manage.exchangeratesapi.io/signup).
-	* If you don't want to get an API key, you can get mock values by entering MOCK as the api key in the settings. 
-* **coinbase.com**:
-	* This service is used by the plugin example. It does not require an API key, but does use SSL.
-	* To remove the plugins completely, just delete (or move) the `plugins` directory from the `data` directory (see the file structure below).
-	* If you wish to keep the plugins but don't have enough memory, you can use a mock client which returns fabricated results. Mocking can be enabled in the `CoinbaseClient.h` file. As you will seeing, mocking is enabled by default on ESP8266.
+* **OctoPrint**:
+	* If you are monitoring an OctoPrint-connected printer, you'll need the API key for it, which can be found in the OctoPrint Web UI.
 
 <a name="structure"></a>
 ## File Structure 
@@ -52,36 +44,33 @@ LEDMatrix
 ├── LMWebUI.[h,cpp]
 ├── LEDMatrix.ino
 ├── LEDMatrixApp.[h,cpp]
-├── README.md
+├── ...
 ├── data
 │   ├── <html files that are specific to this app>
 │   ├── plugins
-│   │   ├── 1_gnrc
-│   │   ├── 3_crypto
+│   │    └── 1_aio
 │   └── wt
 │   │   └── <html files from the WebThing library>
 │   └── wta
 │       └── <html files from the WebThingApp library>
 └── src
-    ├── clients
-    │   └── RateClient
+    ├── hardware
+    │   └── HWConfig.h
     └── screens
-        ├── AppTheme.h
         ├── SplashScreen.[h,cpp]
         ├── HomeScreen.[h,cpp]
-        └── images
-            └── ...
+        └── ...
 ````
 
 Description:
 
 * The `LEDMatrix` directory contains the source code for the app itself:
 
-	* `LMDataSupplier `: This module contains a dataSupplier function which gets plugged into the `DataBroker` to publish app specific information. In this case it is information about exhcange rates.
-	* `LMSettings `: Defines, internalizes, and externalizes the settings that are specific to this app.
-	* `LMWebUI`: Provides app-specific web pages and functions. For example, the configuration page that lets you specify which currencies you are. interested in. `WebThingApp` provides many other pages such as general settings, display settings, and weather settings.
 	* `LEDMatrix.ino`: This is a bridge between the Arduino `setup()` and `loop()` functions and the app initialization and operation. It is boilerplate and there is no app-specific code in this module.
 	* `LEDMatrixApp`: This is the core of the application. It is a subclass of `WTAppImpl` and `WTApp` which are part of the `WebThingApp` library.
+	* `LMSettings `: Defines, internalizes, and externalizes the settings that are specific to this app.
+	* `LMWebUI`: Provides app-specific web pages and functions. For example, the printer configuration page that lets your 3D printers and what to display. `WebThingApp` provides many other pages such as general settings, display settings, and weather settings.
+	* `LMDataSupplier `: This module contains a dataSupplier function which gets plugged into the `DataBroker` to publish app specific information.
 * The `data` directory contains contains all the files that will be written to the file system as part of the build process. There are four sets of files in the data directory:
 
 	* At the root are HTML files that are used by any custom pages served up by the app's Web UI. For example, a custom home page. You may also place a settings.json file here if you want to have settings loaded into the app by default. Otherwise the user will need to configure the app settings when the device starts the first time.
@@ -89,7 +78,6 @@ Description:
 	* The `wt` subdirectory contains HTML for the pages displayed by the `WebThing` Web UI pages. These are low level configuration items such as the hostname to use. You may also place a settings.json file here if you want to have settings loaded into the app by default. Otherwise the user will need to configure all the `WebThings` settings when the device starts the first time.
 	* The `wta` subdirectory contains HTML for the pages displayed by the `WebUIHelper`. These are pages that are common to most apps like a page to configure display settings.
 
-* The `src/clients` directory contains code that implements client objects for web services, sensors, or other data providers/actuators. Of course applications can use existing libraries if they exist. This directory is for app-specific clients.
 
 * The `src/screens` directory contains code for app-specific screens. Most apps will use the common screens provided by `WebThingApp`, but they will also typically provide at least one custom screen.
 
@@ -99,6 +87,3 @@ To build *LEDMatrix*, follow the instructions in the ["Building a WebThingApp"](
 
 Once complete, you can set up your device following the instructions in the ["Setting up your device"](../../README.md#preparation) section. This will get you 90% of the way through the process, but you still need to configure settings that are specific to *LEDMatrix*.
 
-### Configuring the Currencies
-
-### Configuring the Plugins
