@@ -48,6 +48,7 @@ void OLED_Display::device_begin() {
 
   oled->init();
   setOrientation(_options->invertDisplay );
+  setBrightness(100);
 }
 
 void OLED_Display::setBrightness(uint8_t b) {
