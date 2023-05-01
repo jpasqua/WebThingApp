@@ -2,6 +2,9 @@
 #define HWConfig_h
 
 #include <BPABasics.h>
+#include <GenericESP.h>
+#include <gui/devices/DeviceSelect.h>
+
 //
 // A Hardware configuration is a bundle of definitions that describe a
 // particular collection of hardware such as what kind of display is attached,
@@ -36,6 +39,7 @@
    * Config Info for D1Mini
    *
    *----------------------------------------------------------------------------*/
+  #define PROCESSOR_ASSERT PROCESSOR_ESP8266
 
   // ----- Matrix Settings
   constexpr Basics::Pin Wiring_MOSI = D7;  // DIN
@@ -54,6 +58,7 @@
    * Config Info for ESP32D1Mini
    *
    *----------------------------------------------------------------------------*/
+  #define PROCESSOR_ASSERT PROCESSOR_ESP32
 
   // ----- Matrix Settings
   constexpr Basics::Pin Wiring_MOSI = 23;  // DIN
@@ -98,5 +103,28 @@ constexpr HWConfig hwConfig {
   syntheticGrounds, ARRAY_SIZE(syntheticGrounds),
   physicalButtons[0], Basics::UnusedPin
 };
+
+
+/*------------------------------------------------------------------------------
+ *
+ * Sanity Checks
+ *
+ *----------------------------------------------------------------------------*/
+
+#if DEVICE_TYPE != DEVICE_TYPE_MTX
+  #error ERROR: DEVICE_TYPE must be DEVICE_TYPE_MTX
+#endif
+
+#if defined(PROCESSOR_ASSERT)
+  #if defined(ESP8266)
+    #if PROCESSOR_ASSERT != PROCESSOR_ESP8266
+      #error Processor set in IDE is ESP8266, expexted something else
+    #endif
+  #elif defined(ESP32)
+    #if PROCESSOR_ASSERT != PROCESSOR_ESP32
+      #error Processor set in IDE is ESP32, expexted something else
+    #endif
+  #endif
+#endif
 
 #endif  // HWConfig_h
