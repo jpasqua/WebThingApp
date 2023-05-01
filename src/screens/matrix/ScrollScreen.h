@@ -25,6 +25,7 @@ public:
 
   void init(bool autoAdvance = true, uint32_t delay = 50, uint8_t forceCycles = 0);
   void setText(String text, uint8_t fontID = Display.BuiltInFont_ID);
+  void goHomeWhenComplete(bool goHome) { _goHome = goHome; }
 
   virtual void innerActivation() {};
   virtual void innerPeriodic() {};
@@ -34,6 +35,7 @@ private:
   uint8_t _fontID;
   uint16_t _textWidth;
   uint16_t _baseline;
+  bool _goHome;
 
   uint16_t _offset = 0;
   uint16_t _mtxWidth;

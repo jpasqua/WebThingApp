@@ -34,6 +34,7 @@ void ScrollScreen::init(bool autoAdvance, uint32_t delay, uint8_t forceCycles) {
   _autoAdvance = autoAdvance;
   _mtxWidth = Display.mtx->width();
   _forceCycles = forceCycles;
+  _goHome = false;
 }
 
 void ScrollScreen::setText(String text, uint8_t fontID) {
@@ -93,7 +94,9 @@ void ScrollScreen::processPeriodicActivity() {
         delay(_delayBetweenFrames * 3);
       }
       if (_autoAdvance) {
-        ScreenMgr.moveThroughSequence(true);  // Go to the next screen
+        // Go to the next screen
+        if (_goHome) { ScreenMgr.displayHomeScreen(); }
+        else { ScreenMgr.moveThroughSequence(true); } 
         return;
       } else {
         _offset = 0;
