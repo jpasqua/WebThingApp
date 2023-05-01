@@ -21,8 +21,8 @@
  */
 
 
-#ifndef CurrencyMonApp_h
-#define CurrencyMonApp_h
+#ifndef LEDMatrixApp_h
+#define LEDMatrixApp_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -82,4 +82,4 @@ private:
 
 };
 
-#endif	// CurrencyMonApp_h
+#endif	// LEDMatrixApp_h
