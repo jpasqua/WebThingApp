@@ -24,7 +24,7 @@ private:
   uint32_t _displayStartedAt = 0;
   uint16_t _compositeTime = 0;
   bool _colonVisible = true;
-  uint32_t _homeScreenDisplayTime = 10*1000L; // Should be a setting
+  bool _showInfoScreen;
 
   void toggleColon();
   void drawProgressBar();

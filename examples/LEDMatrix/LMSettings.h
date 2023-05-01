@@ -47,6 +47,7 @@ public:
   enum {HSP_Horizontal, HSP_Vertical, HSP_None} homeScreenProgress;
 
   uint16_t scrollDelay;
+  uint32_t homeScreenTime;  // Seconds to stay on the home screen before advancing
 
   static constexpr uint8_t MaxPrinters = 4;
   bool printMonitorEnabled = false;

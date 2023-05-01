@@ -26,6 +26,7 @@ LMSettings::LMSettings() {
 void LMSettings::fromJSON(const JsonDocument &doc) {
   // ----- General LEDMatrix Settings
   scrollDelay = doc["scrollDelay"] | 20;
+  homeScreenTime = doc["homeScreenTime"] | 20;
 
   // ----- Adafruit IO
   aio.username = String(doc["aioUsername"]|"");
@@ -62,6 +63,7 @@ void LMSettings::fromJSON(const JsonDocument &doc) {
 void LMSettings::toJSON(JsonDocument &doc) {
   // ----- General LEDMatrix Settings
   doc[F("scrollDelay")] = scrollDelay;
+  doc[F("homeScreenTime")] = homeScreenTime;
 
   // ----- Adafruit IO
   doc["aioUsername"] = aio.username;
@@ -95,6 +97,7 @@ void LMSettings::logSettings() {
   Log.verbose(F("LEDMatrix Settings"));
   Log.verbose(F("  General Settings"));
   Log.verbose(F("    scrollDelay = %d"), scrollDelay);
+  Log.verbose(F("    homeScreenTime = %d"), homeScreenTime);
   Log.verbose(F("  Adafruit IO Settings"));
   Log.verbose(F("    aio.username = %s"), aio.username.c_str());
   Log.verbose(F("    aio.key = %s"), aio.key.c_str());

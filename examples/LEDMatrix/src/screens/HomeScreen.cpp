@@ -16,10 +16,19 @@
 
 static inline uint16_t compose(int h, int m) { return(h * 100 + m); }
 
-HomeScreen::HomeScreen() { }
+HomeScreen::HomeScreen() {
+  _showInfoScreen = true;
+}
 
 void HomeScreen::display(bool activating) {
-  auto mtx = Display.mtx;
+  auto& mtx = Display.mtx;
+
+  if (_showInfoScreen) {
+    _showInfoScreen = false;
+    wtAppImpl->screens.infoScreen->goHomeWhenComplete(true);
+    ScreenMgr.display(wtAppImpl->screens.infoScreen);
+    return;
+  }
 
   if (activating) { Display.setFont(Display.BuiltInFont_ID); }
   _colonVisible = false;
@@ -69,7 +78,7 @@ void HomeScreen::display(bool activating) {
 void HomeScreen::processPeriodicActivity() {
   static uint32_t _colonLastToggledAt = 0;
   uint32_t curMillis = millis();
-  if (curMillis > _displayStartedAt + _homeScreenDisplayTime) {
+  if (curMillis > _displayStartedAt + lmSettings->homeScreenTime*1000L) {
     ScreenMgr.moveThroughSequence(true);
     return;
   }

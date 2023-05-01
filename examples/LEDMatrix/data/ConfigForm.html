@@ -3,12 +3,14 @@
     var x = document.getElementById(elementID);
     if (show) { x.style.display = 'block'; } else { x.style.display = 'none'; }
   }
+  function isNumberKey(e) { var h = e.which ? e.which : event.keyCode; return !(h > 31 && (h < 48 || h > 57)) }
 </script>
 
 <form class='w3-container' action='/updateLMConfig' method='get'>
   <h2>LEDMatrix Settings:</h2>
 
-  <p><input name='is24hour' class='w3-check' type='checkbox' %USE_24HOUR%> Use 24 Hour Clock (13:30 vs 1:30)</p>
+<p><label>Display home screen for (seconds):</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='homeScreenTime' value='%HS_TIME%' maxlength='5' onkeypress='return isNumberKey(event)'></p>
+<p><input name='is24hour' class='w3-check' type='checkbox' %USE_24HOUR%> Use 24 Hour Clock (13:30 vs 1:30)</p>
   <p><input name='metric' class='w3-check' type='checkbox' %USE_METRIC%> Use Metric</p>
   <p><label>Frame Delay (ms):</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='scrollDelay' value='%SCROLL_DELAY%' maxlength='10'></p>
 

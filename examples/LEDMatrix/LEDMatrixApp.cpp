@@ -185,7 +185,7 @@ Screen* LEDMatrixApp::app_registerScreens() {
     Plugin* p = pluginMgr.getPlugin(i);
     sequence.push_back(p->getFlexScreen());
   }
-  sequence.push_back(wtAppImpl->screens.infoScreen);
+  // sequence.push_back(wtAppImpl->screens.infoScreen);
 
   ScreenMgr.reconcileScreenSequence(lmSettings->screenSettings);
 

@@ -51,6 +51,7 @@ namespace LMWebUI {
     void presentLMconfig() {
       auto mapper =[&](const String &key, String& val) -> void {
         if (key == "SCROLL_DELAY")    val = lmSettings->scrollDelay;
+        else if (key == "HS_TIME")    val = lmSettings->homeScreenTime;
         else if (key == "AIO_KEY")    val = lmSettings->aio.key;
         else if (key == "AIO_USER")   val = lmSettings->aio.username;
         else if (key == "AIO_GROUP")  val = lmSettings->aio.groupName;
@@ -140,6 +141,7 @@ namespace LMWebUI {
         lmSettings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
         lmSettings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
         lmSettings->scrollDelay = WebUI::arg("scrollDelay").toInt();
+        lmSettings->homeScreenTime = WebUI::arg("homeScreenTime").toInt();
         lmSettings->write();
 
         WebUI::redirectHome();
