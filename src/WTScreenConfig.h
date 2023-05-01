@@ -139,7 +139,7 @@ public:
     ScreenMgr.registerScreen("Forecast", forecastScreen);
 
     infoScreen = new InfoScreen();
-    ScreenMgr.registerScreen("Info", infoScreen);
+    ScreenMgr.registerScreen("Info", infoScreen, true);
 
     rebootScreen = new RebootScreen();
     ScreenMgr.registerScreen("Reboot", rebootScreen, true);
