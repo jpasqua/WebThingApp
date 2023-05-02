@@ -19,11 +19,13 @@
 
 class ScrollScreen : public Screen {
 public:
+  static void setDefaultFrameDelay(uint32_t delay);
+  
   ScrollScreen();
   void display(bool activating = false);
   void processPeriodicActivity();
 
-  void init(bool autoAdvance = true, uint32_t delay = 50, uint8_t forceCycles = 0);
+  void init(bool autoAdvance = true, uint32_t delay = 0, uint8_t forceCycles = 0);
   void setText(String text, uint8_t fontID = Display.BuiltInFont_ID);
   void goHomeWhenComplete(bool goHome) { _goHome = goHome; }
 
@@ -46,6 +48,7 @@ private:
   uint8_t _forceCycles = 0;
   uint8_t _cyclesCompleted = 0;
 
+  static uint32_t defaultDelayBetweenFrames;
   void innerDisplay();
 
 };

@@ -23,7 +23,7 @@ ConfigScreen::ConfigScreen() {
   nLabels = 0;
   labels = NULL;
 
-  init(false, 20, 2);
+  init(false, 0, 2);  // 0 for the delay param means "use the default"
 }
 
 void ConfigScreen::setSSID(const String& ssid) {

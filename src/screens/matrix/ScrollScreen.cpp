@@ -24,6 +24,11 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
+uint32_t ScrollScreen::defaultDelayBetweenFrames = 50;  // static (class-level) variable
+void ScrollScreen::setDefaultFrameDelay(uint32_t delay) {
+  defaultDelayBetweenFrames = delay;
+}
+
 ScrollScreen::ScrollScreen() {
   nLabels = 0;
   labels = NULL;
@@ -77,7 +82,8 @@ void ScrollScreen::display(bool activating) {
 
   _cyclesCompleted = 0;
   while (_cyclesCompleted < _forceCycles) {
-    delay(_delayBetweenFrames);
+    uint32_t dbf = _delayBetweenFrames ? _delayBetweenFrames : defaultDelayBetweenFrames;
+    delay(dbf);
     processPeriodicActivity();
   }
   _offset = _mtxWidth - 1;
@@ -85,13 +91,14 @@ void ScrollScreen::display(bool activating) {
 }
 
 void ScrollScreen::processPeriodicActivity() {
+  uint32_t dbf = _delayBetweenFrames ? _delayBetweenFrames : defaultDelayBetweenFrames;
   if (millis() > _nextTimeToDisplay) {
     innerDisplay();
     _offset++;
     if (_offset == _textWidth + _mtxWidth) {
       if (_forceCycles) {
         _cyclesCompleted++;
-        delay(_delayBetweenFrames * 3);
+        delay(dbf * 3);
       }
       if (_autoAdvance) {
         // Go to the next screen
@@ -103,7 +110,7 @@ void ScrollScreen::processPeriodicActivity() {
       }
     }
     // ScrollToBlank + autoAdvance
-    _nextTimeToDisplay = millis() + _delayBetweenFrames;
+    _nextTimeToDisplay = millis() + dbf;
   }
 }
 
