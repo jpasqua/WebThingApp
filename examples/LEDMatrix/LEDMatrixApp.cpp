@@ -20,6 +20,7 @@
 #include <DataBroker.h>
 #include <gui/Display.h>
 #include <gui/ScreenMgr.h>
+#include <screens/matrix/ScrollScreen.h>
 #include <plugins/PluginMgr.h>
 #include <plugins/common/GenericPlugin.h>
 #include <plugins/common/AIOPlugin.h>
@@ -100,7 +101,6 @@ LEDMatrixApp::LEDMatrixApp(LMSettings* settings) :
     WTAppImpl(AppName, AppPrefix, VersionString, settings)
 {
   // CUSTOM: Perform any object initialization here
-  // In this case, nothing app-specific is required
 }
 
 void LEDMatrixApp::printerWasActivated(int index) {
@@ -164,11 +164,13 @@ Screen* LEDMatrixApp::app_registerScreens() {
   homeScreen = new HomeScreen();
   nextPrinterScreen = new NextPrinterScreen();
   allPrinterScreen = new AllPrinterScreen();
+  motdScreen = new MOTDScreen();
   
   ScreenMgr.registerScreen("Splash", splashScreen, true);
   ScreenMgr.registerScreen("Home", homeScreen);
   ScreenMgr.registerScreen("NextPrint", nextPrinterScreen);
   ScreenMgr.registerScreen("AllPrints", allPrinterScreen);
+  ScreenMgr.registerScreen("MOTD", motdScreen);
   ScreenMgr.setAsHomeScreen(homeScreen);
 
   // CUSTOM: Associate a confirm/cancel buttons with the reboot screen
@@ -188,6 +190,7 @@ Screen* LEDMatrixApp::app_registerScreens() {
   // sequence.push_back(wtAppImpl->screens.infoScreen);
 
   ScreenMgr.reconcileScreenSequence(lmSettings->screenSettings);
+  ScrollScreen::setDefaultFrameDelay(lmSettings->scrollDelay);
 
   return splashScreen;
 }

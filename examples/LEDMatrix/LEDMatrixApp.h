@@ -36,6 +36,7 @@
 #include "src/screens/HomeScreen.h"
 #include "src/screens/NextPrinterScreen.h"
 #include "src/screens/AllPrinterScreen.h"
+#include "src/screens/MOTDScreen.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -57,6 +58,7 @@ public:
   HomeScreen*         homeScreen;
   NextPrinterScreen*  nextPrinterScreen;
   AllPrinterScreen*   allPrinterScreen;
+  MOTDScreen*         motdScreen;
 
   // CUSTOM: Data defined by this app which is available to the whole app
   PrinterGroup*   printerGroup;

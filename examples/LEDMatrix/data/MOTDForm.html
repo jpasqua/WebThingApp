@@ -1,0 +1,18 @@
+<script>
+  function beforeSubmit() {
+    var fname = document.getElementById("fileChooser").files[0].name.toLowerCase();
+    console.log(fname)
+    if (fname == 'motd.json') return true;
+    alert('You must select a file named motd.json')
+    return false;
+  }
+</script>
+
+<div>
+  <form method="post" enctype="multipart/form-data" action='/upload' onsubmit='return beforeSubmit();'>
+      <strong>Configure Messages</strong>
+      <p>Click "Choose File" then select a file named <i>motd.json</i></p>
+      <input type="file" id='fileChooser' name="name" accept='.json'>
+      <button class='w3-button w3-block w3-round-large w3-grey w3-section w3-padding' type='submit' value='Upload'>Upload</button>
+  </form>
+</div>

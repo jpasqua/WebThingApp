@@ -1,0 +1,55 @@
+{
+	"days": [
+	  {
+	  	"month": 1,
+	  	"day": 1,
+	  	"msgs": ["Happy New Year!", "It's a New Year!"]
+	  },
+	  {
+	  	"month": 2,
+	  	"day": 16,
+	  	"msgs": ["It's your real birthday!"]
+	  },
+	  {
+	  	"month": 2,
+	  	"day": 17,
+	  	"msgs": ["Happy Birthday!", "Enjoy Your Bday!", "It's your official birthday!"]
+	  },
+	  {
+	  	"month": 11,
+	  	"day": 23,
+	  	"msgs": ["Gobble Gooble", "Happy Turkey Day!", "Give Thanks for Family"]
+	  },
+	  {
+	  	"month": 12,
+	  	"day": 25,
+	  	"msgs": ["Merry Christmas", "Buon Natale"]
+	  }
+	],
+	"times": [
+		{
+			"start": 6, "end": 12,
+			"msgs": ["Good morning", "Have a great day"]
+		},
+		{
+			"start": 12, "end": 17,
+			"msgs": ["Enjoy the afternoon", "How's your day going?"]
+		},
+		{
+			"start": 17, "end": 19,
+			"msgs": ["Enjoy dinner", "Have you eaten yet?"]
+		},
+		{
+			"start": 19, "end": 23,
+			"msgs": ["Have a good evening", "Time to watch youtube", "Time to relax"]
+		},
+		{
+			"start": 23, "end": 4,
+			"msgs": ["Are you still up!?", "What are you doing up?"]
+		},
+		{
+			"start": 4, "end": 6,
+			"msgs": ["What are you doing up so early?"]
+		}
+	]
+}

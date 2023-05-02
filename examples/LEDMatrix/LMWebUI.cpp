@@ -14,6 +14,7 @@
 #include <WebUI.h>
 #include <WebUIHelper.h>
 #include <gui/Display.h>
+#include <screens/matrix/ScrollScreen.h>
 //                                  Local Includes
 #include "LEDMatrixApp.h"
 #include "LMWebUI.h"
@@ -30,7 +31,9 @@ namespace LMWebUI {
       "<a class='w3-bar-item w3-button' href='/presentScreenConfig'>"
       "<i class='fa fa-window-restore'></i> Configure Screens</a>"
       "<a class='w3-bar-item w3-button' href='/presentPrinterConfig'>"
-      "<i class='fa fa-cog'></i> Configure Printers</a>");
+      "<i class='fa fa-cog'></i> Configure Printers</a>"
+      "<a class='w3-bar-item w3-button' href='/presentMOTDPage'>"
+      "<i class='fa fa-cog'></i> Configure MOTD</a>");
 
     void updateSinglePrinter(int i) {
       PrinterSettings* printer = &(lmSettings->printer[i]);
@@ -48,6 +51,15 @@ namespace LMWebUI {
 
   // ----- BEGIN: LMWebUI::Pages
   namespace Pages {
+    void presentMOTDPage() {
+      auto mapper =[](const String &key, String& val) -> void {
+        if (key == "HEADER")          val = "Message of the Day";
+        else if (key == "ADJ")        val = "MOTD";
+      };
+
+      WebUI::wrapWebPage("/presentMOTDPage", "/MOTDForm.html", mapper);
+    }
+
     void presentLMconfig() {
       auto mapper =[&](const String &key, String& val) -> void {
         if (key == "SCROLL_DELAY")    val = lmSettings->scrollDelay;
@@ -144,6 +156,8 @@ namespace LMWebUI {
         lmSettings->homeScreenTime = WebUI::arg("homeScreenTime").toInt();
         lmSettings->write();
 
+        ScrollScreen::setDefaultFrameDelay(lmSettings->scrollDelay);
+
         WebUI::redirectHome();
       };
 
@@ -205,10 +219,13 @@ namespace LMWebUI {
     WebUI::registerHandler("/",                       WebUIHelper::Default::homePage);
     WebUI::registerHandler("/presentLMConfig",        Pages::presentLMconfig);
     WebUI::registerHandler("/presentPrinterConfig",   Pages::presentPrinterConfig);
+    WebUI::registerHandler("/presentMOTDPage",        Pages::presentMOTDPage);
 
     WebUI::registerHandler("/updatePrinterConfig",    Endpoints::updatePrinterConfig);
     WebUI::registerHandler("/updateLMConfig",         Endpoints::updateLMConfig);
 
+    WebUI::registerStatic("/motd.json", "/motd.json");
+    WebUI::Dev::addButton({"View MOTD File", "/motd.json", nullptr, nullptr});
   }
 
 }
