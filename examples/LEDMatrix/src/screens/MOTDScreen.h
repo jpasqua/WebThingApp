@@ -49,16 +49,12 @@ public:
   
   MOTDScreen();
   virtual void innerActivation();
-  virtual void innerPeriodic();
 
 private:
   bool firstActivation = true;
   Messages msgs;
 
   void readMessages(String filePath);
-
-  static constexpr uint32_t UpdateInterval = Basics::minutesToMS(5);
-  uint32_t  _nextTimeToUpdate = 0;
 
   void updateText();
 

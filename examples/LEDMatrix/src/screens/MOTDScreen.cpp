@@ -44,11 +44,6 @@ void MOTDScreen::innerActivation() {
   updateText();
 }
 
-void MOTDScreen::innerPeriodic() {
-  if (millis() > _nextTimeToUpdate) { updateText(); }
-}
-
-
 //
 // ----- MOTDScreen Private Functions
 //
@@ -77,8 +72,6 @@ void MOTDScreen::updateText() {
   int theDay = day(timeNow);
   int theMonth = month(timeNow);
   int theHour = hour(timeNow);
-
-  _nextTimeToUpdate = millis() + UpdateInterval;
 
   // Check whether we're on a special day
   for (auto d: msgs.dayMsgs) {
@@ -132,16 +125,24 @@ void MOTDScreen::readMessages(String filePath) {
  *----------------------------------------------------------------------------*/
 
 void Messages::fromJSON(DynamicJsonDocument& doc) {
-  for (JsonObject day : doc["days"].as<JsonArray>()) {
-    DayMessages d;
+  int currentYear = 2023; // year();
 
-    d.month = day["month"];
-    d.day = day["day"];
-    for (JsonVariant m : day["msgs"].as<JsonArray>()) {
-      const char* msg = m;
-      d.msgs.push_back(msg);
+  for (JsonObject day : doc["days"].as<JsonArray>()) {
+    for (JsonArray when : day["when"].as<JsonArray>()) {
+      int theYear = when[0];
+
+      if (theYear == 0 || theYear == currentYear) {
+        DayMessages d;
+        d.month = when[1];
+        d.day = when[2];
+        for (JsonVariant m : day["msgs"].as<JsonArray>()) {
+          const char* msg = m;
+          d.msgs.push_back(msg);
+        }
+        dayMsgs.push_back(d);
+        break;
+      }
     }
-    dayMsgs.push_back(d);
   }
 
   for (JsonObject time : doc["times"].as<JsonArray>()) {
