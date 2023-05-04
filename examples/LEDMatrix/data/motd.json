@@ -41,11 +41,11 @@
 	"times": [
 		{
 			"start": 6, "end": 12,
-			"msgs": ["Good morning", "Have a great day"]
+			"msgs": ["Good morning", "Have a great day", "Rise and shine!"]
 		},
 		{
 			"start": 12, "end": 17,
-			"msgs": ["Enjoy the afternoon", "How's your day going?"]
+			"msgs": ["Enjoy the afternoon", "How's your day going?", "Good afternoon"]
 		},
 		{
 			"start": 17, "end": 19,
