@@ -32,7 +32,7 @@ namespace LMWebUI {
       "<i class='fa fa-window-restore'></i> Configure Screens</a>"
       "<a class='w3-bar-item w3-button' href='/presentPrinterConfig'>"
       "<i class='fa fa-cog'></i> Configure Printers</a>"
-      "<a class='w3-bar-item w3-button' href='/presentMOTDPage'>"
+      "<a class='w3-bar-item w3-button' href='/uploadPage?targetName=/motd.json'>"
       "<i class='fa fa-cog'></i> Configure MOTD</a>");
 
     void updateSinglePrinter(int i) {
@@ -223,9 +223,6 @@ namespace LMWebUI {
 
     WebUI::registerHandler("/updatePrinterConfig",    Endpoints::updatePrinterConfig);
     WebUI::registerHandler("/updateLMConfig",         Endpoints::updateLMConfig);
-
-    WebUI::registerStatic("/motd.json", "/motd.json");
-    WebUI::Dev::addButton({"View MOTD File", "/motd.json", nullptr, nullptr});
   }
 
 }
