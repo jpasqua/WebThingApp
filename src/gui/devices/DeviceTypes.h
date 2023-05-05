@@ -4,5 +4,6 @@
 
 
 // Allowable values for the DEVICE_TYPE #define
-#define DEVICE_TYPE_TOUCH  0
-#define DEVICE_TYPE_OLED   1
+#define DEVICE_TYPE_TOUCH   0
+#define DEVICE_TYPE_OLED    1
+#define DEVICE_TYPE_MTX     2

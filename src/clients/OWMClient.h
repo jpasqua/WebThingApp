@@ -91,6 +91,7 @@ public:
   void update();
   void updateForecast(int32_t gmtOffset);
   inline Forecast *getForecast() { return &forecast[0]; }
+  inline uint32_t timeOfLastForecastUpdate() { return _timeOfLastForecastUpdate; }
 
   // Convenience functions - getters and setters
   void setKey(String key) { _key = key; }
@@ -111,7 +112,8 @@ private:
   bool   _useMetric = false;
   String _lang = "";
   Forecast forecast[ForecastElements];
-
+  uint32_t _timeOfLastForecastUpdate = 0;
+  
   void dumpForecast();
 };
 

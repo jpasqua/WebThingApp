@@ -66,6 +66,8 @@ public:
   virtual int8_t fontIDFromName(String fontName) const override;
   virtual uint8_t getFontHeight(uint8_t fontID) const override;
   virtual void flush() { };
+  virtual uint16_t width() const override;
+  virtual uint16_t height() const override;
 
   // ----- Screenshot functionality
   virtual void streamScreenShotAsBMP(Stream &s) override;

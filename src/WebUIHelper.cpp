@@ -48,12 +48,21 @@ namespace WebUIHelper {
   namespace Endpoints {
     void setBrightness() {
       auto action = []() {
-        uint8_t b = WebUI::arg(F("value")).toInt();
-        if (b <= 0 || b > 100) {  // NOTE: 0 is not an allowed value!
+        String bString = WebUI::arg(F("value"));
+        bString.trim();
+        if (!isDigit(bString[0])) {
+          Log.warning(F("/setBrightness: %s isn't valid"), bString.c_str());
+          WebUI::closeConnection(400, "Invalid Brightness: " + bString);
+          return;
+        }
+        uint8_t b = bString.toInt();
+          // We know there is at least one leading digit, so a zero result
+          // really means zero, not an error parsing
+        if (b < 0 || b > 100) { 
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
           WebUI::closeConnection(400, "Invalid Brightness: " + WebUI::arg(F("brightness")));
         } else {
-          Display.setBrightness(b);
+          ScreenMgr.setBrightness(b); // Honors screen blanking
           WebUI::closeConnection(200, F("Brightness Set"));
         }
       };
@@ -303,7 +312,7 @@ namespace WebUIHelper {
         else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };
 
-      WebUI::wrapWebPage("/presentPluginConfig", "/wta/ConfigDisplay.html", mapper);
+      WebUI::wrapWebPage("/presentDisplayConfig", "/wta/ConfigDisplay.html", mapper);
     }
 
     void presentScreenConfig() {

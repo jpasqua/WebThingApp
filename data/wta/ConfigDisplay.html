@@ -52,7 +52,26 @@
 <form class='w3-container' action='/updateDisplayConfig' method='get'>
   <h2>Display Options</h2>
 
+  <p>Adjust Current Brightness</p>
+  <div class='w3-container'>
+    <script>
+      function showVal(val) {
+        var sb = document.getElementById('sliderButton');
+        sb.innerHTML = 'Set Brightness <small>(' + val + ')</small>';
+      }
+    </script>
+    <div class='w3-half w3-margin-right'>
+      <input type="range" min="0" max="100" value="%BRIGHT%" class='slider w3-theme-l4' id='bSlider' oninput='showVal(this.value)'>
+    </div>
+    <div class='w3-quarter'>
+      <button type="button" id='sliderButton' onclick="adjustBrightness()">Set Brightness</button>
+    </div>
+      <script>showVal(document.getElementById('bSlider').value)</script>
+  </div>
+
   <p><input name='scheduleEnabled' class='w3-check' type='checkbox' onclick='showHide("schedules")' %SCHED_ENABLED% checked> Enable schedules</p>
+  <div class='w3-card w3-round-large'>
+    <div class='w3-container'>
     <div id="schedules" style='display:none'>
       <p>
         <label>Morning begins at: </label><input type='time' name='morning' value='%MORN%' pattern="(([01]?[0-9])|(2[0-3])):[0-5][0-9]" placeholder="08:00" size='6'>
@@ -63,6 +82,8 @@
         <label> Brightness: </label><input type='text' name='eBright' value='%E_BRIGHT%' placeholder="100" size='6'>\%</p>
       </p>
   </div>
+</div>
+</div>
 
   <p><label>Turn of display after:&nbsp;</label>
     <select class='w3-option w3-padding' name='blank'>
@@ -76,22 +97,6 @@
     </select>
   </p>
 
-  <p>Adjust Current Brightness</p>
-  <div class='w3-container'>
-    <script>
-      function showVal(val) {
-        var sb = document.getElementById('sliderButton');
-        sb.innerHTML = 'Set Brightness <small>(' + val + ')</small>';
-      }
-    </script>
-    <div class='w3-half w3-margin-right'>
-      <input type="range" min="1" max="100" value="%BRIGHT%" class='slider w3-theme-l4' id='bSlider' oninput='showVal(this.value)'>
-    </div>
-    <div class='w3-quarter'>
-      <button type="button" id='sliderButton' onclick="adjustBrightness()">Set Brightness</button>
-    </div>
-      <script>showVal(document.getElementById('bSlider').value)</script>
-  </div>
 
   <hr>
   <p><input name='is24hour' class='w3-check' type='checkbox' %USE_24HOUR%> Use 24 Hour Clock (13:30 vs 1:30)</p>

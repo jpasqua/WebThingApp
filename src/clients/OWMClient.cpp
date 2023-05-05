@@ -198,6 +198,7 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
     }
   }
 
+  _timeOfLastForecastUpdate = millis();
   dumpForecast();
   delete root;
 }

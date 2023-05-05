@@ -57,7 +57,7 @@ void Label::drawSimple(
 void Label::drawProgress(
   float pct, const String& label, uint8_t font, uint8_t borderSize,
   uint16_t, uint16_t borderColor,
-  uint16_t, uint16_t, const String& showPct,
+  uint16_t, uint16_t, bool showPct,
   bool)
 {
   auto oled = Display.oled;
@@ -65,7 +65,7 @@ void Label::drawProgress(
   OLEDDISPLAY_COLOR background = foreground ? OLEDDISPLAY_COLOR::BLACK : OLEDDISPLAY_COLOR::WHITE;
   OLEDDISPLAY_COLOR textColor = OLEDDISPLAY_COLOR::INVERSE;
 
-  String note = (label == showPct) ? String((int)(pct*100)) + "%" : label;
+  String note = showPct ? String((int)(pct*100)) + "%" : label;
 
   // Clear the background
   oled->setColor(background);

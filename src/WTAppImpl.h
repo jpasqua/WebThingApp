@@ -10,6 +10,7 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#include <BPABasics.h>
 //                                  WebThing Includes
 //                                  Local Includes
 #include "WTApp.h"
@@ -37,7 +38,7 @@ public:
   void updateAllData();
 
   // ----- Functions that aren't provided by subclasses
-  void begin(bool respectPowerSettings = false, int SDA = -1, int SCL = -1);
+  void begin(bool respectPowerSettings = false, int SDA = Basics::UnusedPin, int SCL = Basics::UnusedPin);
   void loop();
 
   // ----- Functions that *must* be provided by subclasses

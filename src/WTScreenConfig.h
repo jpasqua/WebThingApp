@@ -107,6 +107,50 @@ public:
 	  ScreenMgr.registerScreen("WiFi", wifiScreen, true);	  
 	}
 };
+
+
+// ----- BEGIN: DEVICE_TYPE_MTX
+#elif DEVICE_TYPE == DEVICE_TYPE_MTX
+
+#include "screens/matrix/ConfigScreen.h"
+#include "screens/matrix/ForecastScreen.h"
+#include "screens/matrix/InfoScreen.h"
+#include "screens/matrix/RebootScreen.h"
+#include "screens/matrix/WeatherScreen.h"
+#include "screens/matrix/WiFiScreen.h"
+
+class AppScreens {
+public:
+  ConfigScreen*       configScreen;
+  ForecastScreen*     forecastScreen;
+  InfoScreen*         infoScreen;
+  RebootScreen*       rebootScreen;
+  WeatherScreen*      weatherScreen;
+  WiFiScreen*         wifiScreen;
+  Screen*             splashScreen;       // Optional. Supplied by the app.
+
+  void registerScreens() {
+    // CUSTOM: To avoid loading a screen, comment out the corresponding pair of lines below.
+
+    configScreen = new ConfigScreen();
+    ScreenMgr.registerScreen("Config", configScreen, true);
+
+    forecastScreen = new ForecastScreen();
+    ScreenMgr.registerScreen("Forecast", forecastScreen);
+
+    infoScreen = new InfoScreen();
+    ScreenMgr.registerScreen("Info", infoScreen, true);
+
+    rebootScreen = new RebootScreen();
+    ScreenMgr.registerScreen("Reboot", rebootScreen, true);
+
+    weatherScreen = new WeatherScreen();
+    ScreenMgr.registerScreen("Weather", weatherScreen);
+
+    wifiScreen = new WiFiScreen();
+    ScreenMgr.registerScreen("WiFi", wifiScreen, true);   
+  }
+};
 #endif
 
 #endif	// WTScreenConfig_h

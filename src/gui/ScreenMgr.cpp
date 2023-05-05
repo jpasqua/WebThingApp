@@ -168,6 +168,10 @@ FlexScreen*  BaseScreenMgr::createFlexScreen(
   return (flexScreen);
 }
 
+void BaseScreenMgr::setBrightness(uint8_t b) {
+  if (isSuspended()) { blankScreen.updateSavedBrightness(b); }
+  else { Display.setBrightness(b); }
+}
 
 void BaseScreenMgr::unsuspend() {
   if (_suspendedScreen) {
@@ -196,13 +200,11 @@ void BaseScreenMgr::processSchedules() {
       uint16_t curTime = hour() * 100 + minute();
       if (curTime >= evening || curTime < morning) {
         if (eveningExecutedOnDay != today) {
-          if (isSuspended()) blankScreen.updateSavedBrightness(_uiOptions->schedule.evening.brightness);
-          else Display.setBrightness(_uiOptions->schedule.evening.brightness);
+          setBrightness(_uiOptions->schedule.evening.brightness);
           eveningExecutedOnDay = today;
         }
       } else if (morningExecutedOnDay != today) {
-        if (isSuspended()) blankScreen.updateSavedBrightness(_uiOptions->schedule.morning.brightness);
-        else Display.setBrightness(_uiOptions->schedule.morning.brightness);
+        setBrightness(_uiOptions->schedule.morning.brightness);
         morningExecutedOnDay = today;
       }
     }

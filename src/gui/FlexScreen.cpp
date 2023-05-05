@@ -1,5 +1,5 @@
 /*
- * FlexScreen:
+ * BaseFlexScreen:
  *    Display values driven by a screen layout definition 
  *                    
  */
@@ -77,17 +77,17 @@ void mapFont(String fontName, int8_t& gfxFont, uint8_t& font) {
 
 /*------------------------------------------------------------------------------
  *
- * FlexScreen Implementation
+ * BaseFlexScreen Implementation
  *
  *----------------------------------------------------------------------------*/
 
-Screen::ButtonHandler FlexScreen::_buttonDelegate;
+Screen::ButtonHandler BaseFlexScreen::_buttonDelegate;
 
-FlexScreen::~FlexScreen() {
+BaseFlexScreen::~BaseFlexScreen() {
   // TO DO: Cleanup!
 }
 
-bool FlexScreen::init(
+bool BaseFlexScreen::init(
     JsonObjectConst& screen,
     uint32_t refreshInterval,
     const Basics::ReferenceMapper &mapper)
@@ -105,28 +105,70 @@ bool FlexScreen::init(
   return fromJSON(screen);
 }
 
-void FlexScreen::display(bool activating) {
+void BaseFlexScreen::renderProgressBar(FlexItem& item, const char* buf) {
+  // buf is of the form:
+  // message|percent     OR     message
+  // If no perent is given, then the message is displayed within a full
+  // progress bar. Otherwise a progress bar will be shown 'percent' full
+  // with the percentage displayed within (eg 47%)
+  int pct = 100;
+  char* delimiter = strchr(buf, '|');
+  if (delimiter) {
+    pct = atoi(delimiter+1);
+    *delimiter = '\0';
+  }
+
+  Label progressLabel(item._x, item._y, item._w, item._h, 0);
+  progressLabel.drawProgress(
+    ((float)pct)/100.0, buf, item._font, item._strokeWidth,
+    Theme::Color_Border, Theme::Color_NormalText, 
+    item._color, _bkg, (delimiter!=nullptr), true);
+}
+
+void BaseFlexScreen::displayItem(FlexItem& item) {
+  int bufSize = Display.width()/6 + 1; // Assume 6 pixel spacing is smallest font
+  char buf[bufSize];  
+
+  item.generateText(buf, bufSize, _mapper);
+
+  if (item._format.equalsIgnoreCase("#progress")) {
+    renderProgressBar(item, buf);
+    return;
+  }
+
+  Display.drawStringInRegion(
+    buf, ((item._gfxFont >= 0) ? item._gfxFont : -item._font), item._datum,
+    item._x, item._y, item._w, item._h, item._xOff, item._yOff,
+    item._color, _bkg);
+
+  for (int i = 0; i < item._strokeWidth; i++) {
+    // Requires device-specific code
+    Display.drawRect(item._x+i, item._y+i, item._w-2*i, item._h-2*i, item._color);
+  }
+}
+void BaseFlexScreen::display(bool activating) {
   // Requires device-specific code
   if (activating) { Display.fillRect(0, 0, Display.Width, Display.Height, _bkg); }
+
   for (int i = 0; i < _nItems; i++) {
-    _items[i].display(_bkg, _mapper);
+    displayItem(_items[i]);
   }
   Display.flush();
   lastDisplayTime = lastClockTime = millis();
 }
 
-void FlexScreen:: processPeriodicActivity() {
+void BaseFlexScreen::processPeriodicActivity() {
   uint32_t curMillis = millis();
   if (curMillis - lastDisplayTime > _refreshInterval) display(false);
   else if (_clock != nullptr  && (curMillis - lastClockTime > 1000L)) {
-    _clock->display(_bkg, _mapper);
+    displayItem(*_clock);
     lastClockTime = curMillis;
   }
 }
 
 // ----- Private functions
 
-bool FlexScreen::fromJSON(JsonObjectConst& screen) {
+bool BaseFlexScreen::fromJSON(JsonObjectConst& screen) {
   // TO DO: If we are overwriting an existing screen
   // we need to clean up all the old data first
 
@@ -177,63 +219,35 @@ void FlexItem::fromJSON(JsonObjectConst& item) {
   _strokeWidth = item[F("strokeWidth")];
 }
 
-void FlexItem::display(uint16_t bkg, Basics::ReferenceMapper mapper) {
+void FlexItem::generateText(char* buf, int bufSize, Basics::ReferenceMapper mapper) {
   const char *fmt = _format.c_str();
 
   if (fmt[0] != 0) {
     Basics::resetString(_val);    // Reuse the same value buffer across all FlexItems, so clear it out
     
     mapper(_key, _val);
-    // TO DO: Use snprintf to determine the correct buffer size
-    int bufSize = Display.Width/6 + 1; // Assume 6 pixel spacing is smallest font
-    char buf[bufSize];
 
     switch (_dataType) {
-      case FlexItem::Type::INT: sprintf(buf, fmt, _val.toInt()); break;
-      case FlexItem::Type::FLOAT: sprintf(buf, fmt, _val.toFloat()); break;
-      case FlexItem::Type::STRING: sprintf(buf, fmt, _val.c_str()); break;
+      case FlexItem::Type::INT: snprintf(buf, bufSize, fmt, _val.toInt()); break;
+      case FlexItem::Type::FLOAT: snprintf(buf, bufSize, fmt, _val.toFloat()); break;
+      case FlexItem::Type::STRING: snprintf(buf, bufSize, fmt, _val.c_str()); break;
       case FlexItem::Type::BOOL: {
         char c = _val[0];
         bool bv = (c == 't' || c == 'T' || c == '1') ;
-        sprintf(buf, fmt, bv ? F("True") : F("False"));
+        snprintf(buf, bufSize, fmt, bv ? F("True") : F("False"));
         break;
       }
       case FlexItem::Type::CLOCK: {
         time_t curTime = now();
-        sprintf(buf, fmt, Output::adjustedHour(hour(curTime)), minute(curTime), second(curTime));
+        snprintf(buf, bufSize, fmt, Output::adjustedHour(hour(curTime)), minute(curTime), second(curTime));
         break;
       }
-      case FlexItem::Type::STATUS:
-        // A Status value consists of a number (often a status code) and a message
-        // The form is code|message
-        int index = _val.indexOf('|');
-        if (index != -1) {
-          String msg = _val.substring(0, index);
-          int code = _val.substring(index+1).toInt();
-          if (strncasecmp(fmt, "#progress", 9) == 0) {
-            String showPct = Basics::EmptyString;
-            if (fmt[9] == '|' && fmt[10] != 0) showPct = String(&fmt[10]);
-            Label progressLabel(_x, _y, _w, _h, 0);
-            progressLabel.drawProgress(
-              ((float)code)/100.0, msg, _font, _strokeWidth,
-              Theme::Color_Border, Theme::Color_NormalText, 
-              _color, bkg, showPct, true);
-            return;
-          } else {
-            sprintf(buf, fmt, _val.c_str(), code);
-          }
-        }
-        break;
+      case FlexItem::Type::STATUS: {
+        _val.toCharArray(buf, bufSize);
+      }
     }
-
-    Display.drawStringInRegion(
-      buf, ((_gfxFont >= 0) ? _gfxFont : -_font), _datum,
-      _x, _y, _w, _h, _xOff, _yOff, _color, bkg);
-  }
-
-  for (int i = 0; i < _strokeWidth; i++) {
-    // Requires device-specific code
-    Display.drawRect(_x+i, _y+i, _w-2*i, _h-2*i, _color);
+  } else {
+    buf[0] = '\0';
   }
 }
 

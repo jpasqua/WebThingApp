@@ -44,6 +44,7 @@ public:
   void display(Screen* screen);
   void displayHomeScreen();
   void refresh();
+  void setBrightness(uint8_t b); // Respects screen blanking
 
   // ----- Screen Sequence functions
   using ScreenSequence = std::vector<Screen*>;
