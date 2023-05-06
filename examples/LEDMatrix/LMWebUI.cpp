@@ -31,9 +31,9 @@ namespace LMWebUI {
       "<a class='w3-bar-item w3-button' href='/presentScreenConfig'>"
       "<i class='fa fa-window-restore'></i> Configure Screens</a>"
       "<a class='w3-bar-item w3-button' href='/presentPrinterConfig'>"
-      "<i class='fa fa-cog'></i> Configure Printers</a>"
+      "<i class='fa fa-glass'></i> Configure Printers</a>"
       "<a class='w3-bar-item w3-button' href='/uploadPage?targetName=/motd.json'>"
-      "<i class='fa fa-cog'></i> Configure MOTD</a>");
+      "<i class='fa fa-commenting'></i> Configure MOTD</a>");
 
     void updateSinglePrinter(int i) {
       PrinterSettings* printer = &(lmSettings->printer[i]);

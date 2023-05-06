@@ -38,7 +38,7 @@ namespace WebUIHelper {
       "<a class='w3-bar-item w3-button' href='/presentPluginConfig'>"
       "<i class='fa fa-plug'></i> Configure Plugins</a>"
       "<a class='w3-bar-item w3-button' href='/updateStatus'>"
-      "<i class='fa fa-recycle'></i> Update Status</a>");
+      "<i class='fa fa-refresh'></i> Update Status</a>");
   }
 
   // ----- END: WebUIHelper::Internal
