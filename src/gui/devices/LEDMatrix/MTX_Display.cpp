@@ -41,18 +41,22 @@ void MTX_Display::device_begin() {
 }
 
 void MTX_Display::setBrightness(uint8_t b) {
+Log.verbose("MTX_Display::setBrightness(%d)", b);
   if (b == _brightness) return;
   if (b == 0) {                   // Turn the display off
     mtx->shutdown(true);          // true -> enter shutdown state
     _brightness = 0;
+Log.verbose("MTX_Display::setBrightness: shutting down");
     return;
   } else if (_brightness == 0) {  // Turn the display back on
     mtx->shutdown(false);         // false -> leave shutdown state
+Log.verbose("MTX_Display::setBrightness: waking up");
   }
 
   _brightness = b < 101 ? b : 100;
 
   uint8_t deviceBrightness = (15 * (uint16_t)b)/100;
+Log.verbose("MTX_Display::setBrightness: deviceBrightness = %d, _brightness = %d", deviceBrightness, _brightness);
   mtx->setIntensity(deviceBrightness);
 }
 
