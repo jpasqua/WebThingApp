@@ -14,8 +14,6 @@ namespace WebUIHelper {
 
   namespace Default {
     void homePage();
-    void devPage();
-    void updateDevConfig();
   }
 }
 #endif	// WebUIHelper_h

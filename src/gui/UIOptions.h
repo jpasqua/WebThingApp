@@ -32,7 +32,6 @@ class UIOptions {
 public:
   bool use24Hour;
   bool useMetric;
-  bool showDevMenu;
   BrightnessSchedule schedule;
   uint32_t screenBlankMinutes;
   

@@ -122,7 +122,7 @@ namespace LMWebUI {
         else if (key.equals("AP_PCT")) val = WebUIHelper::checkedOrNot[lmSettings->allPrinters.pct];
         else if (key.equals("AP_CMPLT")) val = WebUIHelper::checkedOrNot[lmSettings->allPrinters.completeAt];
         else if (key.equals("PM_ENABLED")) val = WebUIHelper::checkedOrNot[lmSettings->printMonitorEnabled];
-        else if (key.equals("SHOW_DEV")) val = wtApp->settings->uiOptions.showDevMenu ? "true" : "false";
+        else if (key.equals("SHOW_DEV")) val = WebThing::settings.showDevMenu ? "true" : "false";
           // SHOW_DEV seems odd to have here, but it's needed to control whether the 
           // "Mock"-related items are displayed.
         else if (key.equals(F("RFRSH"))) val.concat(lmSettings->printerRefreshInterval);
@@ -182,7 +182,7 @@ namespace LMWebUI {
         else if (hspType.equalsIgnoreCase("vertical")) lmSettings->homeScreenProgress = LMSettings::HSP_Vertical;
         else lmSettings->homeScreenProgress = LMSettings::HSP_None;
 
-        if (wtApp->settings->uiOptions.showDevMenu) {
+        if (WebThing::settings.showDevMenu) {
           PrinterSettings* printer = &(lmSettings->printer[0]);
           printer[0].mock = WebUI::hasArg(F("_p0_mock"));
           printer[1].mock = WebUI::hasArg(F("_p1_mock"));

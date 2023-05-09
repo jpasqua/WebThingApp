@@ -227,16 +227,6 @@ namespace WebUIHelper {
 
   // ----- BEGIN: WebUIHelper::Default
   namespace Default {
-    void updateDevConfig() {
-      auto action = []() {
-        wtApp->settings->uiOptions.showDevMenu = WebUI::hasArg("showDevMenu");
-        wtApp->settings->write();
-        WebUI::redirectHome();
-      };
-
-      WebUI::wrapWebAction("/updateDevConfig", action);
-    }
-
     void homePage() {
       auto mapper =[](const String& key, String &val) -> void {
         if (key.equals(F("CITYID"))) {
@@ -336,7 +326,6 @@ namespace WebUIHelper {
 
     WebUI::addCoreMenuItems(Internal::CORE_MENU_ITEMS);
     WebUI::addAppMenuItems(appMenuItems);
-    WebUI::Dev::init(&wtApp->settings->uiOptions.showDevMenu, wtApp->settings);
 
     WebUI::Dev::addButton({"Take a screen shot", "/dev/screenShot", nullptr, nullptr});
 

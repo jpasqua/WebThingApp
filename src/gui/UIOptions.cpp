@@ -38,20 +38,17 @@ void BrightnessSchedule::logSettings() {
 UIOptions::UIOptions() {
   use24Hour = false;
   useMetric = false;
-  showDevMenu = false;
   screenBlankMinutes = 0;
 }
 
 void UIOptions::fromJSON(const JsonDocument &doc) {
   use24Hour = doc[F("use24Hour")];
   useMetric = doc[F("useMetric")];
-  showDevMenu = doc[F("showDevMenu")];
   screenBlankMinutes = doc[F("screenBlankMinutes")];
   schedule.fromJSON(doc);
 }
 
 void UIOptions::toJSON(JsonDocument &doc) {
-  doc["showDevMenu"] = showDevMenu;
   doc[F("use24Hour")] = use24Hour;
   doc[F("useMetric")] = useMetric;
   doc[F("screenBlankMinutes")] = screenBlankMinutes;
@@ -62,7 +59,6 @@ void UIOptions::logSettings() {
   Log.verbose(F("UI Settings"));
   Log.verbose(F("  use24Hour: %T"), use24Hour);
   Log.verbose(F("  useMetric: %T"), useMetric);
-  Log.verbose(F("  show dev menu: %T"), showDevMenu);
   Log.verbose(F("  Blank screen in N minutes: %d"), screenBlankMinutes);
   schedule.logSettings();
 }
