@@ -82,7 +82,6 @@ namespace WebUIHelper {
     void updateWeatherConfig() {
       auto action = []() {
         wtApp->settings->owmOptions.enabled = WebUI::hasArg(F("useOWM"));
-        wtApp->settings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
         wtApp->settings->owmOptions.key = WebUI::arg(F("openWeatherMapApiKey"));
         wtApp->settings->owmOptions.cityID = WebUI::arg(F("cityID")).toInt();
         wtApp->settings->owmOptions.language = WebUI::arg(F("language"));
@@ -97,9 +96,6 @@ namespace WebUIHelper {
       };
 
       WebUI::wrapWebAction("/updateWeatherConfig", action);
-      Output::setOptions(
-        &wtApp->settings->uiOptions.useMetric,
-        &wtApp->settings->uiOptions.use24Hour);
     }
 
     void updatePluginConfig() {
@@ -149,6 +145,7 @@ namespace WebUIHelper {
         wtApp->settings->uiOptions.screenBlankMinutes = WebUI::arg(F("blank")).toInt();
 
         wtApp->settings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
+        wtApp->settings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
         wtApp->settings->displayOptions.invertDisplay = WebUI::hasArg(F("invDisp"));
 
         wtApp->settings->write();
@@ -253,7 +250,6 @@ namespace WebUIHelper {
         }
         else if (key.equals(F("NICKNAME"))) val = wtApp->settings->owmOptions.nickname;
         else if (key.equals(F("CITY"))) val.concat(wtApp->settings->owmOptions.cityID);
-        else if (key.equals(F("USE_METRIC"))) val = checkedOrNot[wtApp->settings->uiOptions.useMetric];
         else if (key == langTarget) val = "selected";
         else if (key.equals(F("USE_OWM")))  val = checkedOrNot[wtApp->settings->owmOptions.enabled];
       };
@@ -298,6 +294,7 @@ namespace WebUIHelper {
         else if (key.equals(F("BRIGHT"))) val.concat(Display.getBrightness());
 
         else if (key.equals(F("USE_24HOUR"))) val = checkedOrNot[uiOptions->use24Hour];
+        else if (key.equals(F("USE_METRIC"))) val = checkedOrNot[wtApp->settings->uiOptions.useMetric];
         else if (key == blankingTarget) val = "selected";
         else if (key.equals(F("INVERT_DISPLAY"))) val = checkedOrNot[wtApp->settings->displayOptions.invertDisplay];
       };

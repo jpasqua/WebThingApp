@@ -7,10 +7,11 @@
 function isNumberKey(e) { var h = e.which ? e.which : event.keyCode; return !(h > 31 && (h < 48 || h > 57)) }
 </script>
 <form class='w3-container' action='/updateWeatherConfig' method='get'>
-  <p><input name='metric' class='w3-check' type='checkbox' %USE_METRIC%> Use Metric (Celsius)</p>
   <h3>Open Weather Map</h3>
   <p><input name='useOWM' class='w3-check' type='checkbox' onclick='showHide("OWMSettings")' %USE_OWM%> Get Weather Data from OpenWeatherMap.org</p>
   <div id="OWMSettings" style='display:none'>
+    <div class='w3-card w3-round'>
+      <div class='w3-container'>
     <p><label>%CITY_NAME% (<a href='http://openweathermap.org/find' target='_BLANK'><i class='fa fa-search'></i>Search for City ID)</a></label>
       <input class='w3-input w3-border w3-margin-bottom' type='text' name='cityID' value='%CITY%' onkeypress='return isNumberKey(event)'></p>
     <p><label>City nickname (leave blank to use "official" city name)</a></label>
@@ -54,6 +55,8 @@ function isNumberKey(e) { var h = e.which ? e.which : event.keyCode; return !(h 
       </select>
     </p>
   </div>
+</div>
+</div>
   <script>
     if (document.getElementsByName('useOWM')[0].checked) { document.getElementById("OWMSettings").style.display = "block"; }
   </script>
