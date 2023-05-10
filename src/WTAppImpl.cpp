@@ -44,6 +44,7 @@ void WTAppImpl::configMayHaveChanged() {
 }
 
 void WTAppImpl::weatherConfigMayHaveChanged() {
+  owmClient->setUnits(wtApp->settings->uiOptions.useMetric);
   // TO DO: Implement me!!
 }
 

@@ -129,6 +129,8 @@ namespace WebUIHelper {
 
     void updateDisplayConfig() {
       auto action = []() {
+        bool curUseMetric = wtApp->settings->uiOptions.useMetric;
+
         wtApp->settings->uiOptions.schedule.active = WebUI::hasArg(F("scheduleEnabled"));
         String t = WebUI::arg(F("morning"));
         int separator = t.indexOf(":");
@@ -150,6 +152,10 @@ namespace WebUIHelper {
 
         wtApp->settings->write();
         //wtApp->settings->logSettings();
+
+        if (curUseMetric != wtApp->settings->uiOptions.useMetric) {
+          wtAppImpl->weatherConfigMayHaveChanged();
+        }
 
         WebUI::redirectHome();
       };
