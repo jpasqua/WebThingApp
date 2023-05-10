@@ -23,12 +23,10 @@ class NextPrinterScreen : public ScrollScreen {
 public:
   NextPrinterScreen();
   virtual void innerActivation() override;
-  virtual bool innerPeriodic() override;
 
 private:
   static constexpr uint32_t UpdateInterval = 30 * 1000L;
   String    _statusText;
-  uint32_t  _nextTimeToUpdate = 0;
 
   void updateText();
 

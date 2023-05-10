@@ -38,11 +38,6 @@ void NextPrinterScreen::innerActivation() {
   updateText();
 }
 
-bool NextPrinterScreen::innerPeriodic() {
-  if (millis() > _nextTimeToUpdate) { updateText(); }
-  return false;
-}
-
 
 // ----- Private Methods
 
@@ -86,7 +81,6 @@ void NextPrinterScreen::updateText() {
     }
   }
   setText(_statusText, Display.BuiltInFont_ID);
-  _nextTimeToUpdate = millis() + UpdateInterval;
 }
 #endif
 
