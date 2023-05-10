@@ -67,8 +67,6 @@ namespace LMWebUI {
         else if (key == "AIO_KEY")    val = lmSettings->aio.key;
         else if (key == "AIO_USER")   val = lmSettings->aio.username;
         else if (key == "AIO_GROUP")  val = lmSettings->aio.groupName;
-        else if (key == "USE_METRIC") val = WebUI::checkedOrNot[lmSettings->uiOptions.useMetric];
-        else if (key == "USE_24HOUR") val = WebUI::checkedOrNot[lmSettings->uiOptions.use24Hour];
         else if (key == "LAT")        val = WebThing::settings.latAsString();
         else if (key == "LNG")        val = WebThing::settings.lngAsString();
         else if (key == "GMAPS_KEY")  val = WebThing::settings.googleMapsKey;
@@ -150,8 +148,6 @@ namespace LMWebUI {
         lmSettings->aio.key = WebUI::arg("aioKey");
         lmSettings->aio.username = WebUI::arg("aioUsername");
         lmSettings->aio.groupName = WebUI::arg("aioGroup");
-        lmSettings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
-        lmSettings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
         lmSettings->scrollDelay = WebUI::arg("scrollDelay").toInt();
         lmSettings->homeScreenTime = WebUI::arg("homeScreenTime").toInt();
         lmSettings->write();
