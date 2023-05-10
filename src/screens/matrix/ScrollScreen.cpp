@@ -91,6 +91,7 @@ void ScrollScreen::display(bool activating) {
 }
 
 void ScrollScreen::processPeriodicActivity() {
+  if (innerPeriodic()) return;
   uint32_t dbf = _delayBetweenFrames ? _delayBetweenFrames : defaultDelayBetweenFrames;
   if (millis() > _nextTimeToDisplay) {
     innerDisplay();

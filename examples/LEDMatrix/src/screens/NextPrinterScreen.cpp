@@ -38,8 +38,9 @@ void NextPrinterScreen::innerActivation() {
   updateText();
 }
 
-void NextPrinterScreen::innerPeriodic() {
+bool NextPrinterScreen::innerPeriodic() {
   if (millis() > _nextTimeToUpdate) { updateText(); }
+  return false;
 }
 
 

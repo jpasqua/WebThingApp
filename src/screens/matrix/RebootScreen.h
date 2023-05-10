@@ -21,7 +21,7 @@
 class RebootScreen : public ScrollScreen {
 public:
   RebootScreen();
-  virtual void innerPeriodic() override;
+  virtual bool innerPeriodic() override;
   virtual void innerActivation() override;
 
   void setButtons(Basics::Pin confirmPin, Basics::Pin cancelPin = Basics::UnusedPin);

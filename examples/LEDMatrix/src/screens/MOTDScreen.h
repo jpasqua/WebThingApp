@@ -48,7 +48,7 @@ public:
   static constexpr size_t MaxDocSize = 8192;
   
   MOTDScreen();
-  virtual void innerActivation();
+  virtual void innerActivation() override;
 
 private:
   bool firstActivation = true;

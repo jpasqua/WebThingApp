@@ -30,7 +30,7 @@ public:
   void goHomeWhenComplete(bool goHome) { _goHome = goHome; }
 
   virtual void innerActivation() {};
-  virtual void innerPeriodic() {};
+  virtual bool innerPeriodic() { return false; }
 
 private:
   String _text;

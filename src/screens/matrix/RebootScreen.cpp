@@ -45,10 +45,20 @@ void RebootScreen::innerActivation() {
     setText("Reboot request! Adv to reboot, Prev to cancel");
   }
   autoCancelTime = millis() + 60 * 1000L; // If nothing has happened in a minute, cancel
+Log.verbose("RebootScreen::innerActivation: autoCancelTime = %d", autoCancelTime);
 }
 
-void RebootScreen::innerPeriodic() {
-  if (millis() >= autoCancelTime) ScreenMgr.displayHomeScreen();
+bool RebootScreen::innerPeriodic() {
+static uint32_t ggg = 5000;
+  if (millis() >= autoCancelTime) {
+    ScreenMgr.displayHomeScreen();
+    return true;
+  }
+  if (millis() > ggg) {
+    ggg = millis() + 5000L;
+    Log.verbose("RebootScreen::innerPeriodic: ggg = %d", ggg);
+  }
+  return false;
 }
 
 void RebootScreen::setButtons(Basics::Pin confirmPin, Basics::Pin cancelPin) {
