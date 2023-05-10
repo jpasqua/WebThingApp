@@ -30,7 +30,11 @@ void HomeScreen::display(bool activating) {
     return;
   }
 
-  if (activating) { Display.setFont(Display.BuiltInFont_ID); }
+  if (activating) {
+    Display.setFont(Display.BuiltInFont_ID);
+    _nextScreenTime = millis() + lmSettings->homeScreenTime*1000L;
+  }
+
   _colonVisible = false;
   mtx->fillScreen(Theme::Color_BLACK);
 
@@ -72,13 +76,12 @@ void HomeScreen::display(bool activating) {
   if (lmSettings->printMonitorEnabled) drawProgressBar();
 
   mtx->write();
-  _displayStartedAt = millis();
 }
 
 void HomeScreen::processPeriodicActivity() {
   static uint32_t _colonLastToggledAt = 0;
   uint32_t curMillis = millis();
-  if (curMillis > _displayStartedAt + lmSettings->homeScreenTime*1000L) {
+  if (curMillis > _nextScreenTime) {
     ScreenMgr.moveThroughSequence(true);
     return;
   }

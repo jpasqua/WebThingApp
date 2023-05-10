@@ -21,7 +21,7 @@ public:
 
 private:
   uint32_t _colonLastToggledAt = 0;
-  uint32_t _displayStartedAt = 0;
+  uint32_t _nextScreenTime = 0;
   uint16_t _compositeTime = 0;
   bool _colonVisible = true;
   bool _showInfoScreen;
