@@ -12,6 +12,7 @@
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <TimeLib.h>
+#include <GenericESP.h>
 //                                  WebThing Includes
 //                                  Local Includes
 #include "../../gui/Display.h"
@@ -39,13 +40,21 @@ RebootScreen::RebootScreen() {
 }
 
 void RebootScreen::innerActivation() {
+  auto& mtx = Display.mtx;
+  uint16_t w = mtx->width();
+  uint16_t h = mtx->height();
   if (nButtonMappings == 0) {
-    setText("Rebooting...");
+    mtx->fillScreen(LOW);
+    Display.drawStringInRegion(
+      "Reboot", Display.BuiltInFont_ID, Display.MC_Align,
+      0, h, w, h, w/2, h/2,  Theme::Color_WHITE, Theme::Color_BLACK);
+    mtx->write();
+    delay(1000L);
+    GenericESP::reset();
   } else {
     setText("Reboot request! Adv to reboot, Prev to cancel");
   }
   autoCancelTime = millis() + 60 * 1000L; // If nothing has happened in a minute, cancel
-Log.verbose("RebootScreen::innerActivation: autoCancelTime = %d", autoCancelTime);
 }
 
 bool RebootScreen::innerPeriodic() {
