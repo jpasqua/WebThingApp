@@ -21,7 +21,7 @@ void FlexScreen::prepForDisplay() {
   _nextTimeToDisplay = 0;
 
   // Build up the text
-  int bufSize = Display.mtx->width()/6 + 1;  // Assume 6 pixel spacing is smallest font
+  int bufSize = 64;  // Assume 6 pixel spacing is smallest font
   char buf[bufSize];
 
   _text.clear();
