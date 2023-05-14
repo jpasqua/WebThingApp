@@ -204,14 +204,19 @@ void BaseScreenMgr::processSchedules() {
       uint16_t curTime = hour() * 100 + minute();
       if (curTime >= evening || curTime < morning) {
         if (eveningExecutedOnDay != today) {
-Log.verbose("Set evening brightness to %d", _uiOptions->schedule.evening.brightness);
+          Log.verbose("Set evening brightness to %d", _uiOptions->schedule.evening.brightness);
           setBrightness(_uiOptions->schedule.evening.brightness);
           eveningExecutedOnDay = today;
         }
       } else if (morningExecutedOnDay != today) {
-Log.verbose("Set morning brightness to %d", _uiOptions->schedule.morning.brightness);
+        Log.verbose("Set morning brightness to %d", _uiOptions->schedule.morning.brightness);
         setBrightness(_uiOptions->schedule.morning.brightness);
         morningExecutedOnDay = today;
+        eveningExecutedOnDay = UINT32_MAX;
+          // The device may have been booted before "morning", say at 6AM. In that case
+          // "evening" will execute, then "morning". At that point evening would not execute
+          // again that day at the normal time, say 10PM. As a result, any time we execute
+          // "morning", we reset eveningExecutedOnDay so it will be executed again.
       }
     }
   }
