@@ -45,7 +45,7 @@ void OWMClient::update() {
     weather.dt = 0;
     return;
   }
-  //serializeJsonPretty(*root, Serial); Serial.println();
+  // serializeJsonPretty(*root, Serial); Serial.println();
 
   weather.cached = false;
   weather.error = "";
@@ -110,6 +110,7 @@ void OWMClient::update() {
   weather.readings.pressure = cityMain["pressure"];
   weather.readings.humidity = cityMain["humidity"];
   weather.readings.windSpeed = city["wind"]["speed"];
+  weather.readings.windDeg = city["wind"]["deg"];
   weather.readings.visibility = city["visibility"];
   weather.readings.cloudiness = city["clouds"]["all"];
 
@@ -209,7 +210,15 @@ void OWMClient::dumpForecast() {
   }
 }
 
+const char* directions[] = {
+  "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+  "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
+};
 
+const char* OWMClient::dirFromDeg(float deg) {
+  int dirIndex = ((int)((deg + 11.5)/22.5))%16;
+  return directions[dirIndex];
+}
 
 
 

@@ -38,6 +38,7 @@ public:
     uint16_t pressure;    // hPa (always hPa regardless of units setting)
     uint8_t  humidity;    // Percent humidity
     float    windSpeed;   // Meters/sec
+    int      windDeg;     // degrees
     uint16_t visibility;  // meters (always meters regardless of units setting)
     uint8_t  cloudiness;  // How cloudy is it 0-100%
   } readings;
@@ -104,6 +105,7 @@ public:
   String getOneWordDescription() { return weather.description.basic; }
   String getLongerDescription() { return weather.description.longer; }
   String getIcon() {  return weather.description.icon; }
+  const char* dirFromDeg(float deg);
 
 private:
   String _endpoint;
