@@ -162,11 +162,16 @@ void WTAppImpl::weatherDataSupplier(const String& key, String& value) {
   if (key.equalsIgnoreCase("temp")) value +=  owmClient->weather.readings.temp;
   else if (key.equalsIgnoreCase("desc")) value += owmClient->weather.description.basic;
   else if (key.equalsIgnoreCase("ldesc")) value += owmClient->weather.description.longer;
-  else if (key.equalsIgnoreCase("city")) {
-    if (settings->owmOptions.nickname.isEmpty())
-      value += owmClient->weather.location.city;
-    else
-      value += settings->owmOptions.nickname;
+  else if (key.equalsIgnoreCase("wind")) {
+      value += (int)(owmClient->weather.readings.windSpeed);
+      value += owmClient->dirFromDeg(owmClient->weather.readings.windDeg);
+  } else if (key.equalsIgnoreCase("pressure")) {
+    value += owmClient->weather.readings.pressure;
+  } else if (key.equalsIgnoreCase("humidity")) {
+    value += owmClient->weather.readings.humidity;
+  } else if (key.equalsIgnoreCase("city")) {
+    if (settings->owmOptions.nickname.isEmpty()) { value += owmClient->weather.location.city; }
+    else { value += settings->owmOptions.nickname; }
   }
 }
 
