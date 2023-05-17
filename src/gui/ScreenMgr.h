@@ -53,6 +53,7 @@ public:
   void beginSequence();
   void moveThroughSequence(bool forward);
   void setSequenceButtons(uint8_t forward, uint8_t backward = 255);
+  Screen* curScreen() { return _curScreen; }
 
   // ----- Plugin-related functions
   FlexScreen* createFlexScreen(
@@ -77,7 +78,7 @@ public:
    * is safe and does nothing.
    */
   virtual void hideActivityIcon() = 0;
-
+  
   // TO DO: These should be private (or at least protected), but the BlankScreen
   // class needs to access them. Think about whether it's worth doing something about this.
   void suspend();
