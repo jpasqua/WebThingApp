@@ -14,7 +14,6 @@ class WiFiScreen : public Screen {
 public:
 
   virtual void display(bool) override {
-    Log.verbose("WiFiScreen::display");
     uint16_t w = Display.mtx->width();
     uint16_t h = Display.mtx->height();
 
