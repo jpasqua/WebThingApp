@@ -58,14 +58,9 @@ void RebootScreen::innerActivation() {
 }
 
 bool RebootScreen::innerPeriodic() {
-static uint32_t ggg = 5000;
   if (millis() >= autoCancelTime) {
     ScreenMgr.displayHomeScreen();
     return true;
-  }
-  if (millis() > ggg) {
-    ggg = millis() + 5000L;
-    Log.verbose("RebootScreen::innerPeriodic: ggg = %d", ggg);
   }
   return false;
 }
