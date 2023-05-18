@@ -44,13 +44,13 @@ WeatherScreen::WeatherScreen() {
 
   if (!settings.fromJSON(WSSettings::settingsFilePath)) {
     // No settings file, use defaults
-    settings.fields.emplace_back(WSSettings::Field("city", true));
-    settings.fields.emplace_back(WSSettings::Field("temp", true));
-    settings.fields.emplace_back(WSSettings::Field("wind", true));
-    settings.fields.emplace_back(WSSettings::Field("baro", false));
-    settings.fields.emplace_back(WSSettings::Field("humi", false));
-    settings.fields.emplace_back(WSSettings::Field("desc", true));
-    settings.fields.emplace_back(WSSettings::Field("ldesc", false));
+    settings.fields.emplace_back(WSSettings::Field("City", true));
+    settings.fields.emplace_back(WSSettings::Field("Temperature", true));
+    settings.fields.emplace_back(WSSettings::Field("Wind", true));
+    settings.fields.emplace_back(WSSettings::Field("Barometer", false));
+    settings.fields.emplace_back(WSSettings::Field("Humidity", false));
+    settings.fields.emplace_back(WSSettings::Field("Description", true));
+    settings.fields.emplace_back(WSSettings::Field("Long Desc.", false));
     settings.toJSON(WSSettings::settingsFilePath);
   }
 }
@@ -79,26 +79,28 @@ void WeatherScreen::innerActivation() {
     if (!f.enabled) continue;
     weatherText += delim;
     delim = ", ";
-    if (f.id.equalsIgnoreCase("city")) {
+    String key = f.id;
+    key.toLowerCase();
+    if (key.startsWith("city")) {
       String& city = wtApp->settings->owmOptions.nickname;
       if (city.isEmpty()) { city = weather.location.city; }
       weatherText += city;
       delim = " ";
-    } else if (f.id.equalsIgnoreCase("temp")) {
+    } else if (key.startsWith("temp")) {
       weatherText += String(weather.readings.temp, 0);
       weatherText += (wtApp->settings->uiOptions.useMetric ? "C" : "F");
-    } else if (f.id.equalsIgnoreCase("humi")) {
+    } else if (key.startsWith("humi")) {
       weatherText += String(weather.readings.humidity);
       weatherText += '%';
-    } else if (f.id.equalsIgnoreCase("baro")) {
-      weatherText += String(weather.readings.pressure);
+    } else if (key.startsWith("baro")) {
+      weatherText += String(Output::baro(weather.readings.pressure));
       weatherText += Output::baroUnits();
-    } else if (f.id.equalsIgnoreCase("wind")) {
+    } else if (key.startsWith("wind")) {
       weatherText += String(weather.readings.windSpeed, 0);
       weatherText += wtApp->owmClient->dirFromDeg(weather.readings.windDeg);
-    } else if (f.id.equalsIgnoreCase("desc")) {
+    } else if (key.startsWith("desc")) {
       weatherText += weather.description.basic;
-    } else if (f.id.equalsIgnoreCase("ldesc")) {
+    } else if (key.startsWith("long")) {
       weatherText += weather.description.longer;
     }
   }
