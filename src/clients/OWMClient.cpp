@@ -98,9 +98,12 @@ void OWMClient::update() {
   weather.time.sunset = city["sys"]["sunset"];
 
   weather.description.basic = city["weather"][0]["main"].as<const char*>();
+  weather.description.basic[0] = toupper(weather.description.basic[0]);
   weather.description.longer = city["weather"][0]["description"].as<const char*>();
+  weather.description.longer[0] = toupper(weather.description.longer[0]);
   weather.description.icon = city["weather"][0]["icon"].as<const char*>();
   weather.description.code = city["weather"][0]["id"];
+
 
   JsonObject cityMain = city["main"];
   weather.readings.temp = cityMain["temp"];
