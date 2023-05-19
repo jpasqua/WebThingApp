@@ -15,6 +15,9 @@
 #include <TFT_eSPI.h>
 #if defined(ESP32)
   #include <analogWrite.h>
+#endif
+#if !defined(PWMRANGE)
+  // Versions of ESP8266 core before 3.0 defined this in Arduino.h
   #define PWMRANGE 255
 #endif
 #include <BPABasics.h>

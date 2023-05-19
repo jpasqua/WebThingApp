@@ -27,7 +27,7 @@ void FlexScreen::prepForDisplay() {
   _text.clear();
   for (int i = 0; i < _nItems; i++) {
     _items[i].generateText(buf, bufSize, _mapper);
-    _text += buf;
+    _text += &(buf[0]);
   }
   _textWidth = Display.getTextWidth(_text, _fontID);
 

@@ -22,7 +22,7 @@
 
 class WSSettings {
 public:
-  static constexpr char* settingsFilePath = "/WSFields.json";
+  static constexpr char const* settingsFilePath = "/WSFields.json";
   
   struct Field {
     Field() = default;
