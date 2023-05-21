@@ -30,6 +30,8 @@
  *----------------------------------------------------------------------------*/
 
 ForecastScreen::ForecastScreen() {
+  settings.read();
+
   nLabels = 0;
   labels = NULL;
 
@@ -50,8 +52,19 @@ void ForecastScreen::innerActivation() {
 
   String& city = wtApp->settings->owmOptions.nickname;
   if (city.isEmpty()) { city = wtApp->owmClient->weather.location.city; }
-  _forecastText = city;
-  _forecastText += " Forecast: ";
+
+  if (settings.showCity) {
+    if (settings.cityBeforeHeading) {
+      _forecastText = city;               _forecastText += ' ';
+      _forecastText += settings.heading;  _forecastText += ' ';
+    }
+    else {
+      _forecastText = settings.heading;   _forecastText += ' ';
+      _forecastText += city;              _forecastText += ' ';
+    }
+  } else {
+    _forecastText = settings.heading;     _forecastText += ' ';
+  }
 
   for (int i = 0; i < wtApp->owmClient->ForecastElements; i++) {
     if (i) _forecastText += ", ";
@@ -60,6 +73,11 @@ void ForecastScreen::innerActivation() {
 
   setText(_forecastText, Display.BuiltInFont_ID);
   _timeOfLastForecast = wtApp->owmClient->timeOfLastForecastUpdate();
+}
+
+void ForecastScreen::settingsHaveChanged() {
+  settings.write();
+  _timeOfLastForecast = 0;  // Force the text to be updated upon the next display
 }
 
 // ----- Private Methods
@@ -74,8 +92,48 @@ void ForecastScreen::appendForecastForDay(Forecast* forecast, String& appendTo) 
   appendTo += '/';
   appendTo += (int)forecast->hiTemp;
   appendTo += ' ';
-  appendTo += WeatherScreen::getTextForIcon(forecast->icon);
+  appendTo += wtApp->owmClient->getTextForIcon(forecast->icon);
 }
+
+
+/*------------------------------------------------------------------------------
+ *
+ * FSSettings Implementation
+ *
+ *----------------------------------------------------------------------------*/
+
+FSSettings::FSSettings() {
+  maxFileSize = 512;
+  version = 1;
+  init("/wta/FSSettings.json");
+
+  showCity = true;
+  cityBeforeHeading = true;
+  String heading = "Forecast";
+}
+
+void FSSettings::fromJSON(const JsonDocument &doc) {
+  JsonObjectConst fsScreen = doc["fsScreen"];
+  showCity = fsScreen["showCity"] | true;
+  cityBeforeHeading = fsScreen["cityBeforeHeading"] | true;
+  heading = fsScreen["heading"].as<String>();
+}
+
+void FSSettings::toJSON(JsonDocument &doc) {
+  JsonObject fsScreen = doc.createNestedObject("fsScreen");
+  fsScreen["showCity"] = showCity;
+  fsScreen["cityBeforeHeading"] = cityBeforeHeading;
+  fsScreen["heading"] = heading;
+}
+
+void FSSettings::logSettings() {
+  Log.verbose(F("Forecast Screen Config"));
+  Log.verbose(F("  Show City: %T"), showCity);
+  Log.verbose(F("  City Before Heading: %T"), cityBeforeHeading);
+  Log.verbose(F("  Heading: %s"), heading.c_str());
+}
+
+
 
 #endif
 
