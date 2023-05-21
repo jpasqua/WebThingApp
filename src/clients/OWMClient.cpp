@@ -207,6 +207,19 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   delete root;
 }
 
+String OWMClient::getTextForIcon(String& icon) {
+  if (icon.startsWith("01")) { return "Clear"; }
+  if (icon.startsWith("02")) { return "Few Clouds"; }
+  if (icon.startsWith("03")) { return "Scattered Clouds"; }
+  if (icon.startsWith("04")) { return "Broken Clouds"; }
+  if (icon.startsWith("09")) { return "Showers"; }
+  if (icon.startsWith("10")) { return "Rain"; }
+  if (icon.startsWith("11")) { return "Thunderstorm"; }
+  if (icon.startsWith("13")) { return "Snow"; }
+  if (icon.startsWith("50")) { return "Haze"; }
+  else return "";
+}
+
 void OWMClient::dumpForecast() {
   for (int i = 0; i < ForecastElements; i++) {
     forecast[i].dumpToLog();

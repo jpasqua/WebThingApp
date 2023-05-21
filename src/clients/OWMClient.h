@@ -105,6 +105,7 @@ public:
   String getOneWordDescription() { return weather.description.basic; }
   String getLongerDescription() { return weather.description.longer; }
   String getIcon() {  return weather.description.icon; }
+  String getTextForIcon(String& icon);
   const char* dirFromDeg(float deg);
 
 private:
