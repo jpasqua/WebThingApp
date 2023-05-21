@@ -42,8 +42,9 @@ WeatherScreen::WeatherScreen() {
   init();
   lastDT = 0;
 
-  if (!settings.fromJSON(WSSettings::settingsFilePath)) {
-    // No settings file, use defaults
+  settings.read();
+  if (settings.fields.size() == 0) {
+    Log.verbose("No WeatherScreen settings were found, using defaults");
     settings.fields.emplace_back(WSSettings::Field("City", true));
     settings.fields.emplace_back(WSSettings::Field("Temperature", true));
     settings.fields.emplace_back(WSSettings::Field("Wind", true));
@@ -51,7 +52,7 @@ WeatherScreen::WeatherScreen() {
     settings.fields.emplace_back(WSSettings::Field("Humidity", false));
     settings.fields.emplace_back(WSSettings::Field("Description", true));
     settings.fields.emplace_back(WSSettings::Field("Long Desc.", false));
-    settings.toJSON(WSSettings::settingsFilePath);
+    settings.write();
   }
 }
 
@@ -109,19 +110,9 @@ void WeatherScreen::innerActivation() {
   lastDT = weather.dt;
 }
 
-// ----- Static methods
-
-String WeatherScreen::getTextForIcon(String& icon) {
-  if (icon.startsWith("01")) { return "Clear"; }
-  if (icon.startsWith("02")) { return "Few Clouds"; }
-  if (icon.startsWith("03")) { return "Scattered Clouds"; }
-  if (icon.startsWith("04")) { return "Broken Clouds"; }
-  if (icon.startsWith("09")) { return "Showers"; }
-  if (icon.startsWith("10")) { return "Rain"; }
-  if (icon.startsWith("11")) { return "Thunderstorm"; }
-  if (icon.startsWith("13")) { return "Snow"; }
-  if (icon.startsWith("50")) { return "Haze"; }
-  else return "";
+void WeatherScreen::settingsHaveChanged() {
+  settings.write();
+  lastDT = UINT32_MAX;  // Force a refresh next time through
 }
 
 /*------------------------------------------------------------------------------
@@ -131,10 +122,9 @@ String WeatherScreen::getTextForIcon(String& icon) {
  *----------------------------------------------------------------------------*/
 
 WSSettings::WSSettings() {
-  // Test
-  // fields.emplace_back(Field("city", true));
-  // fields.emplace_back(Field("temp", false));
-  // fields.emplace_back(Field("wind", true));
+  maxFileSize = 512;
+  version = 1;
+  init("/wta/WSSettings.json");
 }
 
 /* Available fields
@@ -149,39 +139,7 @@ WSSettings::WSSettings() {
 ];
 */
 
-
-bool WSSettings::fromJSON(const char* filePath) {
-  File f = ESP_FS::open(filePath, "r");
-  if (!f) {
-    Log.warning("No weather screen settings file was found: %s", filePath);
-    return false;
-  }
-
-  DynamicJsonDocument doc(MaxDocSize);
-
-  auto error = deserializeJson(doc, f);
-  if (error) {
-    Log.warning(F("Error parsing weather screen settings (%s): %s"), filePath, error.c_str());
-    return false;
-  }
-
-  fromJSON(doc);
-  if (fields.size() == 0) return false;
-  logSettings();
-  return true;
-}
-
-void WSSettings::fromJSON(const String &json) {
-  DynamicJsonDocument doc(MaxDocSize);
-  auto error = deserializeJson(doc, json);
-  if (error) {
-    Log.warning(F("Failed to parse weather screen field settings: %s"), error.c_str());
-    Log.warning(F("%s"), json.c_str());
-  }
-  fromJSON(doc);
-}
-
-void WSSettings::fromJSON(const JsonDocument &doc) {
+void WSSettings::fromJSON(const JsonDocument& doc) {
   fields.clear();
   const JsonArrayConst& jsonFields = doc["fields"].as<JsonArray>();
   Field field;
@@ -192,48 +150,13 @@ void WSSettings::fromJSON(const JsonDocument &doc) {
   }
 }
 
-void WSSettings::toJSON(JsonDocument &doc) {
+void WSSettings::toJSON(JsonDocument& doc) {
   JsonArray jsonFields = doc.createNestedArray("fields");
   for (Field& field : fields) {
     JsonObject jsonField = jsonFields.createNestedObject();
     jsonField["id"] = field.id;
     jsonField["on"] = field.enabled;
   }
-}
-
-
-void WSSettings::toJSON(const char* filePath) {
-  File settingsFile = ESP_FS::open(filePath, "w");
-  if (!settingsFile) {
-    Log.error(F("Failed to open file for writing: %s"), filePath);
-  }
-  Log.verbose("Writing weather screen settings to %s", filePath);
-  toJSON(settingsFile);
-  settingsFile.close();
-}
-
-void WSSettings::toJSON(Stream& s) {
-  // DynamicJsonDocument doc(MaxDocSize);
-  // toJSON(doc);
-  // serializeJson(doc, s);
-
-  s.println("{ \"fields\": [");
-  bool first = true;
-  for (Field& field : fields) {
-    if (!first) s.println(", ");
-    else first = false;
-    s.print("{");
-      s.print("\"id\":\""); s.print(field.id); s.print("\",");
-      s.print("\"on\":"); s.print(field.enabled ? "true" : "false");
-    s.print("}");
-  }
-  s.println("]}");
-}
-
-void WSSettings::toJSON(String &serialString) {
-  DynamicJsonDocument doc(MaxDocSize);
-  toJSON(doc);
-  serializeJson(doc, serialString);
 }
 
 void WSSettings::logSettings() {

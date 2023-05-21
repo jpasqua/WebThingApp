@@ -15,15 +15,15 @@
 #include <vector>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
+//                                  WebThing Includes
+#include <BaseSettings.h>
 //                                  WebThingApp Includes
 #include "../../gui/Screen.h"
 //                                  Local Includes
 //--------------- End:    Includes ---------------------------------------------
 
-class WSSettings {
-public:
-  static constexpr char const* settingsFilePath = "/WSFields.json";
-  
+class WSSettings : public BaseSettings {
+public:  
   struct Field {
     Field() = default;
     Field(const String& theID, bool on) : id(theID), enabled(on) { }
@@ -33,29 +33,31 @@ public:
 
   WSSettings();
 
-  bool fromJSON(const char* filePath);
-  void fromJSON(const JsonDocument& doc);
-  void fromJSON(const String& json);
-  void toJSON(JsonDocument& doc);
-  void toJSON(Stream& s);
-  void toJSON(String& serialString);
-  void toJSON(const char* filePath);
-  void logSettings();
+  // Ensures that other variants of fromJSON() / toJSON aren't hidden
+  // See: https://isocpp.org/wiki/faq/strange-inheritance#hiding-rule
+  using BaseSettings::fromJSON;
+  using BaseSettings::toJSON;
+
+  // Must override these functions of BaseSettings
+  virtual void fromJSON(const JsonDocument& doc) override;
+  virtual void toJSON(JsonDocument& doc) override;
+
+  // May override these functions of BaseSettings
+  virtual void logSettings() override;
 
   std::vector<Field> fields;
 
 private:
-  static constexpr size_t MaxDocSize = 512;
 };
 
 class WeatherScreen : public ScrollScreen {
 public:
-  static String getTextForIcon(String& icon);
-  WSSettings settings;
-
   WeatherScreen();
+
   virtual void innerActivation() override;
-  void fieldsHaveBeenUpdated() { lastDT = UINT32_MAX; }
+  void settingsHaveChanged();
+
+  WSSettings settings;
 
 private:
   uint32_t lastDT = UINT32_MAX;
