@@ -22,15 +22,30 @@
 
 class FSSettings : public BaseSettings {
 public:
+  struct Field {
+    Field() = default;
+    Field(const String& theID, bool on) : id(theID), enabled(on) { }
+    String id;
+    bool enabled;
+  };
+
   FSSettings();
 
-  virtual void fromJSON(const JsonDocument& doc);
-  virtual void toJSON(JsonDocument& doc);
-  virtual void logSettings();
+  // Ensures that other variants of fromJSON() / toJSON aren't hidden
+  // See: https://isocpp.org/wiki/faq/strange-inheritance#hiding-rule
+  using BaseSettings::fromJSON;
+  using BaseSettings::toJSON;
 
-  bool showCity;
-  bool cityBeforeHeading;
-  String heading;
+  // Must override these functions of BaseSettings
+  virtual void fromJSON(const JsonDocument& doc) override;
+  virtual void toJSON(JsonDocument& doc) override;
+
+  // May override these functions of BaseSettings
+  virtual void logSettings() override;
+
+  std::vector<Field> heading;
+  String label;
+  std::vector<Field> fields;
 };
 
 class ForecastScreen : public ScrollScreen {

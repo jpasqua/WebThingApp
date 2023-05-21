@@ -30,8 +30,27 @@
  *----------------------------------------------------------------------------*/
 
 ForecastScreen::ForecastScreen() {
+  // Read the settings
   settings.read();
 
+  bool updateSettings = false;
+  if (settings.heading.size() == 0) {
+    settings.heading.emplace_back(FSSettings::Field("City", true));
+    settings.heading.emplace_back(FSSettings::Field("Label", true));
+    settings.label = "5-Day";
+    updateSettings = true;
+  }
+
+  if (settings.fields.size() == 0) {
+    settings.fields.emplace_back(FSSettings::Field("Day", true));
+    settings.fields.emplace_back(FSSettings::Field("Hi-Lo", true));
+    settings.fields.emplace_back(FSSettings::Field("Description", true));
+    settings.fields.emplace_back(FSSettings::Field("Long Desc.", false));
+    updateSettings = true;
+  }
+  if (updateSettings) { settings.write(); }
+
+  // Perform other initialization
   nLabels = 0;
   labels = NULL;
 
@@ -53,23 +72,25 @@ void ForecastScreen::innerActivation() {
   String& city = wtApp->settings->owmOptions.nickname;
   if (city.isEmpty()) { city = wtApp->owmClient->weather.location.city; }
 
-  if (settings.showCity) {
-    if (settings.cityBeforeHeading) {
-      _forecastText = city;               _forecastText += ' ';
-      _forecastText += settings.heading;  _forecastText += ' ';
+  _forecastText.clear();
+  for (FSSettings::Field f: settings.heading) {
+    if (!f.enabled) continue;
+    if (f.id.equalsIgnoreCase("city")) { _forecastText += city; _forecastText += ' '; }
+    else if (f.id.equalsIgnoreCase("label")) {
+      int len = settings.label.length();
+      if (len) {
+        _forecastText += settings.label;
+        char lastChar = _forecastText[len-1];
+        if (lastChar != ' ' && lastChar != ':') _forecastText += ' ';
+      }
     }
-    else {
-      _forecastText = settings.heading;   _forecastText += ' ';
-      _forecastText += city;              _forecastText += ' ';
-    }
-  } else {
-    _forecastText = settings.heading;     _forecastText += ' ';
   }
 
   for (int i = 0; i < wtApp->owmClient->ForecastElements; i++) {
     if (i) _forecastText += ", ";
     appendForecastForDay(&forecast[i], _forecastText);
   }
+
 
   setText(_forecastText, Display.BuiltInFont_ID);
   _timeOfLastForecast = wtApp->owmClient->timeOfLastForecastUpdate();
@@ -83,16 +104,26 @@ void ForecastScreen::settingsHaveChanged() {
 // ----- Private Methods
 
 void ForecastScreen::appendForecastForDay(Forecast* forecast, String& appendTo) {
-  char* dayAsString = dayStr(weekday(forecast->dt));
-  appendTo += dayAsString[0];
-  appendTo += dayAsString[1];
-  appendTo += dayAsString[2];
-  appendTo += ' ';
-  appendTo += (int)forecast->loTemp;
-  appendTo += '/';
-  appendTo += (int)forecast->hiTemp;
-  appendTo += ' ';
-  appendTo += wtApp->owmClient->getTextForIcon(forecast->icon);
+  bool first = true;
+  for (FSSettings::Field f : settings.fields) {
+    if (!f.enabled) continue;
+    if (!first) { appendTo += ' '; }
+    if (f.id.equalsIgnoreCase("day")) {
+      char* dayAsString = dayStr(weekday(forecast->dt));
+      appendTo += dayAsString[0];
+      appendTo += dayAsString[1];
+      appendTo += dayAsString[2];
+    } else if (f.id.equalsIgnoreCase("hi-lo")) {
+      appendTo += (int)forecast->loTemp;
+      appendTo += '/';
+      appendTo += (int)forecast->hiTemp;
+    } else if (f.id.equalsIgnoreCase("description")) {
+      appendTo += wtApp->owmClient->getTextForIcon(forecast->icon);
+    } else if (f.id.equalsIgnoreCase("long desc.")) {
+      appendTo += wtApp->owmClient->getTextForIcon(forecast->icon);
+    }
+    first = false;
+  }
 }
 
 
@@ -106,31 +137,60 @@ FSSettings::FSSettings() {
   maxFileSize = 512;
   version = 1;
   init("/wta/FSSettings.json");
-
-  showCity = true;
-  cityBeforeHeading = true;
-  String heading = "Forecast";
 }
 
 void FSSettings::fromJSON(const JsonDocument &doc) {
-  JsonObjectConst fsScreen = doc["fsScreen"];
-  showCity = fsScreen["showCity"] | true;
-  cityBeforeHeading = fsScreen["cityBeforeHeading"] | true;
-  heading = fsScreen["heading"].as<String>();
+  heading.clear();
+  fields.clear();
+
+  Field field;
+
+  const JsonArrayConst& jsonHeading = doc["heading"].as<JsonArray>();
+  for (const auto& jsonField : jsonHeading) {
+     field.enabled = jsonField["on"];
+     field.id = jsonField["id"].as<String>();
+     heading.push_back(field);
+  }
+
+  label = doc["label"].as<String>();
+
+  const JsonArrayConst& jsonFields = doc["fields"].as<JsonArray>();
+  for (const auto& jsonField : jsonFields) {
+     field.enabled = jsonField["on"];
+     field.id = jsonField["id"].as<String>();
+     fields.push_back(field);
+  }
 }
 
 void FSSettings::toJSON(JsonDocument &doc) {
-  JsonObject fsScreen = doc.createNestedObject("fsScreen");
-  fsScreen["showCity"] = showCity;
-  fsScreen["cityBeforeHeading"] = cityBeforeHeading;
-  fsScreen["heading"] = heading;
+  JsonArray jsonHeading = doc.createNestedArray("heading");
+  for (Field& field : heading) {
+    JsonObject jsonField = jsonHeading.createNestedObject();
+    jsonField["id"] = field.id;
+    jsonField["on"] = field.enabled;
+  }
+
+  doc["label"] = label;
+
+  JsonArray jsonFields = doc.createNestedArray("fields");
+  for (Field& field : fields) {
+    JsonObject jsonField = jsonFields.createNestedObject();
+    jsonField["id"] = field.id;
+    jsonField["on"] = field.enabled;
+  }
 }
 
 void FSSettings::logSettings() {
-  Log.verbose(F("Forecast Screen Config"));
-  Log.verbose(F("  Show City: %T"), showCity);
-  Log.verbose(F("  City Before Heading: %T"), cityBeforeHeading);
-  Log.verbose(F("  Heading: %s"), heading.c_str());
+  Log.verbose(F("Forecast Screen Settings"));
+  Log.verbose(F("  Heading"));
+  for (const Field& field : heading) {
+    Log.verbose(F("    %s, enabled: %T"), field.id.c_str(), field.enabled);
+  }
+  Log.verbose(F("    Label: %s"), label.c_str());
+  Log.verbose(F("  Fields"));
+  for (const Field& field : fields) {
+    Log.verbose(F("    %s, enabled: %T"), field.id.c_str(), field.enabled);
+  }
 }
 
 
