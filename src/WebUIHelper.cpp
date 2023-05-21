@@ -58,7 +58,7 @@ namespace WebUIHelper {
         uint8_t b = bString.toInt();
           // We know there is at least one leading digit, so a zero result
           // really means zero, not an error parsing
-        if (b < 0 || b > 100) { 
+        if (b > 100) { 
           Log.warning(F("/setBrightness: %d is an unallowed brightness setting"), b);
           WebUI::closeConnection(400, "Invalid Brightness: " + WebUI::arg(F("brightness")));
         } else {
