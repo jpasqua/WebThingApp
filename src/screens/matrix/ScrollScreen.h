@@ -33,6 +33,9 @@ public:
   virtual bool innerPeriodic() { return false; }
 
 private:
+  static uint32_t defaultDelayBetweenFrames;
+  void innerDisplay();
+
   String _text;
   uint8_t _fontID;
   uint16_t _textWidth;
@@ -47,10 +50,6 @@ private:
   uint32_t _nextTimeToDisplay = 0;
   uint8_t _forceCycles = 0;
   uint8_t _cyclesCompleted = 0;
-
-  static uint32_t defaultDelayBetweenFrames;
-  void innerDisplay();
-
 };
 
 #endif  // ScrollScreen_h
