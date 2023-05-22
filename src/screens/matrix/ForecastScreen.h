@@ -18,6 +18,7 @@
 #include <BaseSettings.h>
 //                                  Local Includes
 #include "ScrollScreen.h"
+#include "SettingsOwner.h"
 //--------------- End:    Includes ---------------------------------------------
 
 class FSSettings : public BaseSettings {
@@ -48,11 +49,12 @@ public:
   std::vector<Field> fields;
 };
 
-class ForecastScreen : public ScrollScreen {
+class ForecastScreen : public ScrollScreen, public SettingsOwner {
 public:
   ForecastScreen();
   virtual void innerActivation();
-  void settingsHaveChanged();
+  virtual void settingsHaveChanged() override;
+  virtual BaseSettings* getSettings() { return &settings; }
 
   FSSettings settings;
 

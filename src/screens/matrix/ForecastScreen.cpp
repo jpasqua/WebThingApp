@@ -11,8 +11,8 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
-//                                  WebThing Includes
 #include <BPABasics.h>
+//                                  WebThing Includes
 #include <WebThing.h>
 //                                  Local Includes
 #include "../../WTApp.h"
@@ -30,7 +30,6 @@
  *----------------------------------------------------------------------------*/
 
 ForecastScreen::ForecastScreen() {
-  // Read the settings
   settings.read();
 
   bool updateSettings = false;

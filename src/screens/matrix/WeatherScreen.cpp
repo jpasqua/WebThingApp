@@ -39,9 +39,6 @@
  *----------------------------------------------------------------------------*/
 
 WeatherScreen::WeatherScreen() {
-  init();
-  lastDT = 0;
-
   settings.read();
   if (settings.fields.size() == 0) {
     Log.verbose("No WeatherScreen settings were found, using defaults");
@@ -54,6 +51,9 @@ WeatherScreen::WeatherScreen() {
     settings.fields.emplace_back(WSSettings::Field("Long Desc.", false));
     settings.write();
   }
+
+  init();
+  lastDT = 0;
 }
 
 

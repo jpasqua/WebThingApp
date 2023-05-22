@@ -20,6 +20,8 @@
 //                                  WebThingApp Includes
 #include "../../gui/Screen.h"
 //                                  Local Includes
+#include "ScrollScreen.h"
+#include "SettingsOwner.h"
 //--------------- End:    Includes ---------------------------------------------
 
 class WSSettings : public BaseSettings {
@@ -46,16 +48,15 @@ public:
   virtual void logSettings() override;
 
   std::vector<Field> fields;
-
-private:
 };
 
-class WeatherScreen : public ScrollScreen {
+class WeatherScreen : public ScrollScreen, public SettingsOwner {
 public:
   WeatherScreen();
 
   virtual void innerActivation() override;
-  void settingsHaveChanged();
+  virtual void settingsHaveChanged() override;
+  virtual BaseSettings* getSettings() { return &settings; }
 
   WSSettings settings;
 
