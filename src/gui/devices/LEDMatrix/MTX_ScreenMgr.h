@@ -32,6 +32,7 @@ public:
 
   virtual void device_setup() override;
   virtual void device_processInput() override;
+  virtual void device_changingScreens() override;
   virtual void showActivityIcon(uint16_t accentColor, char symbol = 'i') override;
   virtual void hideActivityIcon() override;
 

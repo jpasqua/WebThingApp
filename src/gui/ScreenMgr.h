@@ -94,7 +94,8 @@ protected:
 
   virtual void device_setup() = 0;
   virtual void device_processInput() = 0;
-
+  virtual void device_changingScreens() { }
+  
   // ----- Data Members
   Screen*   _curScreen;
   Screen*   _homeScreen;

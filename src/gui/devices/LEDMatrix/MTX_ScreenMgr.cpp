@@ -13,6 +13,9 @@ void MTX_ScreenMgr::device_processInput() {
   // is nothing to do here.
 }
 
+void MTX_ScreenMgr::device_changingScreens() { Display.mtx->reset(); }
+
+
 /*------------------------------------------------------------------------------
  *
  * Activity Icon Implementation: Public

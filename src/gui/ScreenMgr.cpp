@@ -137,6 +137,7 @@ void BaseScreenMgr::display(String name) {
 
 void BaseScreenMgr::display(Screen* screen) {
   _curScreen = screen;
+  device_changingScreens();
   screen->activate();
 }
 
