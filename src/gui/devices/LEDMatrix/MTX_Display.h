@@ -85,6 +85,7 @@ public:
   void setOrientation(bool flipped);
   uint16_t getTextWidth(String& text, uint8_t fontID);
   uint16_t getTextWidth(const char* text, uint8_t fontID);
+  void cleanText(String& toBeCleaned);
 
   // ----- Data Members
   Max72xxPanel*  mtx;

@@ -229,6 +229,55 @@ uint16_t MTX_Display::getTextWidth(String& text, uint8_t fontID) {
   return getTextWidth(text.c_str(), fontID);
 }
 
+void MTX_Display::cleanText(String& text) {
+  bool clean = true;
+  for (byte c : text) {
+    if (c > 128) { clean = false; break; }
+  }
+  if (clean) { return; }
+  text.replace("’", "'");
+  text.replace("“", "\"");
+  text.replace("”", "\"");
+  text.replace("`", "'");
+  text.replace("‘", "'");
+  text.replace("„", "'");
+  text.replace("\\\"", "'");
+  text.replace("•", "-");
+  text.replace("é", "e");
+  text.replace("è", "e");
+  text.replace("ë", "e");
+  text.replace("ê", "e");
+  text.replace("à", "a");
+  text.replace("â", "a");
+  text.replace("ù", "u");
+  text.replace("ç", "c");
+  text.replace("î", "i");
+  text.replace("ï", "i");
+  text.replace("ô", "o");
+  text.replace("…", "...");
+  text.replace("–", "-");
+  text.replace("Â", "A");
+  text.replace("À", "A");
+  text.replace("æ", "ae");
+  text.replace("Æ", "AE");
+  text.replace("É", "E");
+  text.replace("È", "E");
+  text.replace("Ë", "E");
+  text.replace("Ô", "O");
+  text.replace("Ö", "Oe");
+  text.replace("ö", "oe");
+  text.replace("œ", "oe");
+  text.replace("Œ", "OE");
+  text.replace("Ù", "U");
+  text.replace("Û", "U");
+  text.replace("Ü", "Ue");
+  text.replace("ü", "ue");
+  text.replace("Ä", "Ae");
+  text.replace("ä", "ae");
+  text.replace("ß", "ss");
+  text.replace("»", "'");
+  text.replace("«", "'");
+}
 
 #define pgm_read_pointer(addr) ((void *)pgm_read_dword(addr))
 
