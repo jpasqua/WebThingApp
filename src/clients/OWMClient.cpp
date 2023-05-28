@@ -136,7 +136,7 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   _endpoint.concat("&lang=");
   _endpoint.concat(_lang);
 
-  DynamicJsonDocument *root = owmService.issueGET(_endpoint, 8192, &filter);
+  DynamicJsonDocument *root = owmService.issueGET(_endpoint, 6144, &filter);
   if (!root) {
     Log.warning(F("Failed to retreive forecast"));
     return;
