@@ -44,6 +44,7 @@ void ScrollScreen::init(bool autoAdvance, uint32_t delay, uint8_t forceCycles) {
 
 void ScrollScreen::setText(String text, uint8_t fontID) {
   _text = text;
+  Display.cleanText(_text); // Make sure all the characters are suitable for the LEDMatrix
   _fontID = fontID;
   _offset = 0;
   _nextTimeToDisplay = 0;
