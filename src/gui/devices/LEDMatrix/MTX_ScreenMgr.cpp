@@ -13,7 +13,10 @@ void MTX_ScreenMgr::device_processInput() {
   // is nothing to do here.
 }
 
-void MTX_ScreenMgr::device_changingScreens() { Display.mtx->reset(); }
+void MTX_ScreenMgr::device_changingScreens() {
+  // If the screen is on, reset it to ensure a good state
+  if (Display.getBrightness()) Display.mtx->reset();
+}
 
 
 /*------------------------------------------------------------------------------
