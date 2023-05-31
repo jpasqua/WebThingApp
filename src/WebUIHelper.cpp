@@ -79,23 +79,21 @@ namespace WebUIHelper {
       WebUI::wrapWebAction("/updateStatus", action, false);
     }
 
-    void updateWeatherConfig() {
-      auto action = []() {
-        wtApp->settings->owmOptions.enabled = WebUI::hasArg(F("useOWM"));
-        wtApp->settings->owmOptions.key = WebUI::arg(F("openWeatherMapApiKey"));
-        wtApp->settings->owmOptions.cityID = WebUI::arg(F("cityID")).toInt();
-        wtApp->settings->owmOptions.language = WebUI::arg(F("language"));
-        wtApp->settings->owmOptions.nickname = WebUI::arg(F("nickname"));
-
+    void updateWthrSettings() {
+      auto action = [&]() {
+        // We are handling an HTTP POST with a JSON payload. There isn't a specific function
+        // to get the payload from the request, instead ask for the arg named "plain"
+        String newSettings = WebUI::arg("plain");
+        if (newSettings.isEmpty()) {
+          WebUI::sendStringContent("text/plain", "Settings are empty", "400 Bad Request");
+          return;
+        }
+        wtApp->settings->owmOptions.fromJSON(newSettings);
         wtApp->settings->write();
-        // wtApp->settings->logSettings();
-        
-        wtAppImpl->weatherConfigMayHaveChanged();
-
-        WebUI::redirectHome();
+        WebUI::sendStringContent("text/plain", "New weather settings were saved");
       };
 
-      WebUI::wrapWebAction("/updateWeatherConfig", action);
+      WebUI::wrapWebAction("/updateWthrSettings", action);
     }
 
     void updatePluginConfig() {
@@ -258,6 +256,7 @@ namespace WebUIHelper {
         else if (key.equals(F("CITY"))) val.concat(wtApp->settings->owmOptions.cityID);
         else if (key == langTarget) val = "selected";
         else if (key.equals(F("USE_OWM")))  val = checkedOrNot[wtApp->settings->owmOptions.enabled];
+        else if (key.equals(F("WTHR_SETTINGS"))) wtApp->settings->owmOptions.toJSON(val);
       };
 
       WebUI::wrapWebPage("/presentWeatherConfig", "/wta/ConfigWeather.html", mapper);
@@ -338,7 +337,7 @@ namespace WebUIHelper {
     WebUI::registerHandler("/presentScreenConfig",    Pages::presentScreenConfig);
 
     WebUI::registerHandler("/updateStatus",           Endpoints::updateStatus);
-    WebUI::registerHandler("/updateWeatherConfig",    Endpoints::updateWeatherConfig);
+    WebUI::registerHandler("/updateWthrSettings",     Endpoints::updateWthrSettings);
     WebUI::registerHandler("/updateDisplayConfig",    Endpoints::updateDisplayConfig);
     WebUI::registerHandler("/updatePluginConfig",     Endpoints::updatePluginConfig);
     WebUI::registerHandler("/updateScreenSelection",  Endpoints::updateScreenSelection);

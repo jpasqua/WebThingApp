@@ -1,64 +1,169 @@
+<!-- Start of ConfigWeather.html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   function showHide(elementID) {
-  var x = document.getElementById(elementID);
-  if (x.style.display === "none") { x.style.display = "block"; } else { x.style.display = "none"; }
-}
+    var x = document.getElementById(elementID);
+    if (x.style.display === "none") { x.style.display = "block"; } else { x.style.display = "none"; }
+  }
 
-function isNumberKey(e) { var h = e.which ? e.which : event.keyCode; return !(h > 31 && (h < 48 || h > 57)) }
+  function isNumberKey(e) { var h = e.which ? e.which : event.keyCode; return !(h > 31 && (h < 48 || h > 57)) }
 </script>
-<form class='w3-container' action='/updateWeatherConfig' method='get'>
-  <h3>Open Weather Map</h3>
-  <p><input name='useOWM' class='w3-check' type='checkbox' onclick='showHide("OWMSettings")' %USE_OWM%> Get Weather Data from OpenWeatherMap.org</p>
+
+<div><b>Open Weather Map</b></div>
+  <div class='w3-row w3-margin-bottom'>
+    <input id='USE_OWM' class='w3-check' type='checkbox' onclick='showHide("OWMSettings")' checked='checked'> Get Weather Data from OpenWeatherMap.org
+  </div>
   <div id="OWMSettings" style='display:none'>
     <div class='w3-card w3-round'>
       <div class='w3-container'>
-    <p><label>%CITY_NAME% (<a href='http://openweathermap.org/find' target='_BLANK'><i class='fa fa-search'></i>Search for City ID)</a></label>
-      <input class='w3-input w3-border w3-margin-bottom' type='text' name='cityID' value='%CITY%' onkeypress='return isNumberKey(event)'></p>
-    <p><label>City nickname (leave blank to use "official" city name)</a></label>
-      <input class='w3-input w3-border w3-margin-bottom' type='text' name='nickname' value='%NICKNAME%'></p>
-    <label><a href='https://openweathermap.org/' target='_BLANK'>OpenWeatherMap API Key</a></label>
-    <input class='w3-input w3-border w3-margin-bottom' type='text' name='openWeatherMapApiKey' value='%WEATHER_KEY%' maxlength='60'>
-    <p>Weather Language: <select class='w3-option w3-padding' name='language'>
-        <option %SLar%>ar</option>
-        <option %SLbg%>bg</option>
-        <option %SLca%>ca</option>
-        <option %SLcz%>cz</option>
-        <option %SLde%>de</option>
-        <option %SLel%>el</option>
-        <option %SLen%>en</option>
-        <option %SLfa%>fa</option>
-        <option %SLfi%>fi</option>
-        <option %SLfr%>fr</option>
-        <option %SLgl%>gl</option>
-        <option %SLhr%>hr</option>
-        <option %SLhu%>hu</option>
-        <option %SLit%>it</option>
-        <option %SLja%>ja</option>
-        <option %SLkr%>kr</option>
-        <option %SLla%>la</option>
-        <option %SLlt%>lt</option>
-        <option %SLmk%>mk</option>
-        <option %SLnl%>nl</option>
-        <option %SLpl%>pl</option>
-        <option %SLpt%>pt</option>
-        <option %SLro%>ro</option>
-        <option %SLru%>ru</option>
-        <option %SLse%>se</option>
-        <option %SLsk%>sk</option>
-        <option %SLsl%>sl</option>
-        <option %SLes%>es</option>
-        <option %SLtr%>tr</option>
-        <option %SLua%>ua</option>
-        <option %SLvi%>vi</option>
-        <option %SLzh_cn%>zh_cn</option>
-        <option %SLzh_tw%>zh_tw</option>
-      </select>
-    </p>
+        <div class='w3-row'>
+          <table>
+            <tr>
+              <td valign='middle'> <label>City ID:&nbsp;</label> </td>
+              <td>
+                <input class='w3-border' type='text' id='CITY_ID' value=''
+                 onkeypress='return isNumberKey(event)'>
+              </td>
+              <td valign='middle'>
+                <a href='http://openweathermap.org/find' target='_BLANK'><i class='fa fa-search'></i>Search </a>
+              </td>
+            </tr>
+            <tr>
+              <td valign='middle'> <label>City Nickname:&nbsp;</label> </td>
+              <td><input class='w3-border' type='text' ID='NICKNAME' value=''></td>
+              <td valign='middle'> Leave blank for official city name </td>
+            </tr>
+            <tr>
+              <td valign='middle'> <label>Refresh Interval:&nbsp;</label> </td>
+              <td>
+                <input class='w3-border' type='text' id='RFRSH' value=''
+                  onkeypress='return isNumberKey(event)'>
+              </td>
+              <td valign='middle'> minutes </td>
+            </tr>
+            <tr>
+              <td valign='middle'> <label>Forecast Interval:&nbsp;</label> </td>
+              <td>
+                <input class='w3-border' type='text' id='FCST_RFRSH' value=''
+                  onkeypress='return isNumberKey(event)'>
+              </td>
+              <td valign='middle'> hours </td>
+            </tr>
+            <tr>
+              <td valign='middle'> <label>Language:&nbsp;</label> </td>
+              <td>
+                <select class='w3-option' id='LANG'>
+                  <option value='en'>en</option>
+                  <option value='ar'>ar</option>
+                  <option value='bg'>bg</option>
+                  <option value='ca'>ca</option>
+                  <option value='cz'>cz</option>
+                  <option value='de'>de</option>
+                  <option value='el'>el</option>
+                  <option value='fa'>fa</option>
+                  <option value='fi'>fi</option>
+                  <option value='fr'>fr</option>
+                  <option value='gl'>gl</option>
+                  <option value='hr'>hr</option>
+                  <option value='hu'>hu</option>
+                  <option value='it'>it</option>
+                  <option value='ja'>ja</option>
+                  <option value='kr'>kr</option>
+                  <option value='la'>la</option>
+                  <option value='lt'>lt</option>
+                  <option value='mk'>mk</option>
+                  <option value='nl'>nl</option>
+                  <option value='pl'>pl</option>
+                  <option value='pt'>pt</option>
+                  <option value='ro'>ro</option>
+                  <option value='ru'>ru</option>
+                  <option value='se'>se</option>
+                  <option value='sk'>sk</option>
+                  <option value='sl'>sl</option>
+                  <option value='es'>es</option>
+                  <option value='tr'>tr</option>
+                  <option value='ua'>ua</option>
+                  <option value='vi'>vi</option>
+                  <option value='zh_cn'>zh_cn</option>
+                  <option value='zh_tw'>zh_tw</option>
+                </select>
+              </td>
+              <td> </td>
+            </tr>
+            <tr>
+              <td valign='middle'>
+                <label><a href='https://openweathermap.org/' target='_BLANK'>API Key:&nbsp;</a></label>
+              </td>
+              <td colspan='2'>
+                <input class='w3-border' type='text' id='API_KEY'
+                  value='' size='50'>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <button class='w3-button w3-block w3-round-large w3-grey w3-margin-top w3-margin-bottom' type='submit' onclick="saveNewSettings()">  Save&nbsp;
+          <span id='WTHR_RESLT' class='w3-margin-left' style='font-style: italic;'></span>
+        </button>
+      </div>
+    </div>
   </div>
-</div>
-</div>
-  <script>
-    if (document.getElementsByName('useOWM')[0].checked) { document.getElementById("OWMSettings").style.display = "block"; }
-  </script>
-  <button class='w3-button w3-block w3-grey w3-section w3-padding' type='submit'>Save</button>
-</form>
+
+<script>
+  function showResult(status, data, resultArea) {
+    $(resultArea).attr('style', 'color:' + (status ? 'green' : 'red'));
+    $(resultArea).html((status ? 'Success' : 'Error') + ': ' + data);
+    setTimeout(function() {
+      $(resultArea).fadeOut("slow", function() {
+        $(resultArea).html('');
+        $(resultArea).attr("style","display:block");
+      }
+    );
+    } ,3000);
+  }
+
+  function doSubmit(payload, saveAction, resultArea) {
+    console.log(payload);
+    $(resultArea).attr('style', 'color: #808080');
+    $(resultArea).html("Updating screen settings...");
+    $.ajax({
+        url: saveAction,
+        type: 'post',
+        dataType: 'text',
+        contentType: 'application/json',
+        success: function(data) { showResult(true, data, resultArea) },
+        error: function(data) { showResult(false, data, resultArea) },
+        data: JSON.stringify(payload)
+    });
+  }
+
+  function saveNewSettings() {
+    var theSettings = { "owm": {} };
+    theSettings.owm.enabled = $("#USE_OWM").is(':checked');
+    theSettings.owm.key = $("#API_KEY").val();
+    theSettings.owm.cityID = parseInt($("#CITY_ID").val());
+    theSettings.owm.lang = $("#LANG").val();
+    theSettings.owm.nickname = $("#NICKNAME").val();
+    theSettings.owm.refresh = parseInt($("#RFRSH").val());
+    theSettings.owm.fcstRefresh = parseInt($("#FCST_RFRSH").val());
+    doSubmit(theSettings, "/updateWthrSettings", "#WTHR_RESLT");
+  }
+
+  function fillWeatherFields(theSettings) {
+    $("#USE_OWM").prop('checked', theSettings.enabled);
+    $("#API_KEY").val(theSettings.key);
+    $("#CITY_ID").val(theSettings.cityID);
+    $("#NICKNAME").val(theSettings.nickname);
+    $("#RFRSH").val(theSettings.refresh);
+    $("#FCST_RFRSH").val(theSettings.fcstRefresh);
+
+    $('#LANG').val(theSettings.language);
+    if ($('#LANG').val() == null) { $("#LANG")[0].selectedIndex = 0; }
+
+    if ($("#USE_OWM").is(':checked')) $(OWMSettings).attr("style","display:block");
+  }
+
+  let weatherSettings = JSON.parse('%WTHR_SETTINGS%');
+console.log(weatherSettings.owm);
+  fillWeatherFields(weatherSettings.owm);
+</script>
+<!-- End of ConfigWeather.html -->
