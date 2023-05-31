@@ -17,6 +17,10 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
+//
+// ----- WTAppSettings Implementation
+// 
+
 WTAppSettings::WTAppSettings() { }
 
 void WTAppSettings::fromJSON(const JsonDocument &doc) {
@@ -41,6 +45,9 @@ void WTAppSettings::logSettings() {
 }
 
 
+//
+// ----- OWMOptions Implementation
+// 
 
 OWMOptions::OWMOptions() {
   enabled = true;
@@ -52,12 +59,15 @@ OWMOptions::OWMOptions() {
 
 void OWMOptions::fromJSON(const JsonDocument &doc) {
   JsonObjectConst owm = doc["owm"].as<JsonObjectConst>();
-  enabled = owm[F("enabled")];
-  key = owm["key"].as<const char*>();
-  cityID = owm[F("cityID")] | 5372223;
-  nickname = owm["nickname"].as<const char*>();
-  language = owm["language"]|"en";
+  enabled     = owm["enabled"];
+  key         = owm["key"].as<const char*>();
+  cityID      = owm["cityID"] | 5372223;
+  nickname    = owm["nickname"].as<const char*>();
+  language    = owm["language"]|"en";
+  refresh     = owm["refresh"] | 60;
+  fcstRefresh = owm["fcstRefresh"] | 8;
 }
+
 
 void OWMOptions::toJSON(JsonDocument &doc) {
   doc["owm"]["enabled"] = enabled;
@@ -65,13 +75,32 @@ void OWMOptions::toJSON(JsonDocument &doc) {
   doc["owm"]["cityID"] = cityID;
   doc["owm"]["language"] = language;
   doc["owm"]["nickname"] = nickname;
+  doc["owm"]["refresh"] = refresh;
+  doc["owm"]["fcstRefresh"] = fcstRefresh;
+}
+
+void OWMOptions::fromJSON(const String& jsonString) {
+  DynamicJsonDocument doc(256);
+  auto error = deserializeJson(doc, jsonString);
+  if (error) {
+    Log.warning("Error (%s) while parsing: %s", error.c_str(), jsonString.c_str());
+  }
+  fromJSON(doc);
+}
+
+void OWMOptions::toJSON(String& jsonString) {
+  DynamicJsonDocument doc(256);
+  toJSON(doc);
+  serializeJson(doc, jsonString);
 }
 
 void OWMOptions::logSettings() {
-  Log.verbose(F("OpenWeatherMap Settings"));
-  Log.verbose(F("  enabled: %T"), enabled);
-  Log.verbose(F("  API Key: %s"), key.c_str());
-  Log.verbose(F("  City ID: %d"), cityID);
-  Log.verbose(F("  Language: %s"), language.c_str());
-  Log.verbose(F("  City nickname: %s"), nickname.c_str());
+  Log.verbose("OpenWeatherMap Settings");
+  Log.verbose("  enabled: %T", enabled);
+  Log.verbose("  API Key: %s", key.c_str());
+  Log.verbose("  City ID: %d", cityID);
+  Log.verbose("  Language: %s", language.c_str());
+  Log.verbose("  City nickname: %s", nickname.c_str());
+  Log.verbose("  Weather Refresh (min): %d", refresh);
+  Log.verbose("  Forecast Refresh (hr): %d", fcstRefresh);
 }

@@ -20,10 +20,16 @@ public:
   int     cityID;       // OpenWeatherMap City ID
   String  language;     // See OpenWeatherMap for list of available languages
   String  nickname;     // If not empty, override the city name with this nickname (e.g. Home)
+  uint16_t refresh;     // Weather Refresh Interval (minutes)
+  uint16_t fcstRefresh; // Forecast Refresh Interval (hours)
 
   OWMOptions();
-  void fromJSON(const JsonDocument &doc);
+  void fromJSON(const JsonDocument& doc);
   void toJSON(JsonDocument &doc);
+
+  void fromJSON(const String& jsonString);
+  void toJSON(String& jsonString);
+
   void logSettings();
 };
 
