@@ -124,21 +124,20 @@ void WTAppImpl::loop() {
 
 // ----- Weather Functions
 void WTAppImpl::refreshWeatherData(bool force) {
-  static const uint32_t ForecastInterval = 8 * 60 * 60 * 1000L; // 8 Hours
-
   if (!settings->owmOptions.enabled) return;
 
   static uint32_t lastWeatherUpdate = 0;
   static uint32_t lastForecastUpdate = 0;
   uint32_t curMillis = millis();
-  uint32_t threshold = (WebThing::settings.processingInterval * 60 * 1000L);
+  uint32_t threshold = Basics::minutesToMS(settings->owmOptions.refresh);
+  uint32_t fcstThreshold = Basics::hoursToMS(settings->owmOptions.fcstRefresh);
 
   if (force || ((curMillis - lastWeatherUpdate) > threshold)) {
     ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->update();
     lastWeatherUpdate = curMillis;
   }
-  if (force || ((curMillis - lastForecastUpdate) > ForecastInterval)) {
+  if (force || ((curMillis - lastForecastUpdate) > fcstThreshold)) {
     ScreenMgr.showActivityIcon(Theme::Color_UpdatingWeather);
     owmClient->updateForecast(WebThing::getGMTOffset());
     lastForecastUpdate = curMillis;
