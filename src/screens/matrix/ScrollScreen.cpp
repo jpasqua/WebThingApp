@@ -42,8 +42,18 @@ void ScrollScreen::init(bool autoAdvance, uint32_t delay, uint8_t forceCycles) {
   _goHome = false;
 }
 
-void ScrollScreen::setText(String text, uint8_t fontID) {
+
+void ScrollScreen::setText(const char* text, uint8_t fontID) {
   _text = text;
+  setTextInternal(fontID);
+}
+
+void ScrollScreen::setText(String& text, uint8_t fontID) {
+  _text = text;
+  setTextInternal(fontID);
+}
+
+void ScrollScreen::setTextInternal(uint8_t fontID) {
   Display.cleanText(_text); // Make sure all the characters are suitable for the LEDMatrix
   _fontID = fontID;
   _offset = 0;
@@ -56,6 +66,7 @@ void ScrollScreen::setText(String text, uint8_t fontID) {
     _baseline = Display.mtx->height() - verticalPadding;
   }
 }
+
 
 void ScrollScreen::innerDisplay() {
   auto& mtx = Display.mtx;
