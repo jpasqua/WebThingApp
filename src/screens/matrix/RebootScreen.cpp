@@ -46,7 +46,7 @@ void RebootScreen::innerActivation() {
   if (nButtonMappings == 0) {
     mtx->fillScreen(LOW);
     Display.drawStringInRegion(
-      "Reboot", Display.BuiltInFont_ID, Display.MC_Align,
+      "Reset", Display.BuiltInFont_ID, Display.MC_Align,
       0, h, w, h, w/2, h/2,  Theme::Color_WHITE, Theme::Color_BLACK);
     mtx->write();
     delay(1000L);
