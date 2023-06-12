@@ -593,7 +593,7 @@ The fields are as follows:
 <a name="datavalues"></a>
 ## Data Values
 
-Any plugin (generic or custom) may access values made available by an app-wide data broker. Values are provided by a number of built-in sources, but can also be provided by plugins and their associated data providers.  For example, the Blynk Weather plugin example makes all of its data available to other plugins.
+Any plugin (generic or custom) may access values made available by an app-wide data broker. Values are provided by a number of built-in sources, but can also be provided by plugins and their associated data providers.  For example, the AdafruitIO Weather plugin example makes all of its data available to other plugins.
 
 Values have names that are composed of multiple parts. All keys begin with a '$' followed by a single letter:
 
