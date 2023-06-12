@@ -1,5 +1,5 @@
 /*
- * Touch_Display:
+ * MTX_Display:
  *    A device-specific implementation of the Display interface for Monochrome LED Matrix displays
  *                    
  */
