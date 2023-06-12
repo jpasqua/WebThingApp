@@ -143,6 +143,12 @@ namespace WebUIHelper {
         wtApp->settings->uiOptions.schedule.evening.brightness = WebUI::arg(F("eBright")).toInt();
 
         wtApp->settings->uiOptions.screenBlankMinutes = WebUI::arg(F("blank")).toInt();
+        if (wtApp->settings->uiOptions.schedule.active && 
+            wtApp->settings->uiOptions.screenBlankMinutes != 0) {
+          // We don't want schedules and screen blanking on at the same time. The UI will
+          // avoid this, but if for some reason we get incompatible settings, choose the schedule
+          wtApp->settings->uiOptions.screenBlankMinutes = 0;
+        }
 
         wtApp->settings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
         wtApp->settings->uiOptions.useMetric = WebUI::hasArg(F("metric"));

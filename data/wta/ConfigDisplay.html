@@ -24,6 +24,29 @@
       xhttp.open("GET", "/setBrightness?value="+brightness, true);
       xhttp.send();
   }
+
+  function blankingChanged() {
+    var selectBox = document.getElementsByName("blank")[0];
+    var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+    var scheduleChecbox = document.getElementsByName("scheduleEnabled")[0];
+    if (selectedValue != "0") {
+      if (scheduleChecbox.checked) scheduleChecbox.click();
+    } else {
+      if (!scheduleChecbox.checked) scheduleChecbox.click();
+    }
+  }
+
+  function scheduleChanged() {
+    let scheduleChecbox = document.getElementsByName("scheduleEnabled")[0];
+    let schedulesContainer = document.getElementById("schedules");
+    if (scheduleChecbox.checked) {
+      let selectBox = document.getElementsByName("blank")[0];
+      selectBox.value = "0"; // Set to never
+      schedulesContainer.style.display = "block";
+    } else {
+      schedulesContainer.style.display = "none";
+    }
+  }
 </script>
 
 <style>
@@ -69,7 +92,7 @@
       <script>showVal(document.getElementById('bSlider').value)</script>
   </div>
 
-  <p><input name='scheduleEnabled' class='w3-check' type='checkbox' onclick='showHide("schedules")' %SCHED_ENABLED% checked> Enable schedules</p>
+  <p><input name='scheduleEnabled' class='w3-check' type='checkbox' onclick='scheduleChanged();' %SCHED_ENABLED% checked> Enable schedules</p>
   <div class='w3-card w3-round-large'>
     <div class='w3-container'>
     <div id="schedules" style='display:none'>
@@ -86,7 +109,7 @@
 </div>
 
   <p><label>Turn of display after:&nbsp;</label>
-    <select class='w3-option w3-padding' name='blank'>
+    <select class='w3-option w3-padding' name='blank' onchange="blankingChanged();">
       <option value='1'  %SL1%>1 minute</option>
       <option value='5'  %SL5%>5 minutes</option>
       <option value='10' %SL10%>10 minutes</option>
@@ -107,5 +130,7 @@
 
   <script>
     activate('scheduleEnabled', 'schedules');
+    blankingChanged();
+    scheduleChanged();
   </script>
 </form>
