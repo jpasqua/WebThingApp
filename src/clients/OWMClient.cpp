@@ -123,9 +123,9 @@ void OWMClient::update() {
 
 void OWMClient::updateForecast(int32_t gmtOffset) {
   StaticJsonDocument<128> filter;
-  filter["list"][0]["dt"] = true;
-  filter["list"][0]["main"]["temp"] = true;
-  filter["list"][0]["weather"][0]["icon"] = true;
+  filter["dt"] = true;
+  filter["main"]["temp"] = true;
+  filter["weather"][0]["icon"] = true;
 
   _endpoint = "/data/2.5/forecast?id=";
   _endpoint.concat(_cityID);
@@ -136,17 +136,13 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   _endpoint.concat("&lang=");
   _endpoint.concat(_lang);
 
-  DynamicJsonDocument *root = owmService.issueGET(_endpoint, 6144, &filter);
-  if (!root) {
-    Log.warning(F("Failed to retreive forecast"));
+  WiFiClient* owmResponse = owmService.initiateRequest(_endpoint.c_str(), GET, "");
+  if (!owmResponse) {
+    Log.warning("Unable to update forecast");
     return;
   }
-  // serializeJsonPretty(*root, Serial); Serial.println();
 
   // The 5 forecast elements correspond to the 5-day forecast
-
-  JsonArray list = (*root)["list"];
-
   int operationalDay = -1;
 
   uint32_t curDT;
@@ -156,12 +152,19 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
   int      dayOfCurDT;
   uint32_t timeOfMaxTemp = 0;
   int forecastIndex = 0;
+  StaticJsonDocument<512> doc;
 
-  // Iterate through the JsonArray this way rather than referencing values by
-  // index in a loop. This is much more efficient since the underlying JsonArray
-  // is actually a linked list (see ArduinoJson doc for the recommendation)
-  for (JsonObject f : list) {
-    curDT = f["dt"];
+  owmResponse->find("\"list\":[");  // Position the stream at beginning of array
+  do {
+    auto error = deserializeJson(doc, *owmResponse, DeserializationOption::Filter(filter));
+    if (error) {
+      Log.warning(F("Error (%s) while parsing forecast"), error.c_str());
+      owmResponse->stop();
+      delete owmResponse;
+      // TO DO: Any other cleanup needed?
+      return;
+    }
+    curDT = doc["dt"];
     curDT += gmtOffset;
     dayOfCurDT = day(curDT);
 
@@ -177,16 +180,19 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
       curMin = 1000;
       curMax = -1000;
     }
-    float curTemp = f["main"]["temp"];
+    float curTemp = doc["main"]["temp"];
     if (curTemp > curMax) {
       curMax = curTemp;
       timeOfMaxTemp = curDT;
-      curIcon = f["weather"][0]["icon"].as<const char*>();
+      curIcon = doc["weather"][0]["icon"].as<const char*>();
     }
     if (curTemp < curMin) {
       curMin = curTemp;
     }
-  }
+  } while (owmResponse->findUntil(",", "]"));
+  owmResponse->stop();
+  delete owmResponse;
+
   if (forecastIndex < ForecastElements) {
     forecast[forecastIndex].dt = timeOfMaxTemp;
     forecast[forecastIndex].loTemp = curMin;
@@ -204,7 +210,6 @@ void OWMClient::updateForecast(int32_t gmtOffset) {
 
   _timeOfLastForecastUpdate = millis();
   dumpForecast();
-  delete root;
 }
 
 String OWMClient::getTextForIcon(String& icon) {
