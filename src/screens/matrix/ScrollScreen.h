@@ -47,6 +47,7 @@ private:
 
   uint16_t _offset = 0;
   uint16_t _mtxWidth;
+  uint16_t _mtxHeight;
   bool _autoAdvance = true;
 
   uint32_t _delayBetweenFrames = 20;

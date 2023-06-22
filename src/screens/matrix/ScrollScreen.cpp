@@ -37,7 +37,6 @@ ScrollScreen::ScrollScreen() {
 void ScrollScreen::init(bool autoAdvance, uint32_t delay, uint8_t forceCycles) {
   _delayBetweenFrames = delay;
   _autoAdvance = autoAdvance;
-  _mtxWidth = Display.mtx->width();
   _forceCycles = forceCycles;
   _goHome = false;
 }
@@ -71,7 +70,7 @@ void ScrollScreen::setTextInternal(uint8_t fontID) {
 void ScrollScreen::innerDisplay() {
   auto& mtx = Display.mtx;
 
-  mtx->fillScreen(Theme::Color_BLACK);
+  Display.fillWith(Theme::Color_BLACK);
   mtx->setCursor((_mtxWidth - 1) - _offset, _baseline);
   mtx->print(_text);
   mtx->write();
@@ -79,6 +78,10 @@ void ScrollScreen::innerDisplay() {
 
 void ScrollScreen::display(bool activating) {
   if (activating) {
+// MTX_Display::Region rightHalf = {32, 0, 63, 8};
+// Display.setRegion(rightHalf);
+    _mtxWidth = Display.width();
+    _mtxHeight = Display.height();
     innerActivation();
     if (_text.isEmpty() && _autoAdvance) {
       ScreenMgr.moveThroughSequence(true);  // Go to the next screen

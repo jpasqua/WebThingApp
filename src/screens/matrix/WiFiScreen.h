@@ -14,8 +14,8 @@ class WiFiScreen : public Screen {
 public:
 
   virtual void display(bool) override {
-    uint16_t w = Display.mtx->width();
-    uint16_t h = Display.mtx->height();
+    uint16_t w = Display.width();
+    uint16_t h = Display.height();
 
     if (w >= 64) {
       drawFauxStrengthIcon(0, h-1);
