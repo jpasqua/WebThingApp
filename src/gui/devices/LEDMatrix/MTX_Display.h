@@ -40,6 +40,9 @@ public:
     M12, MB12
   }; 
 
+  struct Region {
+    uint16_t xMin, yMin, xMax, yMax;
+  };
 
   // ----- Constants
   static constexpr uint8_t  BuiltInFont_ID = 0;
@@ -64,6 +67,7 @@ public:
   virtual void setBrightness(uint8_t b) override;
 
   // ----- Drawing functions -----
+  virtual void fillWith(uint16_t color) override;
   virtual void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) override;
   virtual void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) override;
   virtual void drawStringInRegion(
@@ -86,6 +90,8 @@ public:
   uint16_t getTextWidth(String& text, uint8_t fontID);
   uint16_t getTextWidth(const char* text, uint8_t fontID);
   void cleanText(String& toBeCleaned);
+  void setRegion(Region& region);
+  void resetRegion();
 
   // ----- Data Members
   Max72xxPanel*  mtx;
@@ -93,6 +99,9 @@ public:
 
 protected:
   virtual void device_begin() override;
+
+  uint16_t _regionWidth;
+  uint16_t _regionHeight;
 };
 
 extern MTX_Display Display;
