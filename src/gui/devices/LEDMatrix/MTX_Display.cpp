@@ -29,8 +29,7 @@ void MTX_Display::setDeviceOptions(const DisplayDeviceOptions* options) {
   deviceOptions = options;
   mtx = new Max72xxPanel(
       deviceOptions->csPin, deviceOptions->hDisplays, deviceOptions->vDisplays);
-  _regionWidth = mtx->width();
-  _regionHeight = mtx->height();
+  mtx->focusOnLine(Max72xxPanel::NoFocus);
   setBrightness(7); // Don't blast the intensity right out of the gate
   // mtx->fillScreen(0);  // The Max72XXPanel constructor does this
   mtx->write();
@@ -75,9 +74,16 @@ void MTX_Display::setOrientation(bool flipped) {
         start += increment;
     }
   }
+
+  mtx->setOptimizeHint(true);
+    // We're guaranteeing that the displays are in sequential order,
+    // that the rotations are all the same, that we won't apply an
+    // Adafruit_GFX-level rotation, and that we won't change any of
+    // this in the future.
 }
 
 void MTX_Display::streamScreenShotAsBMP(Stream &s) {
+  int previouslyActiveLine = mtx->swapFocus(-1);
   // Adapted from https://forum.arduino.cc/index.php?topic=406416.0
   byte hiByte, loByte;
 
@@ -128,10 +134,7 @@ void MTX_Display::streamScreenShotAsBMP(Stream &s) {
     }
     s.write(buf, w*2);
   }
-}
-
-void MTX_Display::fillWith(uint16_t color) {
-  mtx->fillRect(0, 0, _regionWidth, _regionHeight, color);
+  mtx->focusOnLine(previouslyActiveLine);
 }
 
 void MTX_Display::drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
@@ -310,23 +313,9 @@ uint16_t MTX_Display::getTextWidth(const char* text, uint8_t fontID) {
   return width;
 }
 
-uint16_t MTX_Display::width() const  { return _regionWidth; }
-uint16_t MTX_Display::height() const { return _regionHeight; }
+uint16_t MTX_Display::width() const  { return mtx->width(); }
+uint16_t MTX_Display::height() const { return mtx->focusedHeight(); }
 
-void MTX_Display::setRegion(Region& region) {
-Log.verbose("Setting region");
-  mtx->clip(region.xMin, region.yMin, region.xMax, region.yMax);
-  mtx->translate(region.xMin, region.yMin);
-  _regionWidth = region.xMax - region.xMin + 1;
-  _regionHeight = region.yMax - region.yMin + 1;
-}
-
-void MTX_Display::resetRegion() {
-  mtx->resetClip();
-  mtx->resetTranslation();
-  _regionWidth = mtx->width();
-  _regionHeight = mtx->height();
-}
 // ----- GLOBAL STATE
 MTX_Display Display;
 

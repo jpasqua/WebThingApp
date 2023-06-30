@@ -41,28 +41,18 @@ void ScrollScreen::init(bool autoAdvance, uint32_t delay, uint8_t forceCycles) {
   _goHome = false;
 }
 
-
-void ScrollScreen::setText(const char* text, uint8_t fontID) {
-  _text = text;
-  setTextInternal(fontID);
-}
-
-void ScrollScreen::setText(String& text, uint8_t fontID) {
-  _text = text;
-  setTextInternal(fontID);
-}
-
 void ScrollScreen::setTextInternal(uint8_t fontID) {
   Display.cleanText(_text); // Make sure all the characters are suitable for the LEDMatrix
   _fontID = fontID;
   _offset = 0;
   _nextTimeToDisplay = 0;
   _textWidth = Display.getTextWidth(_text, _fontID);
-  uint16_t verticalPadding = (Display.mtx->height() - Display.getFontHeight(_fontID))/2;
+  uint16_t height = Display.height();
+  uint16_t verticalPadding = (height - Display.getFontHeight(_fontID))/2;
   if (_fontID == 0) { // Built-in font
     _baseline = verticalPadding;
   } else {
-    _baseline = Display.mtx->height() - verticalPadding;
+    _baseline = height - verticalPadding;
   }
 }
 
@@ -70,7 +60,7 @@ void ScrollScreen::setTextInternal(uint8_t fontID) {
 void ScrollScreen::innerDisplay() {
   auto& mtx = Display.mtx;
 
-  Display.fillWith(Theme::Color_BLACK);
+  mtx->fillScreen(Theme::Color_BLACK);
   mtx->setCursor((_mtxWidth - 1) - _offset, _baseline);
   mtx->print(_text);
   mtx->write();
@@ -78,10 +68,7 @@ void ScrollScreen::innerDisplay() {
 
 void ScrollScreen::display(bool activating) {
   if (activating) {
-// MTX_Display::Region rightHalf = {32, 0, 63, 8};
-// Display.setRegion(rightHalf);
     _mtxWidth = Display.width();
-    _mtxHeight = Display.height();
     innerActivation();
     if (_text.isEmpty() && _autoAdvance) {
       ScreenMgr.moveThroughSequence(true);  // Go to the next screen

@@ -26,8 +26,13 @@ public:
   void processPeriodicActivity();
 
   void init(bool autoAdvance = true, uint32_t delay = 0, uint8_t forceCycles = 0);
-  void setText(String& text, uint8_t fontID = Display.BuiltInFont_ID);
-  void setText(const char* text, uint8_t fontID = Display.BuiltInFont_ID);
+
+  template<typename T>
+  void setText(T&& text, uint8_t fontID = Display.BuiltInFont_ID) {
+    _text = std::forward<T>(text);
+    setTextInternal(fontID);
+  }
+
   void goHomeWhenComplete(bool goHome) { _goHome = goHome; }
 
   virtual void innerActivation() {};
@@ -47,7 +52,6 @@ private:
 
   uint16_t _offset = 0;
   uint16_t _mtxWidth;
-  uint16_t _mtxHeight;
   bool _autoAdvance = true;
 
   uint32_t _delayBetweenFrames = 20;

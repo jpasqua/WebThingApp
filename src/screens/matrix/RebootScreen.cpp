@@ -44,7 +44,7 @@ void RebootScreen::innerActivation() {
   uint16_t w = Display.width();
   uint16_t h = Display.height();
   if (nButtonMappings == 0) {
-    Display.fillWith(Theme::Color_BLACK);
+    mtx->fillScreen(Theme::Color_BLACK);
     Display.drawStringInRegion(
       "Reset", Display.BuiltInFont_ID, Display.MC_Align,
       0, h, w, h, w/2, h/2,  Theme::Color_WHITE, Theme::Color_BLACK);
