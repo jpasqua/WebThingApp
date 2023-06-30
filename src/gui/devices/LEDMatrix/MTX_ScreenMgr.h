@@ -30,12 +30,18 @@ public:
   MTX_ScreenMgr() = default;
   ~MTX_ScreenMgr() = default;
 
+  virtual void displayInfoScreen() override;
+
   virtual void device_setup() override;
   virtual void device_processInput() override;
-  virtual void device_changingScreens() override;
+  virtual void device_changingScreens(Screen* screen) override;
+  virtual void device_processPeriodicActivity() override;
+
   virtual void showActivityIcon(uint16_t accentColor, char symbol = 'i') override;
   virtual void hideActivityIcon() override;
 
+  // MTX-Specific functions
+  void enableTwoLineOperation(Screen* fixedScreen);
 
 private:
   static constexpr uint16_t AI_Size = 8;
@@ -50,6 +56,9 @@ private:
 
   AnimationState animationState;
   uint8_t savedPixels[SavedPixelsSize];
+
+  Screen* _fixedScreen = nullptr;
+  bool _fixedScreenDisplayed = false;
 };
 
 extern MTX_ScreenMgr ScreenMgr;

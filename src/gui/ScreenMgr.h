@@ -43,6 +43,7 @@ public:
   void display(String name);
   void display(Screen* screen);
   void displayHomeScreen();
+  virtual void displayInfoScreen() {}
   void refresh();
   void setBrightness(uint8_t b); // Respects screen blanking
 
@@ -94,8 +95,9 @@ protected:
 
   virtual void device_setup() = 0;
   virtual void device_processInput() = 0;
-  virtual void device_changingScreens() { }
-  
+  virtual void device_changingScreens(Screen* screen) { (void)screen; }
+  virtual void device_processPeriodicActivity() { }
+
   // ----- Data Members
   Screen*   _curScreen;
   Screen*   _homeScreen;

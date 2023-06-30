@@ -102,6 +102,7 @@ void BaseScreenMgr::loop() {
   }
 
   _curScreen->processPeriodicActivity();
+  device_processPeriodicActivity();
 }
 
 Screen* BaseScreenMgr::screenFromName(String& name) {
@@ -137,7 +138,7 @@ void BaseScreenMgr::display(String name) {
 
 void BaseScreenMgr::display(Screen* screen) {
   _curScreen = screen;
-  device_changingScreens();
+  device_changingScreens(screen);
   screen->activate();
 }
 
@@ -297,4 +298,6 @@ void BaseScreenMgr::reconcileScreenSequence(ScreenSettings& screenSettings) {
       // Log.verbose("Adding %s to the screenSequence", screen->name.c_str());
     }
   }
+  _curSequenceIndex = sequence.size()-1;
+    // Start at the end so the first call to moveThroughSequence() will begin at 0
 }

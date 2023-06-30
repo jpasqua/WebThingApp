@@ -64,7 +64,11 @@ WTAppImpl::WTAppImpl(const String& name, const String& prefix, const String& ver
   // Nothing to do here...
 }
 
-void WTAppImpl::begin(bool respectPowerSettings, Basics::Pin SDA, Basics::Pin SCL) {
+void WTAppImpl::begin(
+    bool respectPowerSettings,
+    Basics::Pin SDA, Basics::Pin SCL,
+    bool startWithInfoScreen)
+{
   WebThing::preSetup(SDA, SCL);                 // Must be first
 
   settings->init(SettingsFileName);
@@ -94,7 +98,8 @@ void WTAppImpl::begin(bool respectPowerSettings, Basics::Pin SDA, Basics::Pin SC
 
   conditionalUpdate(true);
 
-  ScreenMgr.displayHomeScreen();
+  if (startWithInfoScreen) ScreenMgr.displayInfoScreen();
+  else ScreenMgr.displayHomeScreen();
 
   WebThing::postSetup();                // Must be last
 

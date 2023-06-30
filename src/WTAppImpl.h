@@ -38,7 +38,10 @@ public:
   void updateAllData();
 
   // ----- Functions that aren't provided by subclasses
-  void begin(bool respectPowerSettings = false, int SDA = Basics::UnusedPin, int SCL = Basics::UnusedPin);
+  void begin(
+      bool respectPowerSettings = false,
+      int SDA = Basics::UnusedPin, int SCL = Basics::UnusedPin,
+      bool startWithInfoScreen = false);
   void loop();
 
   // ----- Functions that *must* be provided by subclasses

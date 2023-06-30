@@ -3,6 +3,11 @@
 
 #include "../../ScreenMgr.h"
 
+static constexpr int FixedLine = 0;
+static constexpr int DynamicLine = 1;
+
+void MTX_ScreenMgr::displayInfoScreen() { display("Info"); }
+
 void MTX_ScreenMgr::device_setup() {
   Display.begin(_displayOptions);
   initActivityIcon();
@@ -13,9 +18,46 @@ void MTX_ScreenMgr::device_processInput() {
   // is nothing to do here.
 }
 
-void MTX_ScreenMgr::device_changingScreens() {
-  // If the screen is on, reset it to ensure a good state
-  if (Display.getBrightness()) Display.mtx->reset();
+static uint32_t nextDisplayReset = 0;
+constexpr uint32_t DisplayResetInterval = Basics::minutesToMS(5);
+
+void MTX_ScreenMgr::device_changingScreens(Screen* screen) {
+  uint32_t curMillis = millis();
+  if (curMillis > nextDisplayReset) {
+    // Periodically reset the display to get rid of any cruft
+    if (Display.getBrightness()) Display.mtx->reset();
+    nextDisplayReset = curMillis + DisplayResetInterval;
+  }
+
+  if (_fixedScreen) {
+    if (_fixedScreenDisplayed || !screen->special) {
+      Display.mtx->focusOnLine(FixedLine);
+      _fixedScreen->display(true);
+      _fixedScreenDisplayed = true;
+      Display.mtx->focusOnLine(DynamicLine);
+    } 
+  }
+}
+
+void MTX_ScreenMgr::device_processPeriodicActivity() {
+  if (_fixedScreen && _fixedScreenDisplayed) {
+    Display.mtx->focusOnLine(FixedLine);
+    _fixedScreen->processPeriodicActivity();
+    Display.mtx->focusOnLine(DynamicLine);
+  }
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * Functions that are specific to DEVICE_TYPE_MTX
+ *
+ *----------------------------------------------------------------------------*/
+
+void MTX_ScreenMgr::enableTwoLineOperation(Screen* fixedScreen) {
+  _fixedScreen = fixedScreen;
+  if (!_fixedScreen) return;
+  Display.mtx->focusOnLine(DynamicLine);
 }
 
 
@@ -28,6 +70,8 @@ void MTX_ScreenMgr::device_changingScreens() {
 #include <Ticker.h>
 Ticker aiAnimationTicker;
 
+static int previouslyActiveLine;
+
 void animateAI(AnimationState* state) {
   Display.mtx->drawPixel(state->x, state->y - state->pos, state->inc < 0 ? 0 : 1);
   Display.mtx->write();
@@ -38,6 +82,8 @@ void animateAI(AnimationState* state) {
 
 void MTX_ScreenMgr::showActivityIcon(uint16_t, char symbol) {
   if (animationState.aiDisplayed) return;
+
+  previouslyActiveLine = Display.mtx->swapFocus(DynamicLine);
   saveBits();
   Display.setFont(Display.BuiltInFont_ID);
 
@@ -56,7 +102,9 @@ void MTX_ScreenMgr::hideActivityIcon() {
   aiAnimationTicker.detach();
   restoreBits();
   animationState.aiDisplayed = false;
+  Display.mtx->focusOnLine(previouslyActiveLine);
 }
+
 
 /*------------------------------------------------------------------------------
  *
