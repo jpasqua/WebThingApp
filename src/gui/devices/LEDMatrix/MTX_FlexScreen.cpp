@@ -31,11 +31,11 @@ void FlexScreen::prepForDisplay() {
   }
   _textWidth = Display.getTextWidth(_text, _fontID);
 
-  uint16_t verticalPadding = (Display.mtx->height() - Display.getFontHeight(_fontID))/2;
+  uint16_t verticalPadding = (Display.height() - Display.getFontHeight(_fontID))/2;
   if (_fontID == 0) { // Built-in font
     _baseline = verticalPadding;
   } else {
-    _baseline = Display.mtx->height() - verticalPadding;
+    _baseline = Display.height() - verticalPadding;
   }
 
   Display.setFont(_fontID);
