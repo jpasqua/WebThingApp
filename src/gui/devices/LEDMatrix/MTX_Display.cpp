@@ -65,7 +65,7 @@ void MTX_Display::fillXOrientation(int& displayNum, int displayInc, int xStart, 
   int xInc = xStart > xStop ? -1 : 1;
   for (int x = xStart; x != xStop; x += xInc) {
     mtx->setPosition(displayNum, x, y);
-    // Serial.printf("setPos(%d, %d, %d)\n", displayNum, x, y);
+    // Serial.printf("setPos(%d, %d, %d), orientation = %d\n", displayNum, x, y, orientation);
     mtx->setRotation(displayNum, orientation);
     displayNum += displayInc;
   }
@@ -78,6 +78,7 @@ void MTX_Display::setOrientation(bool flipped) {
   int orientation =  flipped ? 3 : 1;
   int reverseOrientation = orientation == 1 ? 3: 1;
 
+  // Serial.printf("zigZag = %d, flipped = %d\n", deviceOptions->zigZag, flipped);
   if (deviceOptions->zigZag || deviceOptions->vDisplays == 1) {
     for (int y = 0; y < deviceOptions->vDisplays; y++) {
       for (int x = 0; x < deviceOptions->hDisplays; x++) {
@@ -94,8 +95,8 @@ void MTX_Display::setOrientation(bool flipped) {
       }
     } else {  // !zigZag && !flipped
       for (int y = deviceOptions->vDisplays - 1; y >= 0; y--) {
-        if (y % 2) fillXOrientation(displayNum, displayInc, deviceOptions->hDisplays-1, -1, y, reverseOrientation);
-        else fillXOrientation(displayNum, displayInc, 0, deviceOptions->hDisplays, y, orientation);
+        if (y % 2) fillXOrientation(displayNum, displayInc, 0, deviceOptions->hDisplays, y, orientation);
+        else fillXOrientation(displayNum, displayInc, deviceOptions->hDisplays-1, -1, y, reverseOrientation); 
       }
     }
   }
