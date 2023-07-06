@@ -25,6 +25,7 @@ public:
   Basics::Pin clkPin;   // CLK Pin
   uint8_t hDisplays;    // Number of horizontal displays
   uint8_t vDisplays;    // Number of vertical displays
+  bool zigZag;
 };
 
 class MTX_Display : public BaseDisplay {
@@ -92,6 +93,9 @@ public:
 
 protected:
   virtual void device_begin() override;
+
+private:
+  void fillXOrientation(int& displayNum, int displayInc, int xStart, int xStop, int y, int orientation);
 };
 
 extern MTX_Display Display;

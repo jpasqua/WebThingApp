@@ -61,17 +61,42 @@ Log.verbose("MTX_Display::setBrightness: deviceBrightness = %d, _brightness = %d
   mtx->setIntensity(deviceBrightness);
 }
 
+void MTX_Display::fillXOrientation(int& displayNum, int displayInc, int xStart, int xStop, int y, int orientation) {
+  int xInc = xStart > xStop ? -1 : 1;
+  for (int x = xStart; x != xStop; x += xInc) {
+    mtx->setPosition(displayNum, x, y);
+    // Serial.printf("setPos(%d, %d, %d)\n", displayNum, x, y);
+    mtx->setRotation(displayNum, orientation);
+    displayNum += displayInc;
+  }
+}
+
 void MTX_Display::setOrientation(bool flipped) {
   int nDisplays = deviceOptions->hDisplays * deviceOptions->vDisplays;
-  int start = flipped ? (nDisplays - 1) : 0;
-  int increment = flipped ? -1 : 1;
+  int displayNum = flipped ? (nDisplays - 1) : 0;
+  int displayInc = flipped ? -1 : 1;
   int orientation =  flipped ? 3 : 1;
+  int reverseOrientation = orientation == 1 ? 3: 1;
 
-  for (int y = 0; y < deviceOptions->vDisplays; y++) {
-    for (int x = 0; x < deviceOptions->hDisplays; x++) {
-        mtx->setPosition(start, x, y);
-        mtx->setRotation(start, orientation);
-        start += increment;
+  if (deviceOptions->zigZag || deviceOptions->vDisplays == 1) {
+    for (int y = 0; y < deviceOptions->vDisplays; y++) {
+      for (int x = 0; x < deviceOptions->hDisplays; x++) {
+        mtx->setPosition(displayNum, x, y);
+        mtx->setRotation(displayNum, orientation);
+        displayNum += displayInc;
+      }
+    }
+  } else {
+    if (flipped) {  // !zigZag && flipped
+      for (int y = 0; y < deviceOptions->vDisplays; y++){
+        if (y % 2) fillXOrientation(displayNum, displayInc, 0, deviceOptions->hDisplays,    y, orientation);
+        else fillXOrientation(displayNum, displayInc, deviceOptions->hDisplays-1, -1, y, reverseOrientation);
+      }
+    } else {  // !zigZag && !flipped
+      for (int y = deviceOptions->vDisplays - 1; y >= 0; y--) {
+        if (y % 2) fillXOrientation(displayNum, displayInc, deviceOptions->hDisplays-1, -1, y, reverseOrientation);
+        else fillXOrientation(displayNum, displayInc, 0, deviceOptions->hDisplays, y, orientation);
+      }
     }
   }
 
