@@ -109,7 +109,7 @@ void MTX_Display::setOrientation(bool flipped) {
 }
 
 void MTX_Display::streamScreenShotAsBMP(Stream &s) {
-  int previouslyActiveLine = mtx->swapFocus(-1);
+  int previouslyActiveLine = mtx->swapFocus(Max72xxPanel::NoFocus);
   // Adapted from https://forum.arduino.cc/index.php?topic=406416.0
   byte hiByte, loByte;
 
