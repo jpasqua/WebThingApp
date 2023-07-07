@@ -224,7 +224,7 @@ namespace WebUIHelper {
     void yieldScreenShot() {
       auto action = []() {
         WebUI::sendArbitraryContent(
-            "image/bmp", Display.ScreenShotSize, 
+            "image/bmp", Display.screenShotSize(), 
             [](Stream& s) { Display.streamScreenShotAsBMP(s); });
       };
       WebUI::wrapWebAction("/dev/screenShot", action, false);

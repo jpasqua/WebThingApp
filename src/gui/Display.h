@@ -45,6 +45,7 @@ public:
   void begin(DisplayOptions* displayOptions) {
     _options = displayOptions;
     device_begin();
+    _screenShotSize = 2ul * width() * height() + 54; // 16bpp buffer + 54 byte header
   }
 
   // ----- Brightness control -----
@@ -68,6 +69,7 @@ public:
   
   // ----- Screenshot functionality
   virtual void streamScreenShotAsBMP(Stream &s) = 0;
+  uint32_t screenShotSize() { return _screenShotSize; };
 
 
 protected:
@@ -76,6 +78,7 @@ protected:
 
   uint8_t _brightness = 0;     // 0-100
   DisplayOptions* _options;
+  uint32_t _screenShotSize;
 };
 
 #include "devices/DeviceSelect.h"

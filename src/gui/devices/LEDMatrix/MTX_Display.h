@@ -48,8 +48,6 @@ public:
   static constexpr uint16_t Height = 8;
   static constexpr uint16_t XCenter = Width/2;
   static constexpr uint16_t YCenter = Height/2;
-  static constexpr uint32_t ScreenShotSize = 2ul * Width * Height + 54;
-                              // Pixel Buffer size + a 54 byte header
 
   // ----- Constructors
   MTX_Display() = default;
